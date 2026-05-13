@@ -20,7 +20,7 @@ import akiib         from '../assets/artists/akiib.jpg';
 import bellaShmurda  from '../assets/artists/bella-shmurda.jpg';
 import dremo         from '../assets/artists/dremo.jpg';
 import zinoleesky    from '../assets/artists/zinoleesky.jpg';
-import youngzy       from '../assets/artists/youngzy.png';
+import youngzy       from '../assets/artists/youngzy.jpg';
 import raybekah      from '../assets/artists/raybekah.jpg';
 
 // general
