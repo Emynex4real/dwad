@@ -41,9 +41,9 @@ export default function PromotionPage() {
       />
 
       {/* ── HOW IT WORKS ── */}
-      <section style={{ padding: '120px 56px' }}>
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ How it works</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -56,7 +56,7 @@ export default function PromotionPage() {
             </p>
           </div>
 
-          <div className="grid gap-8 max-[800px]:grid-cols-1" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div className="grid gap-6 grid-cols-1 min-[800px]:grid-cols-3">
             {steps.map(s => (
               <div
                 key={s.num}
@@ -86,11 +86,11 @@ export default function PromotionPage() {
       </section>
 
       {/* ── BUNDLE CTA ── */}
-      <section style={{ padding: '80px 56px' }}>
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
           <div
-            className="cta-card relative border overflow-hidden grid gap-20 items-center max-[900px]:grid-cols-1 max-[900px]:p-8"
-            style={{ padding: '96px 56px', background: 'var(--color-bg-2)', borderColor: 'var(--color-line)', gridTemplateColumns: '1fr 1fr' }}
+            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
+            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
           >
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Bundle</div>
@@ -127,9 +127,9 @@ export default function PromotionPage() {
       </section>
 
       {/* ── CHANNELS ── */}
-      <section style={{ padding: '80px 56px 120px' }}>
+      <section className="py-12 sm:py-20 pb-16 sm:pb-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Channels</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -142,14 +142,14 @@ export default function PromotionPage() {
             </p>
           </div>
           <div
-            className="grid border-t max-[900px]:grid-cols-2 max-[500px]:grid-cols-1"
-            style={{ gridTemplateColumns: 'repeat(4, 1fr)', borderColor: 'var(--color-line)' }}
+            className="grid border-t grid-cols-1 min-[500px]:grid-cols-2 min-[900px]:grid-cols-4"
+            style={{ borderColor: 'var(--color-line)' }}
           >
             {channels.map((c, i) => (
               <div
                 key={c.num}
-                className={`flex flex-col justify-between border-b border-r min-h-[220px] ${i === channels.length - 1 ? 'border-r-0' : ''}`}
-                style={{ padding: '40px 32px', borderColor: 'var(--color-line)' }}
+                className={`flex flex-col justify-between border-b border-r min-h-[220px] ${i === channels.length - 1 ? 'min-[900px]:border-r-0' : ''}`}
+                style={{ padding: '32px 24px', borderColor: 'var(--color-line)' }}
               >
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-gold)', letterSpacing: '0.2em' }}>{c.num}</div>
                 <div>

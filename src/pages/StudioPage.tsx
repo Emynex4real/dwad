@@ -25,9 +25,9 @@ export default function StudioPage() {
       />
 
       {/* Two-col */}
-      <section style={{ padding: '120px 56px' }}>
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-20 items-start max-[900px]:grid-cols-1 max-[900px]:gap-10" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid gap-10 sm:gap-20 items-start grid-cols-1 min-[900px]:grid-cols-2">
             {/* Sticky left */}
             <div style={{ position: 'sticky', top: '120px' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ The room</div>
@@ -75,9 +75,9 @@ export default function StudioPage() {
       </section>
 
       {/* Services list */}
-      <section style={{ padding: '80px 56px' }}>
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Capabilities</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -92,14 +92,27 @@ export default function StudioPage() {
             {services.map(s => (
               <li
                 key={s.idx}
-                className="linklist-item grid gap-6 py-7 border-b items-center cursor-pointer transition-all duration-250"
-                style={{ gridTemplateColumns: '70px 1fr auto', borderColor: 'var(--color-line)', paddingLeft: '0' }}
+                className="linklist-item py-6 sm:py-7 border-b cursor-pointer transition-all duration-250"
+                style={{ borderColor: 'var(--color-line)' }}
               >
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.2em' }}>{s.idx}</span>
-                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 3vw, 40px)', fontWeight: 400 }}>
-                  {s.title} <span className="italic" style={{ color: 'var(--color-gold-2)' }}>{s.italic}</span>
-                </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{s.meta}</span>
+                {/* Mobile layout */}
+                <div className="flex items-start gap-4 sm:hidden">
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.2em', minWidth: '28px', paddingTop: '6px' }}>{s.idx}</span>
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(22px, 5vw, 40px)', fontWeight: 400 }}>
+                      {s.title} <span className="italic" style={{ color: 'var(--color-gold-2)' }}>{s.italic}</span>
+                    </div>
+                    <div className="mt-1" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{s.meta}</div>
+                  </div>
+                </div>
+                {/* Desktop layout */}
+                <div className="hidden sm:grid gap-6 items-center" style={{ gridTemplateColumns: '70px 1fr auto' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.2em' }}>{s.idx}</span>
+                  <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 3vw, 40px)', fontWeight: 400 }}>
+                    {s.title} <span className="italic" style={{ color: 'var(--color-gold-2)' }}>{s.italic}</span>
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{s.meta}</span>
+                </div>
               </li>
             ))}
           </ul>

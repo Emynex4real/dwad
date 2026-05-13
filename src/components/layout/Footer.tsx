@@ -7,19 +7,15 @@ export default function Footer() {
 
   return (
     <footer
-      className="border-t"
+      className="border-t pt-16 sm:pt-24 px-5 sm:px-14 pb-10"
       style={{
         background: 'var(--color-bg)',
         borderColor: 'var(--color-line)',
-        padding: '96px 56px 40px',
       }}
     >
       <div className="max-w-[1440px] mx-auto">
         {/* Grid */}
-        <div
-          className="grid gap-16 max-[800px]:grid-cols-2 max-[800px]:gap-10"
-          style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}
-        >
+        <div className="grid grid-cols-1 min-[500px]:grid-cols-2 min-[800px]:grid-cols-4 gap-10 sm:gap-16">
           {/* Studio */}
           <div>
             <h5
@@ -188,7 +184,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div
-          className="mt-10 pt-6 border-t flex justify-between items-center"
+          className="mt-10 pt-6 border-t flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center"
           style={{
             borderColor: 'var(--color-line)',
             fontFamily: 'var(--font-mono)',

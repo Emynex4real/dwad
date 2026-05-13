@@ -8,11 +8,8 @@ interface PageHeroProps {
 export default function PageHero({ crumb, title, italic, lede }: PageHeroProps) {
   return (
     <section
-      className="border-b relative overflow-hidden"
-      style={{
-        padding: '180px 56px 80px',
-        borderColor: 'var(--color-line)',
-      }}
+      className="border-b relative overflow-hidden pt-32 pb-14 px-5 sm:pt-[180px] sm:pb-20 sm:px-14"
+      style={{ borderColor: 'var(--color-line)' }}
     >
       <div className="max-w-[1440px] mx-auto">
         <div
@@ -31,7 +28,7 @@ export default function PageHero({ crumb, title, italic, lede }: PageHeroProps) 
           style={{
             fontFamily: 'var(--font-serif)',
             fontWeight: 400,
-            fontSize: 'clamp(56px, 7vw, 132px)',
+            fontSize: 'clamp(48px, 7vw, 132px)',
             lineHeight: 0.94,
             letterSpacing: '-0.02em',
             maxWidth: '14ch',

@@ -22,7 +22,7 @@ export default function DistroPage() {
   return (
     <div className="page-enter">
 
-      {/* ── DISTRO HERO — full visual with the distribution network image ── */}
+      {/* ── DISTRO HERO ── */}
       <section
         className="relative overflow-hidden border-b flex items-end"
         style={{ minHeight: '80vh', borderColor: 'var(--color-line)' }}
@@ -33,12 +33,11 @@ export default function DistroPage() {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: 'center top' }}
         />
-        {/* dark gradient so text reads clearly */}
         <div
           className="absolute inset-0"
           style={{ background: 'linear-gradient(180deg, rgba(11,9,7,0.35) 0%, rgba(11,9,7,0.82) 100%)' }}
         />
-        <div className="relative z-10 max-w-[1440px] mx-auto w-full" style={{ padding: '0 56px 80px' }}>
+        <div className="relative z-10 max-w-[1440px] mx-auto w-full px-5 sm:px-14 pb-20">
           <div
             style={{
               fontFamily: 'var(--font-mono)',
@@ -55,7 +54,7 @@ export default function DistroPage() {
             style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 400,
-              fontSize: 'clamp(56px, 7vw, 132px)',
+              fontSize: 'clamp(48px, 7vw, 132px)',
               lineHeight: 0.94,
               letterSpacing: '-0.02em',
               maxWidth: '12ch',
@@ -83,9 +82,9 @@ export default function DistroPage() {
       </section>
 
       {/* Two-col */}
-      <section style={{ padding: '120px 56px' }}>
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-20 items-start max-[900px]:grid-cols-1 max-[900px]:gap-10" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid gap-10 sm:gap-20 items-start grid-cols-1 min-[900px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Why distribute with Dwad</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -111,8 +110,8 @@ export default function DistroPage() {
               {features.map(f => (
                 <li
                   key={f.idx}
-                  className="grid gap-6 py-7 border-b items-center"
-                  style={{ gridTemplateColumns: '60px 1fr auto', borderColor: 'var(--color-line)' }}
+                  className="grid gap-4 sm:gap-6 py-7 border-b items-center grid-cols-[40px_1fr_auto] sm:grid-cols-[60px_1fr_auto]"
+                  style={{ borderColor: 'var(--color-line)' }}
                 >
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-gold)', letterSpacing: '0.2em' }}>{f.idx}</span>
                   <span>
@@ -128,9 +127,9 @@ export default function DistroPage() {
       </section>
 
       {/* Pillars */}
-      <section style={{ padding: '80px 56px' }}>
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Pillars</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -142,14 +141,14 @@ export default function DistroPage() {
             </p>
           </div>
           <div
-            className="grid border-t max-[900px]:grid-cols-2 max-[500px]:grid-cols-1"
-            style={{ gridTemplateColumns: 'repeat(4, 1fr)', borderColor: 'var(--color-line)' }}
+            className="grid border-t grid-cols-1 min-[500px]:grid-cols-2 min-[900px]:grid-cols-4"
+            style={{ borderColor: 'var(--color-line)' }}
           >
             {pillars.map((p, i) => (
               <div
                 key={p.num}
-                className={`flex flex-col justify-between border-b border-r min-h-[220px] ${i === pillars.length - 1 ? 'border-r-0' : ''}`}
-                style={{ padding: '40px 32px', borderColor: 'var(--color-line)' }}
+                className={`flex flex-col justify-between border-b border-r min-h-[220px] ${i === pillars.length - 1 ? 'min-[900px]:border-r-0' : ''}`}
+                style={{ padding: '32px 24px', borderColor: 'var(--color-line)' }}
               >
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-gold)', letterSpacing: '0.2em' }}>{p.num}</div>
                 <div>
@@ -163,9 +162,9 @@ export default function DistroPage() {
       </section>
 
       {/* Catalogue */}
-      <section style={{ padding: '120px 56px' }}>
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Catalogue</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -176,15 +175,13 @@ export default function DistroPage() {
               A selection of recent releases live across all major DSPs.
             </p>
           </div>
-          <div className="grid gap-6 max-[1100px]:grid-cols-3 max-[800px]:grid-cols-2 max-[480px]:grid-cols-1" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+          <div className="grid gap-6 grid-cols-2 min-[800px]:grid-cols-3 min-[1100px]:grid-cols-4">
             {PROJECTS.map((p, i) => <ProjectCard key={i} project={p} idx={i} />)}
           </div>
         </div>
       </section>
 
-
       <Ticker items={['Apple Music', 'Spotify', 'Boomplay', 'Audiomack', 'TikTok', 'Tidal', 'Deezer', 'YouTube Music', 'Amazon', 'Pandora']} />
     </div>
   );
 }
-

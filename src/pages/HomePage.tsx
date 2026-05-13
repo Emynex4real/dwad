@@ -13,15 +13,9 @@ export default function HomePage() {
     <div className="page-enter">
 
       {/* ── HERO ── */}
-      <section
-        className="relative flex flex-col overflow-hidden min-h-screen"
-        style={{ padding: '140px 56px 56px' }}
-      >
+      <section className="relative flex flex-col overflow-hidden min-h-screen pt-32 pb-14 px-5 sm:pt-[140px] sm:pb-14 sm:px-14">
         <div className="max-w-[1440px] w-full mx-auto">
-          <div
-            className="grid gap-20 flex-1 items-end max-[980px]:grid-cols-1 max-[980px]:gap-10"
-            style={{ gridTemplateColumns: '1fr 1.2fr' }}
-          >
+          <div className="grid gap-10 min-[980px]:gap-20 flex-1 items-end grid-cols-1 min-[980px]:grid-cols-[1fr_1.2fr]">
             {/* Left */}
             <div>
               <div
@@ -41,7 +35,7 @@ export default function HomePage() {
                 style={{
                   fontFamily: 'var(--font-serif)',
                   fontWeight: 400,
-                  fontSize: 'clamp(72px, 11vw, 200px)',
+                  fontSize: 'clamp(60px, 11vw, 200px)',
                   lineHeight: 0.92,
                   letterSpacing: '-0.02em',
                 }}
@@ -89,7 +83,7 @@ export default function HomePage() {
 
           {/* Stats */}
           <div
-            className="flex gap-12 items-end flex-wrap mt-16 pt-7 border-t"
+            className="grid grid-cols-2 min-[600px]:grid-cols-4 gap-6 sm:gap-12 mt-16 pt-7 border-t"
             style={{ borderColor: 'var(--color-line)' }}
           >
             {[
@@ -98,7 +92,7 @@ export default function HomePage() {
               { k: '1.2K+', l: 'Releases Shipped' },
               { k: '24/7', l: 'Human Support' },
             ].map(stat => (
-              <div key={stat.l} className="flex-1">
+              <div key={stat.l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '38px', color: 'var(--color-gold-2)', fontWeight: 300 }}>
                   {stat.k}
                 </div>
@@ -115,12 +109,9 @@ export default function HomePage() {
       <Marquee items={['Distribution', 'Production', 'Promotion', 'Spotlight', 'Graphics', 'Radio']} />
 
       {/* ── SERVICES ── */}
-      <section style={{ padding: '120px 56px' }}>
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div
-            className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6 max-[820px]:mb-10"
-            style={{ gridTemplateColumns: '1fr 1fr' }}
-          >
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ 01 — Our craft</div>
               <h2
@@ -138,21 +129,21 @@ export default function HomePage() {
 
           {/* Services grid */}
           <div
-            className="grid border-t border-l max-[820px]:grid-cols-1"
-            style={{ gridTemplateColumns: 'repeat(2, 1fr)', borderColor: 'var(--color-line)' }}
+            className="grid border-t border-l grid-cols-1 min-[820px]:grid-cols-2"
+            style={{ borderColor: 'var(--color-line)' }}
           >
             {SERVICES.map(s => (
               <div
                 key={s.slug}
-                className="service-card relative border-r border-b flex flex-col justify-between overflow-hidden cursor-pointer min-h-[360px] transition-colors duration-[350ms] hover:bg-[var(--color-bg-2)]"
-                style={{ padding: '56px 44px', borderColor: 'var(--color-line)' }}
+                className="service-card relative border-r border-b flex flex-col justify-between overflow-hidden cursor-pointer min-h-[320px] sm:min-h-[360px] transition-colors duration-[350ms] hover:bg-[var(--color-bg-2)]"
+                style={{ padding: '40px 28px', borderColor: 'var(--color-line)' }}
                 onClick={() => navigate(`/${s.slug}`)}
               >
                 <div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)' }}>{s.num} / 04</div>
                   <h3
                     className="mt-6"
-                    style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 56px)', lineHeight: 1, letterSpacing: '-0.01em' }}
+                    style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(32px, 4vw, 56px)', lineHeight: 1, letterSpacing: '-0.01em' }}
                   >
                     {s.title}
                     <span className="block italic font-light" style={{ color: 'var(--color-gold-2)' }}>{s.titleItalic}</span>
@@ -174,11 +165,11 @@ export default function HomePage() {
       </section>
 
       {/* ── FREE RADIO CTA ── */}
-      <section style={{ padding: '80px 56px' }}>
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
           <div
-            className="cta-card relative border overflow-hidden grid gap-20 items-center max-[900px]:grid-cols-1 max-[900px]:p-8"
-            style={{ padding: '96px 56px', background: 'var(--color-bg-2)', borderColor: 'var(--color-line)', gridTemplateColumns: '1fr 1fr' }}
+            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
+            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
           >
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ For Dwad Artists</div>
@@ -218,12 +209,9 @@ export default function HomePage() {
       </section>
 
       {/* ── PROJECTS ── */}
-      <section style={{ padding: '120px 56px' }}>
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div
-            className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6"
-            style={{ gridTemplateColumns: '1fr 1fr' }}
-          >
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ 02 — Recent work</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -235,7 +223,7 @@ export default function HomePage() {
               A glimpse of the records we've shipped to streaming this season.
             </p>
           </div>
-          <div className="grid gap-6 max-[1100px]:grid-cols-3 max-[800px]:grid-cols-2 max-[480px]:grid-cols-1" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+          <div className="grid gap-6 grid-cols-2 min-[800px]:grid-cols-3 min-[1100px]:grid-cols-4">
             {PROJECTS.slice(0, 8).map((p, i) => <ProjectCard key={i} project={p} idx={i} />)}
           </div>
           <div className="mt-12 flex justify-center">
@@ -252,8 +240,8 @@ export default function HomePage() {
 
       {/* ── PLATFORMS ── */}
       <div
-        className="flex flex-wrap justify-center items-center gap-14 border-t border-b"
-        style={{ padding: '56px', borderColor: 'var(--color-line)' }}
+        className="flex flex-wrap justify-center items-center gap-8 sm:gap-14 border-t border-b py-10 sm:py-14 px-5 sm:px-14"
+        style={{ borderColor: 'var(--color-line)' }}
       >
         {PLATFORMS.map((p, i) => (
           <div key={i} className="flex items-center gap-3.5" style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '26px', color: 'var(--color-ink-2)' }}>
@@ -264,12 +252,9 @@ export default function HomePage() {
       </div>
 
       {/* ── REVIEWS ── */}
-      <section style={{ padding: '120px 56px' }}>
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div
-            className="grid gap-15 mb-16 items-end max-[820px]:grid-cols-1 max-[820px]:gap-6"
-            style={{ gridTemplateColumns: '1fr 1fr' }}
-          >
+          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ 03 — Word of mouth</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
@@ -281,7 +266,7 @@ export default function HomePage() {
               Three years in. Hundreds of releases. The trust we've built is everything — here's what comes back from the people we work with.
             </p>
           </div>
-          <div className="grid gap-6 max-[800px]:grid-cols-1" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div className="grid gap-6 grid-cols-1 min-[800px]:grid-cols-3">
             {REVIEWS.map((r, i) => (
               <div
                 key={i}

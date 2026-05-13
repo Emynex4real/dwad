@@ -45,11 +45,10 @@ export default function ContactPage() {
         lede="Tell us about your project and a representative will reply within 24 hours. For the fastest response, message us on WhatsApp."
       />
 
-      <section style={{ padding: '120px 56px 160px' }}>
+      <section className="py-16 sm:py-[120px] pb-16 sm:pb-[160px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
           <div
-            className="grid gap-20 items-start max-[900px]:grid-cols-1 max-[900px]:gap-12"
-            style={{ gridTemplateColumns: '1.2fr 1fr' }}
+            className="grid gap-12 sm:gap-20 items-start grid-cols-1 min-[900px]:grid-cols-[1.2fr_1fr]"
           >
             {/* ── Form ── */}
             {sent ? (
@@ -125,7 +124,7 @@ export default function ContactPage() {
                 <div
                   key={item.label}
                   className="border"
-                  style={{ padding: '32px 40px', background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
+                  style={{ padding: '24px 28px', background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
                 >
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>
                     {item.label}
@@ -133,15 +132,15 @@ export default function ContactPage() {
                   {item.href ? (
                     <a
                       href={item.href}
-                      className="block mt-3 transition-colors duration-250 hover:text-[var(--color-gold)]"
-                      style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', fontWeight: 400, lineHeight: 1.1, color: 'var(--color-ink)' }}
+                      className="block mt-3 transition-colors duration-250 hover:text-[var(--color-gold)] break-all"
+                      style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(20px, 3.5vw, 28px)', fontWeight: 400, lineHeight: 1.2, color: 'var(--color-ink)' }}
                     >
                       {item.value}
                     </a>
                   ) : (
                     <div
                       className="mt-3 whitespace-pre-line"
-                      style={{ fontFamily: 'var(--font-serif)', fontSize: item.label === 'Hours' ? '18px' : '32px', fontWeight: 400, lineHeight: 1.3, color: 'var(--color-ink)' }}
+                      style={{ fontFamily: 'var(--font-serif)', fontSize: item.label === 'Hours' ? '18px' : 'clamp(20px, 3.5vw, 28px)', fontWeight: 400, lineHeight: 1.3, color: 'var(--color-ink)' }}
                     >
                       {item.value}
                     </div>
