@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Arrow from '../ui/Arrow';
-import { NAV, logoDark } from '../../data';
+import { NAV, logoWhite } from '../../data';
 
 export default function Topbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -29,13 +29,13 @@ export default function Topbar() {
       <header
         className={`topbar fixed top-0 left-0 right-0 z-[100] flex items-center justify-between${scrolled || menuOpen ? ' solid border-b' : ''}`}
         style={{
-          padding: '18px 20px',
+          padding: '5px 20px',
           borderColor: scrolled || menuOpen ? 'var(--color-line)' : 'transparent',
         }}
       >
         {/* Logo */}
         <button onClick={() => { setMenuOpen(false); navigate('/'); }} className="cursor-pointer flex-shrink-0">
-          <img src={logoDark} alt="Dwad Music" className="h-9 w-auto object-contain" />
+          <img src={logoWhite} alt="Dwad Music" className="h-28 w-28 object-contain" />
         </button>
 
         {/* Desktop nav */}

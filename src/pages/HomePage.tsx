@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import Marquee from '../components/ui/Marquee';
-import Ticker from '../components/ui/Ticker';
 import ProjectCard from '../components/ui/ProjectCard';
-import { SERVICES, PROJECTS, PLATFORMS, REVIEWS } from '../data';
+import { SERVICES, PROJECTS, REVIEWS, HOF_ARTISTS, ARTIST_NAMES } from '../data';
 import mdayHero from '../assets/artists/mday.jpg';
 
 export default function HomePage() {
@@ -28,7 +27,7 @@ export default function HomePage() {
                   color: 'var(--color-gold)',
                 }}
               >
-                ✦ Music House · Est. 2023 · Lagos
+                Your All-in-One Music Growth Platform
               </div>
               <h1
                 className="mb-8"
@@ -40,21 +39,22 @@ export default function HomePage() {
                   letterSpacing: '-0.02em',
                 }}
               >
-                Sound,<br />
-                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>staged</span><br />
-                worldwide.
+                Dwad Music
               </h1>
               <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-                A Lagos-based music house for distribution, production and promotion — placing independent artists on 200+ platforms across 50+ countries.
+                Everything you Need in One Place. From Production to Promotion to Distribution…<br /><br />
+                A full-service music platform built for Independent Artists and Labels worldwide.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
-                <button
-                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)] group"
+                <a
+                  href="https://wa.me/message/VYJP7JFQPZXSN1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
                   style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
-                  onClick={() => navigate('/distro')}
                 >
-                  Distribute a record<Arrow />
-                </button>
+                  Get started today<Arrow />
+                </a>
                 <button
                   className="inline-flex items-center gap-3 border transition-all duration-250 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
                   style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', borderColor: 'var(--color-line-strong)', color: 'var(--color-ink)' }}
@@ -83,14 +83,12 @@ export default function HomePage() {
 
           {/* Stats */}
           <div
-            className="grid grid-cols-2 min-[600px]:grid-cols-4 gap-6 sm:gap-12 mt-16 pt-7 border-t"
+            className="grid grid-cols-2 gap-6 sm:gap-12 mt-16 pt-7 border-t"
             style={{ borderColor: 'var(--color-line)' }}
           >
             {[
-              { k: '200+', l: 'Streaming Platforms' },
-              { k: '50+', l: 'Countries Active' },
-              { k: '1.2K+', l: 'Releases Shipped' },
               { k: '24/7', l: 'Human Support' },
+              { k: '100+', l: 'Countries Active' },
             ].map(stat => (
               <div key={stat.l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '38px', color: 'var(--color-gold-2)', fontWeight: 300 }}>
@@ -106,7 +104,7 @@ export default function HomePage() {
       </section>
 
       {/* ── MARQUEE ── */}
-      <Marquee items={['Distribution', 'Production', 'Promotion', 'Spotlight', 'Graphics', 'Radio']} />
+      <Marquee items={['Music Distribution', 'Music Production', 'Music Promotion', 'Cover Art Graphics', 'Visual Production', 'Project & Talent Management']} />
 
       {/* ── SERVICES ── */}
       <section className="py-16 sm:py-[120px] px-5 sm:px-14">
@@ -118,13 +116,10 @@ export default function HomePage() {
                 className="mt-5"
                 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}
               >
-                Built for the<br />
-                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>independent</span> artist.
+                Built for <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>independent</span><br />
+                artists and labels.
               </h2>
             </div>
-            <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-              Four pillars — one studio. From writing a beat to landing it in editorial rotation, the team handles every step in-house. No middlemen. No bots. Just people who love this work.
-            </p>
           </div>
 
           {/* Services grid */}
@@ -140,7 +135,7 @@ export default function HomePage() {
                 onClick={() => navigate(`/${s.slug}`)}
               >
                 <div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)' }}>{s.num} / 04</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)' }}>{s.num} / 03</div>
                   <h3
                     className="mt-6"
                     style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(32px, 4vw, 56px)', lineHeight: 1, letterSpacing: '-0.01em' }}
@@ -177,31 +172,22 @@ export default function HomePage() {
                 className="mt-4 relative z-[1]"
                 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1 }}
               >
-                Free<br />
-                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>radio</span> submission.
+                Artist<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Spotlight</span>
               </h2>
             </div>
             <div className="relative z-[1]">
               <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-                Every song you distribute or produce with us gets a chance at terrestrial and online radio — submitted, pitched and tracked by our promotions team. No hidden fees.
+                Be featured by the Dwad editorial team — interviews, cover stories and curated drops for artists building real careers.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
                   style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
-                  onClick={() => navigate('/promotion')}
+                  onClick={() => navigate('/spotlight')}
                 >
-                  How it works<Arrow />
+                  Check Spotlight<Arrow />
                 </button>
-                <a
-                  href="https://wa.me/message/VYJP7JFQPZXSN1"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-3 border transition-all duration-250 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
-                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', borderColor: 'var(--color-line-strong)', color: 'var(--color-ink)' }}
-                >
-                  Talk to a rep<Arrow />
-                </a>
               </div>
             </div>
           </div>
@@ -238,18 +224,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PLATFORMS ── */}
-      <div
-        className="flex flex-wrap justify-center items-center gap-8 sm:gap-14 border-t border-b py-10 sm:py-14 px-5 sm:px-14"
-        style={{ borderColor: 'var(--color-line)' }}
-      >
-        {PLATFORMS.map((p, i) => (
-          <div key={i} className="flex items-center gap-3.5" style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '26px', color: 'var(--color-ink-2)' }}>
-            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: 'var(--color-gold)' }} />
-            {p}
-          </div>
-        ))}
-      </div>
 
       {/* ── REVIEWS ── */}
       <section className="py-16 sm:py-[120px] px-5 sm:px-14">
@@ -291,7 +265,53 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Ticker items={['Now Booking 2026', 'Free Radio Pitch', 'Apple Music', 'Spotify', 'Boomplay', 'TikTok', 'Lagos · Worldwide']} />
+      {/* ── HALL OF FAME ── */}
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="flex items-center gap-6 mb-10">
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', whiteSpace: 'nowrap' }}>
+              ✦ Hall of Fame
+            </span>
+            <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
+          </div>
+          <div className="grid gap-4 sm:gap-8 mb-12 items-end grid-cols-1 min-[820px]:grid-cols-2">
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 0.96, letterSpacing: '-0.02em' }}>
+              Artists who've{' '}
+              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>passed through.</span>
+            </h2>
+            <p style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--color-muted)', fontWeight: 300, maxWidth: '480px' }}>
+              A record of notable artists whose music has moved through the Dwad network — distributed, promoted or produced with our team.
+            </p>
+          </div>
+          <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
+            {HOF_ARTISTS.map((a, i) => (
+              <div
+                key={a.name}
+                className="flex items-center gap-4 sm:gap-8"
+                style={{ background: 'var(--color-bg)', padding: '20px 16px' }}
+              >
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="rounded-full overflow-hidden flex-shrink-0 border" style={{ width: '44px', height: '44px', borderColor: 'var(--color-line-strong)' }}>
+                  <img src={a.photo} alt={a.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 32px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.1 }}>
+                    {a.name}
+                  </div>
+                  <div className="mt-1" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.2em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>
+                    {a.role}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Marquee items={ARTIST_NAMES} duration="1200s" fontSize="18px" />
+
     </div>
   );
 }

@@ -49,7 +49,7 @@ export default function ProjectCard({ project, idx }: ProjectCardProps) {
         </button>
       </div>
 
-      <div className="pt-4 flex justify-between items-baseline gap-3">
+      <div className="pt-4">
         <h4
           style={{
             fontFamily: 'var(--font-serif)',
@@ -60,18 +60,6 @@ export default function ProjectCard({ project, idx }: ProjectCardProps) {
         >
           {project.title}
         </h4>
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'var(--color-muted)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {project.year}
-        </span>
       </div>
       <div
         className="mt-1"

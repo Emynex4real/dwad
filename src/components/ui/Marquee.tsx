@@ -1,9 +1,11 @@
 interface MarqueeProps {
   items: string[];
   italic?: boolean;
+  duration?: string;
+  fontSize?: string;
 }
 
-export default function Marquee({ items, italic = true }: MarqueeProps) {
+export default function Marquee({ items, italic = true, duration = '38s', fontSize = 'clamp(36px, 5vw, 72px)' }: MarqueeProps) {
   const content = (
     <span className="inline-flex items-center gap-14">
       {items.map((t, i) => (
@@ -24,9 +26,10 @@ export default function Marquee({ items, italic = true }: MarqueeProps) {
         className="marquee-track inline-flex gap-14"
         style={{
           fontFamily: 'var(--font-serif)',
-          fontSize: 'clamp(36px, 5vw, 72px)',
+          fontSize,
           fontWeight: 300,
           color: 'var(--color-ink)',
+          animationDuration: duration,
         }}
       >
         {content}{content}

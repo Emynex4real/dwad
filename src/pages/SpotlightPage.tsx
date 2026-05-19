@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import Marquee from '../components/ui/Marquee';
 import Ticker from '../components/ui/Ticker';
-import { ROSTER_ARTISTS, HOF_ARTISTS } from '../data';
+import { ROSTER_ARTISTS, HOF_ARTISTS, ARTIST_NAMES } from '../data';
 
 export default function SpotlightPage() {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export default function SpotlightPage() {
         </div>
       </section>
 
-      <Marquee items={['M Day Yor', 'Akiib', 'Chygoda', 'Highness', 'Aden Ultimate', 'Inature', 'Davee Jay']} />
+      <Marquee items={ARTIST_NAMES} />
 
       {/* ══ SECTION 1 — OUR ROSTER ══ */}
       <section className="pt-16 sm:pt-[100px] pb-14 sm:pb-20 px-5 sm:px-14">
@@ -126,10 +126,8 @@ export default function SpotlightPage() {
             {HOF_ARTISTS.map((a, i) => (
               <div
                 key={a.name}
-                className="flex items-center gap-4 sm:gap-8 group cursor-pointer transition-colors duration-250"
+                className="flex items-center gap-4 sm:gap-8"
                 style={{ background: 'var(--color-bg)', padding: '20px 16px' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'var(--color-bg-2)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'var(--color-bg)'; }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
                   {String(i + 1).padStart(2, '0')}
@@ -145,9 +143,6 @@ export default function SpotlightPage() {
                     {a.role}
                   </div>
                 </div>
-                <span className="transition-transform duration-300 group-hover:translate-x-1.5 flex-shrink-0" style={{ color: 'var(--color-gold)' }}>
-                  <Arrow />
-                </span>
               </div>
             ))}
           </div>
