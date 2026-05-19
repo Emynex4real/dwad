@@ -37,7 +37,7 @@ export default function SpotlightPage() {
         </div>
       </section>
 
-      <Marquee items={ARTIST_NAMES} />
+      <Marquee items={ARTIST_NAMES} duration="1200s" fontSize="18px" />
 
       {/* ══ SECTION 1 — OUR ROSTER ══ */}
       <section className="pt-16 sm:pt-[100px] pb-14 sm:pb-20 px-5 sm:px-14">
