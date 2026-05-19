@@ -120,7 +120,7 @@ export default function Footer() {
         <div
           style={{
             fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(80px, 14vw, 220px)',
+            fontSize: 'clamp(60px, 10vw, 200px)',
             letterSpacing: '-0.03em',
             lineHeight: 0.85,
             marginTop: '80px',
