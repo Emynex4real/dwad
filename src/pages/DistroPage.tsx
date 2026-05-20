@@ -1,22 +1,15 @@
 import Arrow from '../components/ui/Arrow';
 import ProjectCard from '../components/ui/ProjectCard';
 import Ticker from '../components/ui/Ticker';
-import { PROJECTS, distroHero } from '../data';
+import { PROJECTS, HOF_ARTISTS } from '../data';
 
 const features = [
   { idx: '01', title: 'Apple, Spotify, Boomplay, TikTok', desc: '200+ stores worldwide, one delivery.' },
-  { idx: '02', title: 'Publishing & lyrics included', desc: 'Sync, mechanicals, lyric upload — all set up for you.' },
-  { idx: '03', title: 'Personal artist dashboard', desc: 'Track streams, royalties and territory data in real time.' },
-  { idx: '04', title: 'Human support, not bots', desc: 'Talk to a real representative, every time.' },
-  { idx: '05', title: 'Free radio submission', desc: 'Every release becomes a candidate for our radio push.' },
+  { idx: '02', title: 'Personal artist dashboard', desc: 'Track streams, royalties and territory data in real time.' },
+  { idx: '03', title: 'Human support, not bots', desc: 'Talk to a real representative, every time.' },
+  { idx: '04', title: 'Free radio submission', desc: 'Every release becomes a candidate for our radio push.' },
 ];
 
-const pillars = [
-  { num: '01', title: 'Free radio support', desc: 'Songs distributed here automatically enter our promotions pipeline for radio pitching.' },
-  { num: '02', title: 'Personal dashboard', desc: 'An artist-only login with real-time streams, payouts and territory breakdowns.' },
-  { num: '03', title: 'Active support', desc: 'WhatsApp + email. Our team is online seven days a week — never an FAQ bot.' },
-  { num: '04', title: 'Easy payments', desc: 'Bank transfer, credit and debit card. Withdraw in your local currency.' },
-];
 
 export default function DistroPage() {
   return (
@@ -24,32 +17,10 @@ export default function DistroPage() {
 
       {/* ── DISTRO HERO ── */}
       <section
-        className="relative overflow-hidden border-b flex items-end"
-        style={{ minHeight: '80vh', borderColor: 'var(--color-line)' }}
+        className="border-b"
+        style={{ borderColor: 'var(--color-line)', padding: 'clamp(60px, 10vw, 160px) 20px clamp(60px, 10vw, 160px)' }}
       >
-        <img
-          src={distroHero}
-          alt="Your global distribution network"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center top' }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, rgba(11,9,7,0.35) 0%, rgba(11,9,7,0.82) 100%)' }}
-        />
-        <div className="relative z-10 max-w-[1440px] mx-auto w-full px-5 sm:px-14 pb-20">
-          <div
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '11px',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: 'var(--color-gold)',
-              marginBottom: '20px',
-            }}
-          >
-            ✦ Service 01
-          </div>
+        <div className="max-w-[1440px] mx-auto w-full px-5 sm:px-14">
           <h1
             style={{
               fontFamily: 'var(--font-serif)',
@@ -76,7 +47,7 @@ export default function DistroPage() {
               maxWidth: '520px',
             }}
           >
-            Upload to Apple Music, Spotify, Boomplay, TikTok and 200+ streaming platforms worldwide. Publishing setup and lyrics included with every release. Real humans, real dashboards, real royalties.
+            Upload to Apple Music, Spotify, Boomplay, TikTok and 200+ streaming platforms worldwide. Real humans, real dashboards, real royalties.
           </p>
         </div>
       </section>
@@ -92,7 +63,7 @@ export default function DistroPage() {
                 <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Two hundred</span> stores.
               </h2>
               <p className="mt-6" style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-                You hand us the master and the artwork — we handle the rest. Metadata, splits, lyrics, publishing, takedowns, and a personal dashboard so you can watch the streams roll in.
+                You hand us the master and the artwork — we handle the rest. Metadata, splits, publishing, takedowns, and a personal dashboard so you can watch the streams roll in.
               </p>
               <div className="mt-8">
                 <a
@@ -126,35 +97,116 @@ export default function DistroPage() {
         </div>
       </section>
 
-      {/* Pillars */}
+      {/* How It Works */}
       <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
-            <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Pillars</div>
-              <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
-                Why<br /><span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>choose</span> us.
-              </h2>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '40px' }}>
+            ✦ How It Works
+          </div>
+          <div className="flex flex-col border-t" style={{ borderColor: 'var(--color-line)' }}>
+            {[
+              { num: '01', text: 'Contact us and send us your music to be distributed.' },
+              { num: '02', text: 'We set up your personal distribution account with your advance dashboard.' },
+              { num: '03', text: 'Your music goes live on all platforms worldwide.' },
+            ].map(step => (
+              <div
+                key={step.num}
+                className="flex items-start gap-8 border-b py-10"
+                style={{ borderColor: 'var(--color-line)' }}
+              >
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--color-gold)', letterSpacing: '0.2em', minWidth: '32px', paddingTop: '4px' }}>
+                  {step.num}
+                </span>
+                <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(22px, 3vw, 36px)', fontWeight: 400, lineHeight: 1.3, color: 'var(--color-ink)' }}>
+                  {step.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bundle */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="flex flex-col"
+            style={{ background: 'var(--color-bg-2)', padding: 'clamp(40px, 6vw, 80px) clamp(28px, 5vw, 72px)', border: '1px solid var(--color-line)' }}
+          >
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '28px' }}>
+              ✦ Bundle
             </div>
-            <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-              A distributor is only as good as the people behind it. Here's what you get when you sign with Dwad.
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 84px)', lineHeight: 1.05, letterSpacing: '-0.015em', maxWidth: '14ch' }}>
+              Distribute<br />
+              + <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>promote</span> together.
+            </h2>
+            <p className="mt-8" style={{ fontSize: '17px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
+              Sign for distribution and your first radio pitch is on us. The most popular path for artists releasing their next single with Dwad.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <a
+                href="https://wa.me/message/VYJP7JFQPZXSN1"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+              >
+                Bundle Distribution<Arrow />
+              </a>
+              <a
+                href="https://wa.me/message/VYJP7JFQPZXSN1"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 transition-colors duration-250 hover:text-[var(--color-gold)]"
+                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', border: '1px solid var(--color-line)', color: 'var(--color-ink)' }}
+              >
+                Talk to a Rep<Arrow />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Hall of Fame */}
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="flex items-center gap-6 mb-10">
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', whiteSpace: 'nowrap' }}>
+              ✦ Hall of Fame
+            </span>
+            <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
+          </div>
+          <div className="grid gap-4 sm:gap-8 mb-12 items-end grid-cols-1 min-[820px]:grid-cols-2">
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 0.96, letterSpacing: '-0.02em' }}>
+              Artists who've{' '}
+              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>passed through.</span>
+            </h2>
+            <p style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--color-muted)', fontWeight: 300, maxWidth: '480px' }}>
+              A record of notable artists whose music has moved through the Dwad network — distributed, promoted or produced with our team.
             </p>
           </div>
-          <div
-            className="grid border-t grid-cols-1 min-[500px]:grid-cols-2 min-[900px]:grid-cols-4"
-            style={{ borderColor: 'var(--color-line)' }}
-          >
-            {pillars.map((p, i) => (
+          <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
+            {HOF_ARTISTS.map((a, i) => (
               <div
-                key={p.num}
-                className={`flex flex-col justify-between border-b border-r min-h-[220px] ${i === pillars.length - 1 ? 'min-[900px]:border-r-0' : ''}`}
-                style={{ padding: '32px 24px', borderColor: 'var(--color-line)' }}
+                key={a.name}
+                className="flex items-center gap-4 sm:gap-8"
+                style={{ background: 'var(--color-bg)', padding: '20px 16px' }}
               >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-gold)', letterSpacing: '0.2em' }}>{p.num}</div>
-                <div>
-                  <h4 className="mt-3.5" style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', lineHeight: 1.1, fontWeight: 400 }}>{p.title}</h4>
-                  <p className="mt-3" style={{ color: 'var(--color-muted)', fontSize: '13px', lineHeight: 1.5 }}>{p.desc}</p>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="rounded-full overflow-hidden flex-shrink-0 border" style={{ width: '44px', height: '44px', borderColor: 'var(--color-line-strong)' }}>
+                  <img src={a.photo} alt={a.name} className="w-full h-full object-cover" />
                 </div>
+                <div className="flex-1 min-w-0">
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 32px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.1 }}>
+                    {a.name}
+                  </div>
+                  <div className="mt-1" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.2em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>
+                    {a.role}
+                  </div>
+                </div>
+                <Arrow />
               </div>
             ))}
           </div>

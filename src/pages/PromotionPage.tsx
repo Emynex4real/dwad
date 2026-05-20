@@ -34,9 +34,9 @@ export default function PromotionPage() {
   return (
     <div className="page-enter">
       <PageHero
-        crumb="✦ Service 03"
-        title="Radio &"
-        italic="promotion."
+        crumb=""
+        title="Music"
+        italic="Promotion."
         lede="Land your record on the right stations, the right playlists and the right feeds. Campaigns built around the territories that move your music, run by people who know the gatekeepers."
       />
 
@@ -162,7 +162,7 @@ export default function PromotionPage() {
         </div>
       </section>
 
-      <Ticker items={['Now Booking', 'Free Radio Pitch', 'Pitch-To-Editorial', 'TikTok Push', 'Lagos · UK · US · ZA']} />
+      <Ticker items={['Available worldwide']} />
     </div>
   );
 }

@@ -95,10 +95,8 @@ export default function Footer() {
             </h5>
             <ul className="list-none">
               {[
-                { href: 'https://www.instagram.com/dwad.music.entertainment/', label: 'Instagram', external: true },
-                { href: 'https://web.facebook.com/DwadMusic/', label: 'Facebook', external: true },
-                { href: '#', label: 'YouTube' },
-                { href: '#', label: 'Boomplay' },
+                { href: 'https://www.instagram.com/dwadmusic.ig/', label: 'Instagram', external: true },
+                { href: 'https://www.facebook.com/DwadMusic', label: 'Facebook', external: true },
               ].map(item => (
                 <li key={item.label} className="mb-3">
                   <a
@@ -148,7 +146,7 @@ export default function Footer() {
           }}
         >
           <span>© 2026 Dwad Music Entertainment · Lagos, Nigeria</span>
-          <span>50+ Countries · 200+ Platforms</span>
+          <span>Available worldwide</span>
         </div>
       </div>
     </footer>

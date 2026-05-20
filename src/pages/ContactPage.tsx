@@ -85,7 +85,19 @@ export default function ContactPage() {
               </div>
             ) : (
               <form
-                onSubmit={e => { e.preventDefault(); setSent(true); }}
+                onSubmit={e => {
+                  e.preventDefault();
+                  const text = [
+                    `*New enquiry from dwadmusic.com*`,
+                    ``,
+                    `*Name:* ${form.name}`,
+                    `*Email:* ${form.email}`,
+                    `*Service:* ${form.service}`,
+                    `*Message:* ${form.message}`,
+                  ].join('\n');
+                  window.open(`https://wa.me/2348030845751?text=${encodeURIComponent(text)}`, '_blank');
+                  setSent(true);
+                }}
                 className="flex flex-col gap-6"
               >
                 <Field label="Your name" value={form.name} onChange={update('name')} placeholder="Artist or band name" />

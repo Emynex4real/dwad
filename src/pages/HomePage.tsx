@@ -71,13 +71,6 @@ export default function HomePage() {
               style={{ aspectRatio: '4 / 5', background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
             >
               <img src={mdayHero} alt="M Day Yor" className="w-full h-full object-cover" />
-              <div
-                className="absolute bottom-5 left-5 right-5 z-[2] flex justify-between items-end"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-ink)' }}
-              >
-                <span>Vol. 04 · Cover</span>
-                <span>2026</span>
-              </div>
             </div>
           </div>
 
@@ -111,7 +104,6 @@ export default function HomePage() {
         <div className="max-w-[1440px] mx-auto">
           <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ 01 — Our craft</div>
               <h2
                 className="mt-5"
                 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}
@@ -135,7 +127,6 @@ export default function HomePage() {
                 onClick={() => navigate(`/${s.slug}`)}
               >
                 <div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)' }}>{s.num} / 03</div>
                   <h3
                     className="mt-6"
                     style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(32px, 4vw, 56px)', lineHeight: 1, letterSpacing: '-0.01em' }}
@@ -199,14 +190,13 @@ export default function HomePage() {
         <div className="max-w-[1440px] mx-auto">
           <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ 02 — Recent work</div>
-              <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
                 Released<br />
                 <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>through</span> Dwad.
               </h2>
             </div>
             <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-              A glimpse of the records we've shipped to streaming this season.
+              A glimpse of some records we've shipped to streaming recently.
             </p>
           </div>
           <div className="grid gap-6 grid-cols-2 min-[800px]:grid-cols-3 min-[1100px]:grid-cols-4">
@@ -230,8 +220,7 @@ export default function HomePage() {
         <div className="max-w-[1440px] mx-auto">
           <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ 03 — Word of mouth</div>
-              <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
                 What our<br />
                 <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>artists</span> say.
               </h2>

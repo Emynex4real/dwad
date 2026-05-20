@@ -58,8 +58,10 @@ export default function Topbar() {
               {n.label}
             </NavLink>
           ))}
-          <NavLink
-            to="/contact"
+          <a
+            href="https://wa.me/message/VYJP7JFQPZXSN1"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-3 border rounded-full transition-all duration-250 hover:bg-[var(--color-gold)] hover:text-[var(--color-bg)]"
             style={{
               fontFamily: 'var(--font-mono)',
@@ -72,13 +74,15 @@ export default function Topbar() {
             }}
           >
             Start a project<Arrow />
-          </NavLink>
+          </a>
         </nav>
 
         {/* Mobile: CTA pill + hamburger */}
         <div className="flex items-center gap-3 min-[820px]:hidden">
-          <NavLink
-            to="/contact"
+          <a
+            href="https://wa.me/message/VYJP7JFQPZXSN1"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setMenuOpen(false)}
             className="flex items-center gap-2 border rounded-full transition-all duration-250 hover:bg-[var(--color-gold)] hover:text-[var(--color-bg)]"
             style={{
@@ -92,7 +96,7 @@ export default function Topbar() {
             }}
           >
             Start<Arrow />
-          </NavLink>
+          </a>
 
           <button
             className="flex flex-col justify-center gap-[6px] w-8 h-8 cursor-pointer"
@@ -143,7 +147,7 @@ export default function Topbar() {
               className="text-left py-5 border-b transition-colors duration-250 hover:text-[var(--color-gold)]"
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '36px',
+                fontSize: '26px',
                 fontWeight: 400,
                 color: 'var(--color-ink)',
                 borderColor: 'var(--color-line)',

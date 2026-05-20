@@ -1,7 +1,7 @@
 import type { Service, Project, Review, NavItem } from '../types';
 
 // covers
-import necessary     from '../assets/covers/necessary.jpg';
+import blessed        from '../assets/covers/blessed.jpg';
 import hushLittleBoys from '../assets/covers/hush-little-boys.jpg';
 import mdayEp        from '../assets/covers/mday-ep.jpg';
 import demSay        from '../assets/covers/dem-say.jpg';
@@ -12,7 +12,7 @@ import moneyJarul    from '../assets/covers/money-jarul.jpg';
 import emmanuelOlajide from '../assets/covers/emmanuel-olajide.jpg';
 import ucheOnyeEgwu  from '../assets/covers/uche-onye-egwu.jpg';
 import bulletOlayemi from '../assets/covers/bullet-olayemi.jpg';
-import humanOlayemi  from '../assets/covers/human-olayemi.jpg';
+import ayakata       from '../assets/covers/ayahata.jpg';
 
 // artist photos
 import mday          from '../assets/artists/mday.jpg';
@@ -55,21 +55,28 @@ export const SERVICES: Service[] = [
     titleItalic: 'Promotion',
     desc: 'Radio placements, sponsored ads online, editorial and press releases… Get the best promotion plans here.',
   },
+  {
+    num: '04',
+    slug: 'studio',
+    title: 'Cover Art',
+    titleItalic: 'Graphics',
+    desc: 'Professional cover art and graphic design for singles, EPs, albums, and social media — built to convert on every platform.',
+  },
 ];
 
 export const PROJECTS: Project[] = [
-  { title: 'Necessary',        artist: 'M Day Yor',              year: '2024', cover: necessary },
+  { title: 'Blessed',          artist: 'Omoba De Jumbo Beats',   year: '2024', cover: blessed },
   { title: 'Hush Little Boys', artist: 'Davee Jay',              year: '2024', cover: hushLittleBoys },
-  { title: 'EP',               artist: 'M Day Yor',              year: '2024', cover: mdayEp },
-  { title: 'Dem Say',          artist: 'Yung Sheriff',           year: '2024', cover: demSay },
-  { title: 'Give Up',          artist: 'Mana Sseh',              year: '2024', cover: giveUp },
-  { title: 'Halle Halle',      artist: 'James Daniel',           year: '2024', cover: halleHalle },
-  { title: 'Hustle',           artist: 'Alabi Enoch Olamide',    year: '2024', cover: hustleAlabi },
-  { title: 'Money',            artist: 'Jarulwest',              year: '2024', cover: moneyJarul },
-  { title: 'Cover Vol. 2',     artist: 'Emmanuel Olajide',       year: '2024', cover: emmanuelOlajide },
-  { title: 'Official',         artist: 'Uche Onye Egwu',         year: '2024', cover: ucheOnyeEgwu },
-  { title: 'Bullet',           artist: 'Olayemi Afolayan',       year: '2024', cover: bulletOlayemi },
-  { title: 'Human',            artist: 'Olayemi Afolayan',       year: '2024', cover: humanOlayemi },
+  { title: 'Wahala Day',       artist: 'M Day Yor',              year: '2024', cover: mdayEp },
+  { title: 'Dem Say',          artist: 'Yungsheriff ft Graham D', year: '2024', cover: demSay },
+  { title: 'Never Give Up',    artist: 'Mana-Sseh ft Zub\'s',    year: '2024', cover: giveUp },
+  { title: 'Halle Halle',      artist: 'Moh-Nice',               year: '2024', cover: halleHalle },
+  { title: 'Hustle',           artist: 'Olani YTD',              year: '2024', cover: hustleAlabi },
+  { title: 'Money',            artist: 'Jaruwiz x Babyrichs',    year: '2024', cover: moneyJarul },
+  { title: 'Giving Thanks',    artist: 'Highness',               year: '2024', cover: emmanuelOlajide },
+  { title: 'Oya Egbu Onwu',   artist: 'Uche Onye Egwu',         year: '2024', cover: ucheOnyeEgwu },
+  { title: 'Bullet',           artist: 'Olasphere',              year: '2024', cover: bulletOlayemi },
+  { title: 'Ayakata',          artist: 'Lyriq Yeyé',             year: '2024', cover: ayakata },
 ];
 
 export const ROSTER_ARTISTS = [
