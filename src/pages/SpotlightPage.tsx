@@ -1,12 +1,9 @@
-import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import Marquee from '../components/ui/Marquee';
 import Ticker from '../components/ui/Ticker';
 import { ROSTER_ARTISTS, HOF_ARTISTS, ARTIST_NAMES } from '../data';
 
 export default function SpotlightPage() {
-  const navigate = useNavigate();
-
   return (
     <div className="page-enter">
 
