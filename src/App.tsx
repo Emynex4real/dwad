@@ -10,6 +10,7 @@ const StudioPage    = lazy(() => import('./pages/StudioPage'));
 const PromotionPage = lazy(() => import('./pages/PromotionPage'));
 const SpotlightPage = lazy(() => import('./pages/SpotlightPage'));
 const ContactPage   = lazy(() => import('./pages/ContactPage'));
+const GraphicsPage  = lazy(() => import('./pages/GraphicsPage'));
 
 function PageLoader() {
   return (
@@ -67,6 +68,7 @@ function AppLayout() {
             <Route path="/studio"    element={<StudioPage />} />
             <Route path="/promotion" element={<PromotionPage />} />
             <Route path="/spotlight" element={<SpotlightPage />} />
+            <Route path="/graphics"  element={<GraphicsPage />} />
             <Route path="/contact"   element={<ContactPage />} />
             <Route path="*"          element={<HomePage />} />
           </Routes>

@@ -57,7 +57,7 @@ export const SERVICES: Service[] = [
   },
   {
     num: '04',
-    slug: 'studio',
+    slug: 'graphics',
     title: 'Cover Art',
     titleItalic: 'Graphics',
     desc: 'Professional cover art and graphic design for singles, EPs, albums, and social media — built to convert on every platform.',
@@ -85,11 +85,11 @@ export const ROSTER_ARTISTS = [
 ];
 
 export const HOF_ARTISTS = [
-  { name: 'Bella Shmurda', role: 'Afrobeats · NG', photo: bellaShmurda },
-  { name: 'Dremo',         role: 'Hip Hop · NG',   photo: dremo },
-  { name: 'Zinoleesky',    role: 'Street Pop · NG', photo: zinoleesky },
-  { name: 'Samad',         role: 'Afrobeats · NG', photo: samad },
-  { name: 'Raybekah',      role: 'Afropop · NG',   photo: raybekah },
+  { name: 'Bella Shmurda', role: 'Afrobeats · NG',  photo: bellaShmurda, spotify: 'https://open.spotify.com/artist/7kK5badbqOjd8WlT2XWMeM' },
+  { name: 'Dremo',         role: 'Hip Hop · NG',    photo: dremo,        spotify: 'https://open.spotify.com/artist/6m0X6OQm6w3h4k7xnh4LeR' },
+  { name: 'Zinoleesky',    role: 'Street Pop · NG', photo: zinoleesky,   spotify: 'https://open.spotify.com/artist/6Kp3KWPiVgi33DkJqo9T4g' },
+  { name: 'Samad',         role: 'Afrobeats · NG',  photo: samad,        spotify: 'https://open.spotify.com/artist/0X1sGf1y8XCupQFDUkiPmB' },
+  { name: 'Raybekah',      role: 'Afropop · NG',    photo: raybekah,     spotify: 'https://open.spotify.com/artist/0SwPkNmxB2YGHWVJMI8kpW' },
 ];
 
 export const ARTIST_NAMES: string[] = [
@@ -234,9 +234,9 @@ export const REVIEWS: Review[] = [
 
 export const NAV: NavItem[] = [
   { slug: 'home',      label: 'Home' },
-  { slug: 'distro',    label: 'Distro' },
-  { slug: 'studio',    label: 'Studio' },
+  { slug: 'distro',    label: 'Distribution' },
+  { slug: 'studio',    label: 'Production' },
   { slug: 'promotion', label: 'Promotion' },
+  { slug: 'graphics',  label: 'Cover Art Graphics' },
   { slug: 'spotlight', label: 'Spotlight' },
-  { slug: 'contact',   label: 'Contact' },
 ];

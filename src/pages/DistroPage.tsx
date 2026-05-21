@@ -1,7 +1,7 @@
 import Arrow from '../components/ui/Arrow';
 import ProjectCard from '../components/ui/ProjectCard';
 import Ticker from '../components/ui/Ticker';
-import { PROJECTS, HOF_ARTISTS } from '../data';
+import { PROJECTS, HOF_ARTISTS, distroHero } from '../data';
 
 const features = [
   { idx: '01', title: 'Apple, Spotify, Boomplay, TikTok', desc: '200+ stores worldwide, one delivery.' },
@@ -17,38 +17,58 @@ export default function DistroPage() {
 
       {/* ── DISTRO HERO ── */}
       <section
-        className="border-b"
-        style={{ borderColor: 'var(--color-line)', padding: 'clamp(60px, 10vw, 160px) 20px clamp(60px, 10vw, 160px)' }}
+        className="border-b pt-32 pb-14 px-5 sm:pt-[180px] sm:pb-20 sm:px-14"
+        style={{ borderColor: 'var(--color-line)' }}
       >
-        <div className="max-w-[1440px] mx-auto w-full px-5 sm:px-14">
-          <h1
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontWeight: 400,
-              fontSize: 'clamp(48px, 7vw, 132px)',
-              lineHeight: 0.94,
-              letterSpacing: '-0.02em',
-              maxWidth: '12ch',
-            }}
-          >
-            Music{' '}
-            <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>
-              distribution.
-            </span>
-          </h1>
-          <p
-            className="mt-8"
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '17px',
-              lineHeight: 1.55,
-              color: 'var(--color-ink-2)',
-              fontWeight: 300,
-              maxWidth: '520px',
-            }}
-          >
-            Upload to Apple Music, Spotify, Boomplay, TikTok and 200+ streaming platforms worldwide. Real humans, real dashboards, real royalties.
-          </p>
+        <div className="max-w-[1440px] mx-auto w-full">
+          <div className="grid gap-10 min-[900px]:gap-20 items-end grid-cols-1 min-[900px]:grid-cols-2">
+            <div>
+              <h1
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontWeight: 400,
+                  fontSize: 'clamp(48px, 7vw, 132px)',
+                  lineHeight: 0.94,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Music{' '}
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>
+                  distribution.
+                </span>
+              </h1>
+              <p
+                className="mt-8"
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '17px',
+                  lineHeight: 1.55,
+                  color: 'var(--color-ink-2)',
+                  fontWeight: 300,
+                  maxWidth: '520px',
+                }}
+              >
+                Upload to Apple Music, Spotify, Boomplay, TikTok and 200+ streaming platforms worldwide. Real humans, real dashboards, real royalties.
+              </p>
+              <div className="mt-10">
+                <a
+                  href="https://wa.me/message/VYJP7JFQPZXSN1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                >
+                  Get started<Arrow />
+                </a>
+              </div>
+            </div>
+            <div
+              className="relative overflow-hidden border"
+              style={{ aspectRatio: '4 / 5', borderColor: 'var(--color-line)' }}
+            >
+              <img src={distroHero} alt="Music Distribution" className="w-full h-full object-cover" />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -108,6 +128,7 @@ export default function DistroPage() {
               { num: '01', text: 'Contact us and send us your music to be distributed.' },
               { num: '02', text: 'We set up your personal distribution account with your advance dashboard.' },
               { num: '03', text: 'Your music goes live on all platforms worldwide.' },
+              { num: '04', text: 'Earn as the fans listen.' },
             ].map(step => (
               <div
                 key={step.num}
@@ -137,8 +158,8 @@ export default function DistroPage() {
               ✦ Bundle
             </div>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 84px)', lineHeight: 1.05, letterSpacing: '-0.015em', maxWidth: '14ch' }}>
-              Distribute<br />
-              + <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>promote</span> together.
+              Distribution<br />
+              + <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>promotion</span> together.
             </h2>
             <p className="mt-8" style={{ fontSize: '17px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
               Sign for distribution and your first radio pitch is on us. The most popular path for artists releasing their next single with Dwad.
@@ -187,9 +208,12 @@ export default function DistroPage() {
           </div>
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {HOF_ARTISTS.map((a, i) => (
-              <div
+              <a
                 key={a.name}
-                className="flex items-center gap-4 sm:gap-8"
+                href={a.spotify}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-4 sm:gap-8 transition-colors duration-250 hover:bg-[var(--color-bg-2)]"
                 style={{ background: 'var(--color-bg)', padding: '20px 16px' }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
@@ -207,7 +231,7 @@ export default function DistroPage() {
                   </div>
                 </div>
                 <Arrow />
-              </div>
+              </a>
             ))}
           </div>
         </div>

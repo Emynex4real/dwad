@@ -274,9 +274,12 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {HOF_ARTISTS.map((a, i) => (
-              <div
+              <a
                 key={a.name}
-                className="flex items-center gap-4 sm:gap-8"
+                href={a.spotify}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-4 sm:gap-8 transition-colors duration-250 hover:bg-[var(--color-bg-2)]"
                 style={{ background: 'var(--color-bg)', padding: '20px 16px' }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
@@ -293,7 +296,8 @@ export default function HomePage() {
                     {a.role}
                   </div>
                 </div>
-              </div>
+                <Arrow />
+              </a>
             ))}
           </div>
         </div>
