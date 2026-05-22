@@ -172,7 +172,7 @@ export default function RoyaltiesPage() {
       </section>
 
       {/* ── ROYALTY SECTIONS ── */}
-      {royaltyTypes.map((r, i) => (
+      {royaltyTypes.map((r) => (
         <section
           key={r.id}
           id={r.id}
