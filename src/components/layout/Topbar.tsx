@@ -137,7 +137,7 @@ export default function Topbar() {
       {/* Mobile overlay menu */}
       <div
         className={`fixed inset-0 z-[99] flex flex-col min-[820px]:hidden transition-opacity duration-300 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        style={{ background: 'var(--color-bg)', paddingTop: '72px' }}
+        style={{ background: 'var(--color-bg)', paddingTop: '128px' }}
       >
         <nav className="flex flex-col px-5 pt-6 flex-1 overflow-y-auto">
           {NAV.filter(n => n.slug !== 'home').map(n => (

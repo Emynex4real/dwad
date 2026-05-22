@@ -385,7 +385,36 @@ export default function SpotlightPage() {
         </div>
       </section>
 
-      <Ticker items={['Spotlight Vol. 04', 'New Issues Monthly', 'Pitch Open · 2026', 'Lagos Editorial']} />
+      {/* ── GET FEATURED CTA ── */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="flex flex-col"
+            style={{ background: 'var(--color-bg-2)', padding: 'clamp(40px, 6vw, 80px) clamp(28px, 5vw, 72px)', border: '1px solid var(--color-line)' }}
+          >
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '28px' }}>
+              ✦ Get Featured
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 84px)', lineHeight: 1.05, letterSpacing: '-0.015em', maxWidth: '16ch' }}>
+              Do you want to get featured on the{' '}
+              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Dwad Music Spotlight?</span>
+            </h2>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <a
+                href="https://wa.me/message/VYJP7JFQPZXSN1"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+              >
+                Talk to us<Arrow />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Ticker items={['Spotlight Vol. 04', 'New Issues Monthly', 'Pitch Open', 'Lagos Editorial']} />
     </div>
   );
 }

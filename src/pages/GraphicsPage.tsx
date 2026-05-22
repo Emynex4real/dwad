@@ -1,6 +1,7 @@
 import Arrow from '../components/ui/Arrow';
 import Ticker from '../components/ui/Ticker';
-import { HOF_ARTISTS } from '../data';
+import ProjectCard from '../components/ui/ProjectCard';
+import { HOF_ARTISTS, PROJECTS } from '../data';
 
 const deliverables = [
   { idx: '01', title: 'Single & EP Cover Art', desc: 'DSP-ready artwork sized and optimised for every platform.' },
@@ -41,8 +42,8 @@ export default function GraphicsPage() {
 
       {/* ── HERO ── */}
       <section
-        className="border-b"
-        style={{ borderColor: 'var(--color-line)', padding: 'clamp(60px, 10vw, 160px) 20px clamp(60px, 10vw, 160px)' }}
+        className="border-b pt-32 pb-14 sm:pt-[180px] sm:pb-20"
+        style={{ borderColor: 'var(--color-line)' }}
       >
         <div className="max-w-[1440px] mx-auto w-full px-5 sm:px-14">
           <div
@@ -133,6 +134,21 @@ export default function GraphicsPage() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ── RECENT WORK ── */}
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="flex items-center gap-6 mb-10">
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', whiteSpace: 'nowrap' }}>
+              ✦ Recent Work
+            </span>
+            <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
+          </div>
+          <div className="grid gap-6 grid-cols-2 min-[800px]:grid-cols-3 min-[1100px]:grid-cols-4">
+            {PROJECTS.map((p, i) => <ProjectCard key={i} project={p} idx={i} />)}
           </div>
         </div>
       </section>

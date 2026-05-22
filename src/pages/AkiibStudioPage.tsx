@@ -1,32 +1,7 @@
-import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
-import PageHero from '../components/ui/PageHero';
-import { studioMain, HOF_ARTISTS } from '../data';
-import akiibPhoto  from '../assets/artists/akiib.jpg';
+import { studioMain } from '../data';
+import akiibPhoto from '../assets/artists/akiib.jpg';
 import youngzyPhoto from '../assets/artists/youngzy.jpg';
-
-const whyPoints = [
-  {
-    title: 'Great Quality',
-    desc: 'Get amazing music production quality here. Industry standard is guaranteed on every project we work on.',
-  },
-  {
-    title: 'Professional Post Production',
-    desc: 'We have professional mixing engineers ready to enhance the quality of your music to the highest level.',
-  },
-  {
-    title: 'Free Bonuses',
-    desc: 'Get free cover art graphics, free music distribution account setup and many more bonuses included.',
-  },
-];
-
-const services = [
-  { idx: '01', title: 'Beat', italic: 'production', meta: 'Custom & lease options' },
-  { idx: '02', title: 'Vocal', italic: 'recording', meta: 'Engineer included' },
-  { idx: '03', title: 'Mixing &', italic: 'mastering', meta: 'Detailed & industry-standard' },
-  { idx: '04', title: 'Live Instruments', italic: '(Sax, Guitar, Violin)', meta: 'In-studio session' },
-  { idx: '05', title: 'Full', italic: 'release package', meta: 'Custom · Talk to us' },
-];
 
 const packages = [
   {
@@ -151,17 +126,61 @@ const terms = [
   },
 ];
 
-export default function StudioPage() {
-  const navigate = useNavigate();
-
+export default function AkiibStudioPage() {
   return (
     <div className="page-enter">
-      <PageHero
-        crumb=""
-        title="Music"
-        italic="Production."
-        lede="Beats, recording, mixing and mastering. Our in-house production team takes a record from idea to finished master — and ships it to streaming the same day if you need."
-      />
+
+      {/* ── HERO ── */}
+      <section
+        className="border-b pt-32 pb-14 px-5 sm:pt-[180px] sm:pb-20 sm:px-14"
+        style={{ borderColor: 'var(--color-line)' }}
+      >
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: 'var(--color-gold)',
+              marginBottom: '24px',
+            }}
+          >
+            ✦ Akiib Studio
+          </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontWeight: 400,
+              fontSize: 'clamp(48px, 7vw, 132px)',
+              lineHeight: 0.94,
+              letterSpacing: '-0.02em',
+              maxWidth: '14ch',
+            }}
+          >
+            Music{' '}
+            <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>
+              Production.
+            </span>
+          </h1>
+          <div className="mt-10 grid items-end gap-8 sm:gap-16 grid-cols-1 min-[820px]:grid-cols-2">
+            <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '520px' }}>
+              Beats, recording, mixing and mastering. Our in-house production team takes a record from idea to finished master — and ships it to streaming the same day if you need.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://wa.me/message/VYJP7JFQPZXSN1"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+              >
+                Book a session<Arrow />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── WHY WORK WITH US ── */}
       <section className="py-16 sm:py-[120px] px-5 sm:px-14">
@@ -173,7 +192,11 @@ export default function StudioPage() {
             <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
           </div>
           <div className="grid gap-6 grid-cols-1 min-[800px]:grid-cols-3">
-            {whyPoints.map(p => (
+            {[
+              { title: 'Great Quality', desc: 'Get amazing music production quality here. Industry standard is guaranteed on every project we work on.' },
+              { title: 'Professional Post Production', desc: 'We have professional mixing engineers ready to enhance the quality of your music to the highest level.' },
+              { title: 'Free Bonuses', desc: 'Get free cover art graphics, free music distribution account setup and many more bonuses included.' },
+            ].map(p => (
               <div
                 key={p.title}
                 className="border flex flex-col"
@@ -188,7 +211,7 @@ export default function StudioPage() {
         </div>
       </section>
 
-      {/* ── TWO-COL STUDIO ── */}
+      {/* ── THE STUDIO ── */}
       <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
           <div className="grid gap-10 sm:gap-20 items-start grid-cols-1 min-[900px]:grid-cols-2">
@@ -198,9 +221,9 @@ export default function StudioPage() {
                 A studio for<br /><span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>finished</span> records.
               </h2>
               <p className="mt-6" style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-                We don't just track vocals. The Dwad studio is set up to deliver mastered, distribution-ready records — including artwork, metadata and a release plan.
+                We don't just track vocals. The studio is set up to deliver mastered, distribution-ready records — including artwork, metadata and a release plan.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-8">
                 <a
                   href="https://wa.me/message/VYJP7JFQPZXSN1"
                   target="_blank"
@@ -210,93 +233,14 @@ export default function StudioPage() {
                 >
                   Book a session<Arrow />
                 </a>
-                <button
-                  className="inline-flex items-center gap-3 border transition-all duration-250 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
-                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', borderColor: 'var(--color-line-strong)', color: 'var(--color-ink)' }}
-                  onClick={() => navigate('/distro')}
-                >
-                  See distribution<Arrow />
-                </button>
               </div>
             </div>
             <div>
               <div className="relative overflow-hidden border" style={{ aspectRatio: '4/5', borderColor: 'var(--color-line)' }}>
-                <img src={studioMain} alt="Dwad studio mixing console" className="w-full h-full object-cover" />
+                <img src={studioMain} alt="Studio mixing console" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-12 sm:py-20 px-5 sm:px-14">
-        <div className="max-w-[1440px] mx-auto">
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '40px' }}>
-            ✦ How It Works
-          </div>
-          <div className="flex flex-col border-t" style={{ borderColor: 'var(--color-line)' }}>
-            {[
-              { num: '01', text: 'Purchase beats from our beat store.' },
-              { num: '02', text: 'Record vocals in our studio or any studio around you.' },
-              { num: '03', text: 'Let our trained engineers handle the mixing and mastering.' },
-            ].map(step => (
-              <div
-                key={step.num}
-                className="flex items-start gap-8 border-b py-10"
-                style={{ borderColor: 'var(--color-line)' }}
-              >
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--color-gold)', letterSpacing: '0.2em', minWidth: '32px', paddingTop: '4px' }}>
-                  {step.num}
-                </span>
-                <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(22px, 3vw, 36px)', fontWeight: 400, lineHeight: 1.3, color: 'var(--color-ink)' }}>
-                  {step.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CAPABILITIES ── */}
-      <section className="py-12 sm:py-20 px-5 sm:px-14">
-        <div className="max-w-[1440px] mx-auto">
-          <div className="grid gap-6 sm:gap-15 mb-10 sm:mb-16 items-end grid-cols-1 min-[820px]:grid-cols-2">
-            <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Capabilities</div>
-              <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
-                What we<br /><span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>make.</span>
-              </h2>
-            </div>
-            <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-              Pick a service à la carte, or hand us the whole project. Either way, you walk out with masters that hit on every platform.
-            </p>
-          </div>
-          <ul className="list-none m-0">
-            {services.map(s => (
-              <li
-                key={s.idx}
-                className="linklist-item py-6 sm:py-7 border-b cursor-pointer transition-all duration-250"
-                style={{ borderColor: 'var(--color-line)' }}
-              >
-                <div className="flex items-start gap-4 sm:hidden">
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.2em', minWidth: '28px', paddingTop: '6px' }}>{s.idx}</span>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(22px, 5vw, 40px)', fontWeight: 400 }}>
-                      {s.title} <span className="italic" style={{ color: 'var(--color-gold-2)' }}>{s.italic}</span>
-                    </div>
-                    <div className="mt-1" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{s.meta}</div>
-                  </div>
-                </div>
-                <div className="hidden sm:grid gap-6 items-center" style={{ gridTemplateColumns: '70px 1fr auto' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.2em' }}>{s.idx}</span>
-                  <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 3vw, 40px)', fontWeight: 400 }}>
-                    {s.title} <span className="italic" style={{ color: 'var(--color-gold-2)' }}>{s.italic}</span>
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{s.meta}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
@@ -306,10 +250,7 @@ export default function StudioPage() {
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>
             ✦ Packages
           </div>
-          <h2
-            className="mb-14"
-            style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1, letterSpacing: '-0.015em' }}
-          >
+          <h2 className="mb-14" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
             Pick your<br />
             <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>package.</span>
           </h2>
@@ -338,7 +279,6 @@ export default function StudioPage() {
             </div>
           </div>
 
-          {/* Main packages grid */}
           <div className="grid gap-6 grid-cols-1 min-[700px]:grid-cols-2 min-[1100px]:grid-cols-4">
             {packages.slice(1).map(pkg => (
               <div
@@ -453,11 +393,7 @@ export default function StudioPage() {
                   style={{ aspectRatio: '1/1', borderColor: 'var(--color-line)', background: 'var(--color-bg-2)' }}
                 >
                   {p.photo ? (
-                    <img
-                      src={p.photo}
-                      alt={p.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
+                    <img src={p.photo} alt={p.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6vw, 72px)', color: 'var(--color-gold)', fontWeight: 300, fontStyle: 'italic' }}>
@@ -476,7 +412,7 @@ export default function StudioPage() {
         </div>
       </section>
 
-      {/* ── STUDIO LOCATIONS ── */}
+      {/* ── STUDIO LOCATION ── */}
       <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
           <div
@@ -485,17 +421,14 @@ export default function StudioPage() {
           >
             <div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Studio Location</div>
-              <h2
-                className="mt-4"
-                style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1 }}
-              >
+              <h2 className="mt-4" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1 }}>
                 Ajah, Egbeda<br />
                 <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>&amp; Ikorodu.</span>
               </h2>
             </div>
             <div>
               <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
-                Our studios are located in Ajah, Egbeda and Ikorodu, Lagos, Nigeria. Come in and let's make something great together.
+                Studios located in Ajah, Egbeda and Ikorodu, Lagos, Nigeria. Come in and let's make something great together.
               </p>
               <div className="mt-8">
                 <a
@@ -519,10 +452,7 @@ export default function StudioPage() {
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>
             ✦ Very Important
           </div>
-          <h2
-            className="mb-14"
-            style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(32px, 4vw, 64px)', lineHeight: 1, letterSpacing: '-0.015em' }}
-          >
+          <h2 className="mb-14" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(32px, 4vw, 64px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
             Kindly take note of<br />
             <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>the below.</span>
           </h2>
@@ -536,94 +466,6 @@ export default function StudioPage() {
                 <span style={{ fontFamily: 'var(--font-serif)', fontSize: '48px', fontStyle: 'italic', color: 'var(--color-gold-2)', fontWeight: 300, lineHeight: 1 }}>{t.num}</span>
                 <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', fontWeight: 400 }}>{t.title}</h4>
                 <p style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--color-muted)' }}>{t.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── BUNDLE CTA ── */}
-      <section className="py-12 sm:py-20 px-5 sm:px-14">
-        <div className="max-w-[1440px] mx-auto">
-          <div
-            className="flex flex-col"
-            style={{ background: 'var(--color-bg-2)', padding: 'clamp(40px, 6vw, 80px) clamp(28px, 5vw, 72px)', border: '1px solid var(--color-line)' }}
-          >
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '28px' }}>
-              ✦ Bundle
-            </div>
-            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 84px)', lineHeight: 1.05, letterSpacing: '-0.015em', maxWidth: '14ch' }}>
-              Production<br />
-              + <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>distribution</span><br />
-              + <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>promotion.</span>
-            </h2>
-            <p className="mt-8" style={{ fontSize: '17px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
-              Get your record made, distributed to 200+ platforms, and promoted via radio and sponsored ads — all under one roof with Dwad.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <a
-                href="https://wa.me/message/VYJP7JFQPZXSN1"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
-              >
-                Get the bundle<Arrow />
-              </a>
-              <a
-                href="https://wa.me/message/VYJP7JFQPZXSN1"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-3 transition-colors duration-250 hover:text-[var(--color-gold)]"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', border: '1px solid var(--color-line)', color: 'var(--color-ink)' }}
-              >
-                Talk to a rep<Arrow />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── HALL OF FAME ── */}
-      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
-        <div className="max-w-[1440px] mx-auto">
-          <div className="flex items-center gap-6 mb-10">
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', whiteSpace: 'nowrap' }}>
-              ✦ Hall of Fame
-            </span>
-            <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
-          </div>
-          <div className="grid gap-4 sm:gap-8 mb-12 items-end grid-cols-1 min-[820px]:grid-cols-2">
-            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 0.96, letterSpacing: '-0.02em' }}>
-              Artists who've{' '}
-              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>passed through.</span>
-            </h2>
-            <p style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--color-muted)', fontWeight: 300, maxWidth: '480px' }}>
-              A record of notable artists whose music has moved through the Dwad network — distributed, promoted or produced with our team.
-            </p>
-          </div>
-          <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
-            {HOF_ARTISTS.map((a, i) => (
-              <div
-                key={a.name}
-                className="flex items-center gap-4 sm:gap-8"
-                style={{ background: 'var(--color-bg)', padding: '20px 16px' }}
-              >
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div className="rounded-full overflow-hidden flex-shrink-0 border" style={{ width: '44px', height: '44px', borderColor: 'var(--color-line-strong)' }}>
-                  <img src={a.photo} alt={a.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 32px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.1 }}>
-                    {a.name}
-                  </div>
-                  <div className="mt-1" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.2em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>
-                    {a.role}
-                  </div>
-                </div>
-                <Arrow />
               </div>
             ))}
           </div>

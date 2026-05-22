@@ -26,7 +26,7 @@ import raybekah      from '../assets/artists/raybekah.jpg';
 // general
 import logoDark      from '../assets/logo-dark.png';
 import logoWhite     from '../assets/logo-white.png';
-import distroHero    from '../assets/distro-hero.png';
+import distroHero    from '../assets/IMG_6223.PNG';
 import studioMain    from '../assets/studio/console-main.jpg';
 import studioDetail  from '../assets/studio/console-detail.jpg';
 import studioDaw     from '../assets/studio/daw.jpg';
@@ -237,6 +237,8 @@ export const NAV: NavItem[] = [
   { slug: 'distro',    label: 'Distribution' },
   { slug: 'studio',    label: 'Production' },
   { slug: 'promotion', label: 'Promotion' },
-  { slug: 'graphics',  label: 'Cover Art Graphics' },
-  { slug: 'spotlight', label: 'Spotlight' },
+  { slug: 'graphics',    label: 'Cover Art Graphics' },
+  { slug: 'publishing',  label: 'Publishing' },
+  { slug: 'management',  label: 'Management' },
+  { slug: 'spotlight',   label: 'Spotlight' },
 ];

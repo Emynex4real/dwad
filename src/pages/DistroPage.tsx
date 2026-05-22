@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import ProjectCard from '../components/ui/ProjectCard';
 import Ticker from '../components/ui/Ticker';
@@ -12,6 +13,8 @@ const features = [
 
 
 export default function DistroPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="page-enter">
 
@@ -64,9 +67,9 @@ export default function DistroPage() {
             </div>
             <div
               className="relative overflow-hidden border"
-              style={{ aspectRatio: '4 / 5', borderColor: 'var(--color-line)' }}
+              style={{ borderColor: 'var(--color-line)' }}
             >
-              <img src={distroHero} alt="Music Distribution" className="w-full h-full object-cover" />
+              <img src={distroHero} alt="Music Distribution" className="w-full h-auto object-contain" />
             </div>
           </div>
         </div>
@@ -253,6 +256,41 @@ export default function DistroPage() {
           </div>
           <div className="grid gap-6 grid-cols-2 min-[800px]:grid-cols-3 min-[1100px]:grid-cols-4">
             {PROJECTS.map((p, i) => <ProjectCard key={i} project={p} idx={i} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ROYALTIES TEASER ── */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
+            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
+          >
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Education</div>
+              <h2
+                className="mt-4"
+                style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1 }}
+              >
+                How music<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>royalties work.</span>
+              </h2>
+            </div>
+            <div>
+              <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
+                Mechanical, performance, print, sync — understand every royalty type your music can earn and how Dwad collects them all on your behalf.
+              </p>
+              <div className="mt-8">
+                <button
+                  onClick={() => navigate('/royalties')}
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                >
+                  Learn how royalties work<Arrow />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
