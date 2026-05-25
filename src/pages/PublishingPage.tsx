@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
-import Ticker from '../components/ui/Ticker';
 
 const steps = [
   {
@@ -34,7 +33,7 @@ const comparison = [
   {
     label: 'Dwad Publishing',
     points: [
-      'You keep 100% of your copyright',
+      'You keep 100% of your copyright ownership',
       'Open to artists at every stage',
       'Full control over your catalogue',
       'Real-time, transparent statements',
@@ -77,14 +76,14 @@ export default function PublishingPage() {
               maxWidth: '14ch',
             }}
           >
-            Own your{' '}
+            Get your{' '}
             <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>
-              royalties.
+              publishing royalties.
             </span>
           </h1>
           <div className="mt-10 grid items-end gap-8 sm:gap-16 grid-cols-1 min-[820px]:grid-cols-2">
             <p style={{ fontFamily: 'var(--font-sans)', fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '520px' }}>
-              Dwad Music Publishing empowers songwriters, producers and artists of all kinds to take complete ownership of their publishing royalties — without giving up a single percentage of copyright.
+              Dwad Music Publishing empowers songwriters, artists and labels of all levels to earn from their publishings.
             </p>
             <div className="flex flex-wrap gap-3">
               <a
@@ -94,7 +93,7 @@ export default function PublishingPage() {
                 className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
               >
-                Register as a songwriter<Arrow />
+                Set up your publishing<Arrow />
               </a>
             </div>
           </div>
@@ -241,43 +240,6 @@ export default function PublishingPage() {
         </div>
       </section>
 
-      {/* ── SPLIT SHEET CTA ── */}
-      <section className="py-12 sm:py-20 px-5 sm:px-14">
-        <div className="max-w-[1440px] mx-auto">
-          <div
-            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
-            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
-          >
-            <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Split Sheet</div>
-              <h2
-                className="mt-4 relative z-[1]"
-                style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1 }}
-              >
-                Protect your<br />
-                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>songwriting splits.</span>
-              </h2>
-            </div>
-            <div className="relative z-[1]">
-              <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-                A split sheet is the most important document a songwriter can have. It records who wrote what, prevents disputes, and ensures every contributor gets paid properly. Talk to our team to get yours set up.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="https://wa.me/message/VYJP7JFQPZXSN1"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
-                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
-                >
-                  Get your split sheet<Arrow />
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── ROYALTIES TEASER ── */}
       <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
@@ -313,7 +275,6 @@ export default function PublishingPage() {
         </div>
       </section>
 
-      <Ticker items={['Music Publishing', 'Royalty Collection', 'Split Sheets', 'Songwriter Registration', 'Copyright Ownership', 'Publishing Admin']} />
     </div>
   );
 }

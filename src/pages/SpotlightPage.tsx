@@ -123,7 +123,7 @@ export default function SpotlightPage() {
                 href={a.spotify}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-4 sm:gap-8 transition-colors duration-250 hover:bg-[var(--color-bg-2)]"
+                className="flex items-center gap-4 sm:gap-8 transition-all duration-150 hover:bg-[var(--color-bg-2)] active:scale-[1.02]"
                 style={{ background: 'var(--color-bg)', padding: '20px 16px' }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
@@ -166,7 +166,7 @@ export default function SpotlightPage() {
           </p>
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {[
-              { num: '01', name: 'Olarwise',   role: 'Artist', spotify: 'https://open.spotify.com/search/olarwise/artists' },
+              { num: '01', name: 'Badess Kid',  role: 'Artist', spotify: 'https://open.spotify.com/artist/2CPYKOVDrb7jnJzi8lo3fD' },
               { num: '02', name: 'Dmanteaser', role: 'Artist', spotify: 'https://open.spotify.com/search/dmanteaser/artists' },
               { num: '03', name: 'Jazzydking', role: 'Artist', spotify: 'https://open.spotify.com/search/jazzydking/artists' },
             ].map(a => (
@@ -175,7 +175,7 @@ export default function SpotlightPage() {
                 href={a.spotify || undefined}
                 target={a.spotify ? '_blank' : undefined}
                 rel={a.spotify ? 'noreferrer' : undefined}
-                className={`flex items-center gap-4 sm:gap-8${a.spotify ? ' transition-colors duration-250 hover:bg-[var(--color-bg-2)]' : ''}`}
+                className={`flex items-center gap-4 sm:gap-8${a.spotify ? ' transition-all duration-150 hover:bg-[var(--color-bg-2)] active:scale-[1.02]' : ''}`}
                 style={{ background: 'var(--color-bg)', padding: '20px 16px', cursor: a.spotify ? 'pointer' : 'default' }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>{a.num}</span>
@@ -209,25 +209,25 @@ export default function SpotlightPage() {
           </div>
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {[
-              { title: 'Rain of Blessings', artist: 'Ransom Ikedinachi',               spotify: 'https://open.spotify.com/search/ransom%20ikedinachi/artists' },
-              { title: 'A Cry to God',       artist: 'King Yungzil',                    spotify: 'https://open.spotify.com/search/king%20yungzil/artists' },
-              { title: 'Drip',               artist: 'African Boy',                     spotify: 'https://open.spotify.com/search/african%20boy/artists' },
-              { title: 'My Life',            artist: 'Normal Donzee ft. Bella Shmurda', spotify: 'https://open.spotify.com/search/normal%20donzee/artists' },
-              { title: 'All for You',        artist: 'Karmarr',                         spotify: 'https://open.spotify.com/search/karmarr/artists' },
-              { title: 'Where You Dey',      artist: 'Jah Lingo',                       spotify: 'https://open.spotify.com/search/jah%20lingo/artists' },
-              { title: 'Oja Men',            artist: 'Ysteve ft. Ojadilichukwu',        spotify: 'https://open.spotify.com/search/ysteve/artists' },
-              { title: 'Who is Akiib? EP',   artist: 'Akiib',                           spotify: 'https://open.spotify.com/search/akiib/artists' },
-              { title: 'Love Letter',   artist: 'Valid Patema',       spotify: 'https://open.spotify.com/search/VALID%20PATEMA/artists' },
-              { title: 'Oya Egbu Onwu', artist: 'Uche Onye Egwu',    spotify: 'https://open.spotify.com/search/UCHE%20ONYE%20EGWU/artists' },
-              { title: 'Naija',         artist: 'Solotone',            spotify: 'https://open.spotify.com/search/SOLOTONE/artists' },
-              { title: 'Ohema Remix',   artist: 'Nokyes ft Sugarboi', spotify: 'https://open.spotify.com/search/NOKYES/artists' },
+              { title: 'Gallivant',          artist: 'Youngzy',                         spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
+              { title: 'A Cry to God',       artist: 'King Yungzil',                    spotify: 'https://open.spotify.com/artist/326UBkWhn2XgCcjIhjtmr7' },
+              { title: 'Drip',               artist: 'African Boy',                     spotify: 'https://open.spotify.com/artist/25bc1K8fnRXnOG0lyKOCEl' },
+              { title: 'My Life',            artist: 'Normal Donzee ft. Bella Shmurda', spotify: 'https://open.spotify.com/artist/7uOVdfoFMg0FbFmc1Xp7Ye' },
+              { title: 'All for You',        artist: 'Karmarr',                         spotify: 'https://open.spotify.com/artist/1eesfZPQ3CCwy2qKdifzY9' },
+              { title: 'Where You Dey',      artist: 'Jah Lingo',                       spotify: 'https://open.spotify.com/artist/4j7tdwUsMU9Y8PxeQrmCE1' },
+              { title: 'Oja Men',            artist: 'Ysteve ft. Ojadilichukwu',        spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
+              { title: 'Who is Akiib? EP',   artist: 'Akiib',                           spotify: 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG' },
+              { title: 'Love Letter',        artist: 'Valid Patema',                    spotify: 'https://open.spotify.com/artist/2AwcOuICLKuwxBoftfCpMQ' },
+              { title: 'Oya Egbu Onwu',      artist: 'Uche Onye Egwu',                 spotify: 'https://open.spotify.com/artist/1GiPtQPB6UOfSHDiedkkl9' },
+              { title: 'Naija',              artist: 'Solotone',                        spotify: 'https://open.spotify.com/artist/5TR5ha19awStaDcqWGnwHU' },
+              { title: 'Ohema Remix',        artist: 'Nokyes ft Sugarboi',              spotify: 'https://open.spotify.com/artist/1nJ9LK9SJxdYAFUGy4FYuI' },
             ].map((s, i) => (
               <a
                 key={s.title}
                 href={s.spotify || undefined}
                 target={s.spotify ? '_blank' : undefined}
                 rel={s.spotify ? 'noreferrer' : undefined}
-                className={`flex items-center gap-4 sm:gap-8${s.spotify ? ' transition-colors duration-250 hover:bg-[var(--color-bg-2)]' : ''}`}
+                className={`flex items-center gap-4 sm:gap-8${s.spotify ? ' transition-all duration-150 hover:bg-[var(--color-bg-2)] active:scale-[1.02]' : ''}`}
                 style={{ background: 'var(--color-bg)', padding: '20px 16px', cursor: s.spotify ? 'pointer' : 'default' }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
@@ -306,25 +306,25 @@ export default function SpotlightPage() {
           </div>
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {[
-              { title: 'Kilode',        artist: 'G Win',                    spotify: 'https://open.spotify.com/search/G%20WIN/artists' },
-              { title: 'Oja Men',       artist: 'Ysteve ft. Ojadilichukwu', spotify: 'https://open.spotify.com/search/YSTEVE/artists' },
-              { title: 'Party Animal',  artist: 'Nature Republiq',           spotify: 'https://open.spotify.com/search/NATURE%20REPUBLIQ/artists' },
-              { title: 'Grace Time',    artist: 'Omo Oluwa Badboi Kp',      spotify: 'https://open.spotify.com/search/OMO%20OLUWA%20BADBOI%20KP/artists' },
-              { title: 'Watin Dey',     artist: 'Jazzydking',                spotify: 'https://open.spotify.com/search/JAZZYDKING/artists' },
-              { title: 'Yehowa Ye',     artist: 'Empaya Vybez',             spotify: 'https://open.spotify.com/search/EMPAYA%20VYBEZ/artists' },
-              { title: 'Crazy',         artist: 'BThree',                    spotify: 'https://open.spotify.com/search/BTHREE/artists' },
-              { title: 'Holy Father',   artist: 'Olarwise',                  spotify: 'https://open.spotify.com/search/OLARWISE/artists' },
-              { title: 'Mommy',         artist: 'Mhuftybwoy',                spotify: 'https://open.spotify.com/search/MHUFTYBWOY/artists' },
-              { title: 'Flenjo',        artist: 'Brown Spice',               spotify: 'https://open.spotify.com/search/BROWN%20SPICE/artists' },
-              { title: 'Street Hunter', artist: 'Obimax nwa OZ',            spotify: 'https://open.spotify.com/search/OBIMAX%20NWA%20OZ/artists' },
-              { title: 'Bianca',        artist: 'Boldmanhs',                 spotify: 'https://open.spotify.com/search/BOLDMANHS/artists' },
+              { title: 'Gallivant',     artist: 'Youngzy',                  spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
+              { title: 'Oja Men',       artist: 'Ysteve ft. Ojadilichukwu', spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
+              { title: 'Party Animal',  artist: 'Nature Republiq',          spotify: 'https://open.spotify.com/artist/0XMntmvSwcr9AjpRgZ9cQ4' },
+              { title: 'Grace Time',    artist: 'Omo Oluwa Badboi Kp',     spotify: 'https://open.spotify.com/artist/2WgKuGjjR3RfKpzBxTyAX0' },
+              { title: 'Watin Dey',     artist: 'Jazzydking',               spotify: 'https://open.spotify.com/artist/4Lde6MtzI4hIWwobB5Wc46' },
+              { title: 'Yehowa Ye',     artist: 'Empaya Vybez',            spotify: 'https://open.spotify.com/album/2YWVKEc1cPnYdHFw0ox2rZ' },
+              { title: 'Crazy',         artist: 'BThree',                   spotify: 'https://open.spotify.com/album/1pW6nzt5pPCpAcQEYHQHau' },
+              { title: 'Omo Oloja',     artist: 'Akiib',                    spotify: 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG' },
+              { title: 'Mommy',         artist: 'Mhuftybwoy',               spotify: 'https://open.spotify.com/artist/48WsE4LHxumfAOmy7hI1Z8' },
+              { title: 'Flenjo',        artist: 'Brown Spice',              spotify: 'https://open.spotify.com/artist/0d9ezg07OhJowFemqUo7ax' },
+              { title: 'Gallivant',     artist: 'Youngzy',                  spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
+              { title: 'Bianca',        artist: 'Boldmanhs',                spotify: 'https://open.spotify.com/artist/24grl33UR73dBjbqGSRp8n' },
             ].map((s, i) => (
               <a
                 key={s.title}
                 href={s.spotify || undefined}
                 target={s.spotify ? '_blank' : undefined}
                 rel={s.spotify ? 'noreferrer' : undefined}
-                className={`flex items-center gap-4 sm:gap-8${s.spotify ? ' transition-colors duration-250 hover:bg-[var(--color-bg-2)]' : ''}`}
+                className={`flex items-center gap-4 sm:gap-8${s.spotify ? ' transition-all duration-150 hover:bg-[var(--color-bg-2)] active:scale-[1.02]' : ''}`}
                 style={{ background: 'var(--color-bg)', padding: '20px 16px', cursor: s.spotify ? 'pointer' : 'default' }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>

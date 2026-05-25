@@ -16,6 +16,9 @@ const RoyaltiesPage    = lazy(() => import('./pages/RoyaltiesPage'));
 const ManagementPage   = lazy(() => import('./pages/ManagementPage'));
 const AkiibStudioPage  = lazy(() => import('./pages/AkiibStudioPage'));
 const AkiibMusicPage   = lazy(() => import('./pages/AkiibMusicPage'));
+const LegalPage        = lazy(() => import('./pages/LegalPage'));
+const BeatsPage        = lazy(() => import('./pages/BeatsPage'));
+const RadioPage        = lazy(() => import('./pages/RadioPage'));
 
 function PageLoader() {
   return (
@@ -79,6 +82,9 @@ function AppLayout() {
             <Route path="/management"    element={<ManagementPage />} />
             <Route path="/akiibstudio"   element={<AkiibStudioPage />} />
             <Route path="/akiibmusic"    element={<AkiibMusicPage />} />
+            <Route path="/legal"     element={<LegalPage />} />
+            <Route path="/beats"     element={<BeatsPage />} />
+            <Route path="/radio"     element={<RadioPage />} />
             <Route path="/contact"   element={<ContactPage />} />
             <Route path="*"          element={<HomePage />} />
           </Routes>

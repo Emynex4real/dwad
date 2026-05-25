@@ -150,28 +150,49 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FREE RADIO CTA ── */}
+      {/* ── PROMO CARDS ── */}
       <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
-          <div
-            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
-            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
-          >
-            <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ For Dwad Artists</div>
-              <h2
-                className="mt-4 relative z-[1]"
-                style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1 }}
-              >
-                Artist<br />
-                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Spotlight</span>
+          <div className="grid gap-6 grid-cols-1 min-[700px]:grid-cols-2">
+
+            {/* Radio Airplay */}
+            <div
+              className="flex flex-col border"
+              style={{ background: 'var(--color-bg-2)', padding: 'clamp(36px, 5vw, 64px) clamp(24px, 4vw, 56px)', borderColor: 'var(--color-gold)' }}
+            >
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '20px' }}>✦ Free For Artists</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
+                Free Radio<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Airplay.</span>
               </h2>
+              <p className="mt-6 flex-1" style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300 }}>
+                Get your music on radio — free. Available on the premium distribution plan and selected production packages.
+              </p>
+              <div className="mt-8">
+                <button
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                  onClick={() => navigate('/radio')}
+                >
+                  Get free radio plays<Arrow />
+                </button>
+              </div>
             </div>
-            <div className="relative z-[1]">
-              <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
+
+            {/* Artist Spotlight */}
+            <div
+              className="flex flex-col border"
+              style={{ background: 'var(--color-bg-2)', padding: 'clamp(36px, 5vw, 64px) clamp(24px, 4vw, 56px)', borderColor: 'var(--color-line)' }}
+            >
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '20px' }}>✦ For Dwad Artists</div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
+                Artist<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Spotlight.</span>
+              </h2>
+              <p className="mt-6 flex-1" style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300 }}>
                 Be featured by the Dwad editorial team — interviews, cover stories and curated drops for artists building real careers.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-8">
                 <button
                   className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
                   style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
@@ -181,6 +202,7 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -214,6 +236,27 @@ export default function HomePage() {
         </div>
       </section>
 
+
+      {/* ── FREE BONUSES ── */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="flex flex-col border"
+            style={{ background: 'var(--color-bg-2)', padding: 'clamp(40px, 6vw, 80px) clamp(28px, 5vw, 72px)', borderColor: 'var(--color-gold)' }}
+          >
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '28px' }}>
+              ✦ Free Bonuses
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05, letterSpacing: '-0.015em', maxWidth: '16ch' }}>
+              More than just{' '}
+              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>music.</span>
+            </h2>
+            <p className="mt-8" style={{ fontSize: '17px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
+              Get free radio promotions, free cover arts and many more bonus included.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* ── REVIEWS ── */}
       <section className="py-16 sm:py-[120px] px-5 sm:px-14">

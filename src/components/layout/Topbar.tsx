@@ -144,10 +144,10 @@ export default function Topbar() {
             <button
               key={n.slug}
               onClick={() => handleMobileNav(n.slug === 'home' ? '/' : `/${n.slug}`)}
-              className="text-left py-5 border-b transition-colors duration-250 hover:text-[var(--color-gold)]"
+              className="text-left py-3 border-b transition-colors duration-250 hover:text-[var(--color-gold)]"
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '26px',
+                fontSize: '20px',
                 fontWeight: 400,
                 color: 'var(--color-ink)',
                 borderColor: 'var(--color-line)',

@@ -1,9 +1,12 @@
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import PageHero from '../components/ui/PageHero';
 import { studioMain, HOF_ARTISTS } from '../data';
-import akiibPhoto  from '../assets/artists/akiib.jpg';
-import youngzyPhoto from '../assets/artists/youngzy.jpg';
+import hallelujahCover from '../assets/hallelujah.jpeg';
+import gbeseCover      from '../assets/gbese.jpeg';
+import badessKidCover  from '../assets/badess kid .jpeg';
+import gallivantCover  from '../assets/gallivant.jpeg';
 
 const whyPoints = [
   {
@@ -16,7 +19,7 @@ const whyPoints = [
   },
   {
     title: 'Free Bonuses',
-    desc: 'Get free cover art graphics, free music distribution account setup and many more bonuses included.',
+    desc: 'Get free radio promotions, free music distribution account set up, free cover arts and many more bonus included.',
   },
 ];
 
@@ -30,19 +33,8 @@ const services = [
 
 const packages = [
   {
-    tier: 'Promo',
-    price: '₦50,000',
-    studio: 'Ikorodu Studio',
-    items: [
-      'Beat lease',
-      'Recording, Mixing & Mastering',
-    ],
-    featured: false,
-    note: 'Terms & conditions apply',
-  },
-  {
     tier: 'Package 1',
-    price: '₦200,000',
+    price: '$150',
     studio: null,
     items: [
       'Beat lease',
@@ -56,7 +48,7 @@ const packages = [
   },
   {
     tier: 'Package 2',
-    price: '₦300,000',
+    price: '$300',
     studio: null,
     items: [
       'Beat lease',
@@ -73,7 +65,7 @@ const packages = [
   },
   {
     tier: 'Package 3',
-    price: '₦500,000',
+    price: '$500',
     studio: null,
     items: [
       'Personal Beat',
@@ -92,8 +84,8 @@ const packages = [
   },
   {
     tier: 'Package 4',
-    price: '₦1,000,000',
-    studio: 'Ajah & Egbeda Studios',
+    price: '$1,000',
+    studio: null,
     items: [
       'Personal Beat',
       'Beat lease',
@@ -112,37 +104,37 @@ const packages = [
 ];
 
 const tracklist = [
-  { num: '01', title: 'All for the Money', artist: 'Youngzy' },
-  { num: '02', title: 'Maro', artist: 'Badess Kid' },
-  { num: '03', title: 'Gallivant', artist: 'Youngzy' },
-  { num: '04', title: 'Addicted', artist: 'Akiib' },
-  { num: '05', title: 'Questions', artist: 'Skiitz x Miraji' },
-  { num: '06', title: 'Ayo', artist: 'Yemi Ekun' },
-  { num: '07', title: 'Green Light', artist: 'Zephyr' },
-  { num: '08', title: 'On Guard', artist: 'Nonny Gee' },
-  { num: '09', title: 'Omo Oloja', artist: 'Akiib' },
-  { num: '10', title: 'Gbese', artist: 'Blazebankz' },
-  { num: '11', title: 'Who is Akiib (Intro)', artist: 'Akiib' },
-  { num: '12', title: 'Uselu Roundabout', artist: 'Youngzy' },
-  { num: '13', title: 'Fame', artist: 'Badboi Yemi' },
-  { num: '14', title: 'Hallelujah', artist: 'Junbho' },
-  { num: '15', title: 'My Life (Master)', artist: 'J Smalling' },
-  { num: '16', title: 'Why', artist: 'Kenk C' },
-  { num: '17', title: 'Disrespect', artist: 'Spice' },
+  { num: '01', title: 'All for the Money', artist: 'Youngzy', src: '' },
+  { num: '02', title: 'Maro', artist: 'Badess Kid', src: '' },
+  { num: '03', title: 'Gallivant', artist: 'Youngzy', src: '' },
+  { num: '04', title: 'Addicted', artist: 'Akiib', src: '' },
+  { num: '05', title: 'Questions', artist: 'Skiitz x Miraji', src: '' },
+  { num: '06', title: 'Ayo', artist: 'Yemi Ekun', src: '' },
+  { num: '07', title: 'Green Light', artist: 'Zephyr', src: '' },
+  { num: '08', title: 'On Guard', artist: 'Nonny Gee', src: '' },
+  { num: '09', title: 'Omo Oloja', artist: 'Akiib', src: '' },
+  { num: '10', title: 'Gbese', artist: 'Blazebankz', src: '' },
+  { num: '11', title: 'Who is Akiib (Intro)', artist: 'Akiib', src: '' },
+  { num: '12', title: 'Uselu Roundabout', artist: 'Youngzy', src: '' },
+  { num: '13', title: 'Fame', artist: 'Badboi Yemi', src: '' },
+  { num: '14', title: 'Hallelujah', artist: 'Junbho', src: '' },
+  { num: '15', title: 'My Life (Master)', artist: 'J Smalling', src: '' },
+  { num: '16', title: 'Why', artist: 'Kenk C', src: '' },
+  { num: '17', title: 'Disrespect', artist: 'Spice', src: '' },
 ];
 
 const recentProjects = [
-  { title: 'Formula', artist: 'Tuneboi Col ft. Favour Tkb', photo: null },
-  { title: 'Hallelujah', artist: 'Junbho', photo: null },
-  { title: 'Baby', artist: 'Youngzy', photo: youngzyPhoto },
-  { title: 'Addicted', artist: 'Akiib', photo: akiibPhoto },
+  { title: 'Hallelujah', artist: 'Junbho',     photo: hallelujahCover, spotify: 'https://open.spotify.com/artist/0bDsfHoVhvC2RZ5SYv9w3S' },
+  { title: 'Gbese',      artist: 'Blazebankz', photo: gbeseCover,      spotify: 'https://open.spotify.com/artist/0a6Lm1GzTLEBsFUB61gQY9' },
+  { title: 'Maro',       artist: 'Badess Kid', photo: badessKidCover,  spotify: 'https://open.spotify.com/artist/2CPYKOVDrb7jnJzi8lo3fD' },
+  { title: 'Gallivant',  artist: 'Youngzy',    photo: gallivantCover,  spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
 ];
 
 const terms = [
   {
     num: '01',
     title: 'Split Sheet',
-    desc: 'Split sheets & beat licenses must be filled for all songs I produce for you.',
+    desc: 'Split sheets & beat licenses must be filled for all songs we produce for you.',
   },
   {
     num: '02',
@@ -153,6 +145,23 @@ const terms = [
 
 export default function StudioPage() {
   const navigate = useNavigate();
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const handleTrackClick = (idx: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (activeIdx === idx) {
+      if (isPlaying) { audio.pause(); setIsPlaying(false); }
+      else { void audio.play(); setIsPlaying(true); }
+    } else {
+      audio.src = tracklist[idx].src;
+      setActiveIdx(idx);
+      if (tracklist[idx].src) { void audio.play(); setIsPlaying(true); }
+      else { setIsPlaying(false); }
+    }
+  };
 
   return (
     <div className="page-enter">
@@ -314,33 +323,9 @@ export default function StudioPage() {
             <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>package.</span>
           </h2>
 
-          {/* Promo banner */}
-          <div
-            className="border mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-            style={{ padding: '28px 32px', borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)' }}
-          >
-            <div className="flex items-center gap-4">
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-bg)', background: 'var(--color-gold)', padding: '4px 10px' }}>PROMO !!!</span>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>Ikorodu Studio · Terms &amp; conditions apply</div>
-            </div>
-            <div className="flex items-center gap-6 flex-wrap">
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>₦50,000</div>
-              <div style={{ fontSize: '13px', color: 'var(--color-muted)', lineHeight: 1.5 }}>Beat lease · Recording · Mixing &amp; Mastering</div>
-              <a
-                href="https://wa.me/message/VYJP7JFQPZXSN1"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 24px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
-              >
-                Get started<Arrow />
-              </a>
-            </div>
-          </div>
-
           {/* Main packages grid */}
           <div className="grid gap-6 grid-cols-1 min-[700px]:grid-cols-2 min-[1100px]:grid-cols-4">
-            {packages.slice(1).map(pkg => (
+            {packages.map(pkg => (
               <div
                 key={pkg.tier}
                 className="flex flex-col border"
@@ -401,10 +386,10 @@ export default function StudioPage() {
         <div className="max-w-[1440px] mx-auto">
           <div className="grid gap-10 sm:gap-20 items-start grid-cols-1 min-[900px]:grid-cols-2">
             <div style={{ position: 'sticky', top: '120px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Listen to my works</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Listen to our works</div>
               <h2 className="mt-5" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
-                Songs I've<br />
-                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>produced.</span>
+                Songs we<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>produce.</span>
               </h2>
               <p className="mt-6" style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300 }}>
                 Listen to some songs recently produced here. Send a message and let's work on your next hit.
@@ -420,20 +405,29 @@ export default function StudioPage() {
               </a>
             </div>
             <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
-              {tracklist.map(t => (
+              {tracklist.map((t, i) => (
                 <div
                   key={t.num}
-                  className="flex items-center gap-4 sm:gap-6"
-                  style={{ background: 'var(--color-bg)', padding: '16px' }}
+                  onClick={() => handleTrackClick(i)}
+                  className="flex items-center gap-4 sm:gap-6 cursor-pointer transition-all duration-150 active:scale-[1.02]"
+                  style={{
+                    background: activeIdx === i ? 'var(--color-bg-2)' : 'var(--color-bg)',
+                    padding: '16px',
+                    borderLeft: `2px solid ${activeIdx === i ? 'var(--color-gold)' : 'transparent'}`,
+                  }}
                 >
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>{t.num}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: activeIdx === i ? 'var(--color-gold)' : 'var(--color-muted)', minWidth: '28px' }}>{t.num}</span>
                   <div className="flex-1 min-w-0">
                     <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.2 }}>{t.title}</div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--color-muted)', textTransform: 'uppercase', marginTop: '2px' }}>{t.artist}</div>
                   </div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: activeIdx === i && isPlaying ? 'var(--color-gold)' : 'var(--color-muted)', flexShrink: 0 }}>
+                    {activeIdx === i && isPlaying ? '⏸' : '▶'}
+                  </span>
                 </div>
               ))}
             </div>
+            <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
           </div>
         </div>
       </section>
@@ -447,30 +441,22 @@ export default function StudioPage() {
           </div>
           <div className="grid gap-6 grid-cols-2 min-[700px]:grid-cols-4">
             {recentProjects.map((p, i) => (
-              <div key={i} className="group">
+              <a key={i} href={p.spotify} target="_blank" rel="noreferrer" className="group block">
                 <div
                   className="relative overflow-hidden border"
                   style={{ aspectRatio: '1/1', borderColor: 'var(--color-line)', background: 'var(--color-bg-2)' }}
                 >
-                  {p.photo ? (
-                    <img
-                      src={p.photo}
-                      alt={p.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6vw, 72px)', color: 'var(--color-gold)', fontWeight: 300, fontStyle: 'italic' }}>
-                        {p.title[0]}
-                      </span>
-                    </div>
-                  )}
+                  <img
+                    src={p.photo}
+                    alt={p.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 </div>
                 <div className="pt-4">
                   <h4 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: '20px' }}>{p.title}</h4>
                   <div className="mt-1" style={{ fontSize: '13px', color: 'var(--color-muted)' }}>{p.artist}</div>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -489,13 +475,13 @@ export default function StudioPage() {
                 className="mt-4"
                 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1 }}
               >
-                Ajah, Egbeda<br />
-                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>&amp; Ikorodu.</span>
+                Available<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>worldwide.</span>
               </h2>
             </div>
             <div>
               <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
-                Our studios are located in Ajah, Egbeda and Ikorodu, Lagos, Nigeria. Come in and let's make something great together.
+                Once you're ready we get you a studio close to you wherever you're located worldwide and our producers and engineers handle the rest.
               </p>
               <div className="mt-8">
                 <a
@@ -579,6 +565,38 @@ export default function StudioPage() {
               >
                 Talk to a rep<Arrow />
               </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── RADIO AIRPLAY CARD ── */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
+            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-gold)' }}
+          >
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Free For Artists</div>
+              <h2 className="mt-4" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1 }}>
+                Free Radio<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Airplay.</span>
+              </h2>
+            </div>
+            <div>
+              <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
+                Package 2, 3 and 4 include free radio promotion. Get your music on radio at no extra charge.
+              </p>
+              <div className="mt-8">
+                <button
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                  onClick={() => navigate('/radio')}
+                >
+                  Get free radio plays<Arrow />
+                </button>
+              </div>
             </div>
           </div>
         </div>

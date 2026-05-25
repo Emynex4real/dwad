@@ -1,9 +1,7 @@
 import type { Service, Project, Review, NavItem } from '../types';
 
 // covers
-import blessed        from '../assets/covers/blessed.jpg';
 import hushLittleBoys from '../assets/covers/hush-little-boys.jpg';
-import mdayEp        from '../assets/covers/mday-ep.jpg';
 import demSay        from '../assets/covers/dem-say.jpg';
 import giveUp        from '../assets/covers/give-up.jpg';
 import halleHalle    from '../assets/covers/halle-halle.jpg';
@@ -65,11 +63,9 @@ export const SERVICES: Service[] = [
 ];
 
 export const PROJECTS: Project[] = [
-  { title: 'Blessed',          artist: 'Omoba De Jumbo Beats',   year: '2024', cover: blessed },
-  { title: 'Hush Little Boys', artist: 'Davee Jay',              year: '2024', cover: hushLittleBoys },
-  { title: 'Wahala Day',       artist: 'M Day Yor',              year: '2024', cover: mdayEp },
-  { title: 'Dem Say',          artist: 'Yungsheriff ft Graham D', year: '2024', cover: demSay },
-  { title: 'Never Give Up',    artist: 'Mana-Sseh ft Zub\'s',    year: '2024', cover: giveUp },
+  { title: 'Hush Little Boys', artist: 'Davee Jay',               year: '2024', cover: hushLittleBoys },
+  { title: 'Dem Say',          artist: 'Yungsheriff ft Graham D',  year: '2024', cover: demSay },
+  { title: 'Never Give Up',    artist: 'Mana-Sseh ft Zub\'s',     year: '2024', cover: giveUp },
   { title: 'Halle Halle',      artist: 'Moh-Nice',               year: '2024', cover: halleHalle },
   { title: 'Hustle',           artist: 'Olani YTD',              year: '2024', cover: hustleAlabi },
   { title: 'Money',            artist: 'Jaruwiz x Babyrichs',    year: '2024', cover: moneyJarul },
@@ -233,12 +229,12 @@ export const REVIEWS: Review[] = [
 ];
 
 export const NAV: NavItem[] = [
-  { slug: 'home',      label: 'Home' },
-  { slug: 'distro',    label: 'Distribution' },
-  { slug: 'studio',    label: 'Production' },
-  { slug: 'promotion', label: 'Promotion' },
-  { slug: 'graphics',    label: 'Cover Art Graphics' },
-  { slug: 'publishing',  label: 'Publishing' },
-  { slug: 'management',  label: 'Management' },
-  { slug: 'spotlight',   label: 'Spotlight' },
+  { slug: 'home',       label: 'Home' },
+  { slug: 'distro',     label: 'Distribution' },
+  { slug: 'studio',     label: 'Production' },
+  { slug: 'promotion',  label: 'Promotion' },
+  { slug: 'publishing', label: 'Publishing' },
+  { slug: 'spotlight',  label: 'Spotlight' },
+  { slug: 'management', label: 'Management' },
+  { slug: 'graphics',   label: 'Cover Art' },
 ];

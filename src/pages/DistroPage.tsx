@@ -191,6 +191,59 @@ export default function DistroPage() {
         </div>
       </section>
 
+      {/* Free Bonuses */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="flex flex-col border"
+            style={{ background: 'var(--color-bg-2)', padding: 'clamp(40px, 6vw, 80px) clamp(28px, 5vw, 72px)', borderColor: 'var(--color-gold)' }}
+          >
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '28px' }}>
+              ✦ Free Bonuses
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 72px)', lineHeight: 1.05, letterSpacing: '-0.015em', maxWidth: '16ch' }}>
+              More than just{' '}
+              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>distribution.</span>
+            </h2>
+            <p className="mt-8" style={{ fontSize: '17px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
+              Get free radio promotions, free cover arts and many more bonus included.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── RADIO AIRPLAY CARD ── */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
+            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-gold)' }}
+          >
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Free For Artists</div>
+              <h2 className="mt-4" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1 }}>
+                Free Radio<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Airplay.</span>
+              </h2>
+            </div>
+            <div>
+              <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
+                On the premium distribution plan, your music goes on radio — free. No extra charge, no extra steps.
+              </p>
+              <div className="mt-8">
+                <button
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                  onClick={() => navigate('/radio')}
+                >
+                  Get free radio plays<Arrow />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Hall of Fame */}
       <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">

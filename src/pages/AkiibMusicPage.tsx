@@ -1,5 +1,6 @@
 import Arrow from '../components/ui/Arrow';
 import akiibPhoto from '../assets/artists/akiib.jpg';
+import whoIsAkiibCover from '../assets/12.jpeg';
 
 const streamingLinks = [
   {
@@ -35,10 +36,10 @@ const streamingLinks = [
 ];
 
 const releases = [
-  { title: 'Who is Akiib?', subtitle: 'EP', year: '2024' },
-  { title: 'Addicted', subtitle: 'Single', year: '2024' },
-  { title: 'Omo Oloja', subtitle: 'Single', year: '2024' },
-  { title: 'Asalamalekun', subtitle: 'Single · Video out', year: '2024' },
+  { title: 'Who is Akiib?', subtitle: 'EP · 7 Tracks', year: '2024', cover: whoIsAkiibCover },
+  { title: 'Addicted',      subtitle: 'Single', year: '2024', cover: akiibPhoto },
+  { title: 'Omo Oloja',     subtitle: 'Single', year: '2024', cover: akiibPhoto },
+  { title: 'Asalamalekun',  subtitle: 'Single · Video out', year: '2024', cover: akiibPhoto },
 ];
 
 export default function AkiibMusicPage() {
@@ -183,7 +184,7 @@ export default function AkiibMusicPage() {
             <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
           </div>
           <div className="grid gap-6 grid-cols-2 min-[700px]:grid-cols-4">
-            {releases.map((r, i) => (
+            {releases.map((r) => (
               <a
                 key={r.title}
                 href="https://open.spotify.com/search/akiib/artists"
@@ -192,20 +193,18 @@ export default function AkiibMusicPage() {
                 className="group"
                 style={{ textDecoration: 'none' }}
               >
-                {/* Cover art placeholder with Akiib photo tinted */}
                 <div
                   className="relative overflow-hidden border"
                   style={{ aspectRatio: '1/1', borderColor: 'var(--color-line)', background: 'var(--color-bg-2)' }}
                 >
                   <img
-                    src={akiibPhoto}
+                    src={r.cover}
                     alt={r.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    style={{ filter: `hue-rotate(${i * 25}deg) saturate(0.7)` }}
                   />
-                  <div className="absolute inset-0" style={{ background: 'rgba(11,9,7,0.45)' }} />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(11,9,7,0.7) 0%, transparent 55%)' }} />
                   <div className="absolute inset-0 flex flex-col justify-end p-4">
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(16px, 2.5vw, 22px)', color: 'var(--color-ink)', lineHeight: 1.1 }}>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(14px, 2vw, 20px)', color: 'var(--color-ink)', lineHeight: 1.1 }}>
                       {r.title}
                     </div>
                     <div className="mt-1" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.2em', color: 'var(--color-gold)', textTransform: 'uppercase' }}>
