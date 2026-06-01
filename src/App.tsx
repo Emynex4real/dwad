@@ -3,7 +3,12 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Topbar from './components/layout/Topbar';
 import Footer from './components/layout/Footer';
 import { logoDark } from './data';
+import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import AdminRoute from './routes/AdminRoute';
+import ArtistRoute from './routes/ArtistRoute';
 
+// ── Public pages ──────────────────────────────────────────────────────────────
 const HomePage      = lazy(() => import('./pages/HomePage'));
 const DistroPage    = lazy(() => import('./pages/DistroPage'));
 const StudioPage    = lazy(() => import('./pages/StudioPage'));
@@ -19,11 +24,33 @@ const AkiibMusicPage   = lazy(() => import('./pages/AkiibMusicPage'));
 const LegalPage        = lazy(() => import('./pages/LegalPage'));
 const BeatsPage        = lazy(() => import('./pages/BeatsPage'));
 const RadioPage        = lazy(() => import('./pages/RadioPage'));
+const LoginPage        = lazy(() => import('./pages/LoginPage'));
 
+// ── Dashboard layouts ──────────────────────────────────────────────────────────
+const AdminLayout  = lazy(() => import('./layouts/AdminLayout'));
+const ArtistLayout = lazy(() => import('./layouts/ArtistLayout'));
+
+// ── Admin pages ───────────────────────────────────────────────────────────────
+const AdminOverviewPage       = lazy(() => import('./pages/admin/AdminOverviewPage'));
+const AdminArtistsPage        = lazy(() => import('./pages/admin/AdminArtistsPage'));
+const AdminArtistDetailPage   = lazy(() => import('./pages/admin/AdminArtistDetailPage'));
+const AdminSubscriptionsPage  = lazy(() => import('./pages/admin/AdminSubscriptionsPage'));
+const AdminUploadsPage        = lazy(() => import('./pages/admin/AdminUploadsPage'));
+const AdminReportsPage        = lazy(() => import('./pages/admin/AdminReportsPage'));
+const AdminNotificationsPage  = lazy(() => import('./pages/admin/AdminNotificationsPage'));
+
+// ── Artist pages ──────────────────────────────────────────────────────────────
+const ArtistHomePage      = lazy(() => import('./pages/artist/ArtistHomePage'));
+const ArtistReleasesPage  = lazy(() => import('./pages/artist/ArtistReleasesPage'));
+const ArtistAnalyticsPage = lazy(() => import('./pages/artist/ArtistAnalyticsPage'));
+const ArtistIncomePage    = lazy(() => import('./pages/artist/ArtistIncomePage'));
+const ArtistUploadPage    = lazy(() => import('./pages/artist/ArtistUploadPage'));
+
+// ── Shared utilities ──────────────────────────────────────────────────────────
 function PageLoader() {
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center"
+      className="fixed inset-0 z-200 flex items-center justify-center"
       style={{ background: 'var(--color-bg)' }}
     >
       <img src={logoDark} alt="Dwad Music" className="w-40 opacity-80" />
@@ -63,7 +90,8 @@ function AnimatedPage({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AppLayout() {
+// ── Public layout (with Topbar + Footer) ──────────────────────────────────────
+function PublicLayout() {
   return (
     <>
       <ScrollToTop />
@@ -86,6 +114,7 @@ function AppLayout() {
             <Route path="/beats"     element={<BeatsPage />} />
             <Route path="/radio"     element={<RadioPage />} />
             <Route path="/contact"   element={<ContactPage />} />
+            <Route path="/login"     element={<LoginPage />} />
             <Route path="*"          element={<HomePage />} />
           </Routes>
         </Suspense>
@@ -95,10 +124,50 @@ function AppLayout() {
   );
 }
 
+// ── Root router ───────────────────────────────────────────────────────────────
+function AppRouter() {
+  const { pathname } = useLocation();
+  const isDashboard = pathname.startsWith('/admin') || pathname.startsWith('/artist');
+
+  if (isDashboard) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route index element={<AdminOverviewPage />} />
+            <Route path="artists" element={<AdminArtistsPage />} />
+            <Route path="artists/:id" element={<AdminArtistDetailPage />} />
+            <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
+            <Route path="uploads" element={<AdminUploadsPage />} />
+            <Route path="reports" element={<AdminReportsPage />} />
+            <Route path="notifications" element={<AdminNotificationsPage />} />
+          </Route>
+
+          {/* Artist routes */}
+          <Route path="/artist" element={<ArtistRoute><ArtistLayout /></ArtistRoute>}>
+            <Route path="home"      element={<ArtistHomePage />} />
+            <Route path="releases"  element={<ArtistReleasesPage />} />
+            <Route path="analytics" element={<ArtistAnalyticsPage />} />
+            <Route path="income"    element={<ArtistIncomePage />} />
+            <Route path="upload"    element={<ArtistUploadPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    );
+  }
+
+  return <PublicLayout />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <AppLayout />
+      <AuthProvider>
+        <NotificationProvider>
+          <AppRouter />
+        </NotificationProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

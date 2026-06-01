@@ -3,6 +3,9 @@ import Marquee from '../components/ui/Marquee';
 import Ticker from '../components/ui/Ticker';
 import { ROSTER_ARTISTS, HOF_ARTISTS, ARTIST_NAMES } from '../data';
 import mdayPhoto from '../assets/artists/mday.jpg';
+import badessKidPhoto from '../assets/badess kid .jpeg';
+import gallivantCover from '../assets/gallivant.jpeg';
+import whoIsAkiibCover from '../assets/who is akiib.jpeg';
 
 export default function SpotlightPage() {
   return (
@@ -166,9 +169,9 @@ export default function SpotlightPage() {
           </p>
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {[
-              { num: '01', name: 'Badess Kid',  role: 'Artist', spotify: 'https://open.spotify.com/artist/2CPYKOVDrb7jnJzi8lo3fD' },
-              { num: '02', name: 'Dmanteaser', role: 'Artist', spotify: 'https://open.spotify.com/search/dmanteaser/artists' },
-              { num: '03', name: 'Jazzydking', role: 'Artist', spotify: 'https://open.spotify.com/search/jazzydking/artists' },
+              { num: '01', name: 'Badess Kid',  role: 'Artist', photo: badessKidPhoto, spotify: 'https://open.spotify.com/artist/2CPYKOVDrb7jnJzi8lo3fD' },
+              { num: '02', name: 'Dmanteaser', role: 'Artist', photo: null, spotify: 'https://open.spotify.com/search/dmanteaser/artists' },
+              { num: '03', name: 'Jazzydking', role: 'Artist', photo: null, spotify: 'https://open.spotify.com/search/jazzydking/artists' },
             ].map(a => (
               <a
                 key={a.num}
@@ -179,8 +182,11 @@ export default function SpotlightPage() {
                 style={{ background: 'var(--color-bg)', padding: '20px 16px', cursor: a.spotify ? 'pointer' : 'default' }}
               >
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>{a.num}</span>
-                <div className="rounded-full flex-shrink-0 flex items-center justify-center border" style={{ width: '44px', height: '44px', borderColor: 'var(--color-line-strong)', background: 'var(--color-bg-2)' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', color: 'var(--color-gold)' }}>{a.name[0]}</span>
+                <div className="rounded-full overflow-hidden shrink-0 flex items-center justify-center border" style={{ width: '44px', height: '44px', borderColor: 'var(--color-line-strong)', background: 'var(--color-bg-2)' }}>
+                  {a.photo
+                    ? <img src={a.photo} alt={a.name} className="w-full h-full object-cover" />
+                    : <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', color: 'var(--color-gold)' }}>{a.name[0]}</span>
+                  }
                 </div>
                 <div className="flex-1 min-w-0">
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 32px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.1 }}>{a.name}</div>
@@ -209,18 +215,18 @@ export default function SpotlightPage() {
           </div>
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {[
-              { title: 'Gallivant',          artist: 'Youngzy',                         spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
-              { title: 'A Cry to God',       artist: 'King Yungzil',                    spotify: 'https://open.spotify.com/artist/326UBkWhn2XgCcjIhjtmr7' },
-              { title: 'Drip',               artist: 'African Boy',                     spotify: 'https://open.spotify.com/artist/25bc1K8fnRXnOG0lyKOCEl' },
-              { title: 'My Life',            artist: 'Normal Donzee ft. Bella Shmurda', spotify: 'https://open.spotify.com/artist/7uOVdfoFMg0FbFmc1Xp7Ye' },
-              { title: 'All for You',        artist: 'Karmarr',                         spotify: 'https://open.spotify.com/artist/1eesfZPQ3CCwy2qKdifzY9' },
-              { title: 'Where You Dey',      artist: 'Jah Lingo',                       spotify: 'https://open.spotify.com/artist/4j7tdwUsMU9Y8PxeQrmCE1' },
-              { title: 'Oja Men',            artist: 'Ysteve ft. Ojadilichukwu',        spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
-              { title: 'Who is Akiib? EP',   artist: 'Akiib',                           spotify: 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG' },
-              { title: 'Love Letter',        artist: 'Valid Patema',                    spotify: 'https://open.spotify.com/artist/2AwcOuICLKuwxBoftfCpMQ' },
-              { title: 'Oya Egbu Onwu',      artist: 'Uche Onye Egwu',                 spotify: 'https://open.spotify.com/artist/1GiPtQPB6UOfSHDiedkkl9' },
-              { title: 'Naija',              artist: 'Solotone',                        spotify: 'https://open.spotify.com/artist/5TR5ha19awStaDcqWGnwHU' },
-              { title: 'Ohema Remix',        artist: 'Nokyes ft Sugarboi',              spotify: 'https://open.spotify.com/artist/1nJ9LK9SJxdYAFUGy4FYuI' },
+              { title: 'Gallivant',          artist: 'Youngzy',                         cover: gallivantCover,   spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
+              { title: 'A Cry to God',       artist: 'King Yungzil',                    cover: null,             spotify: 'https://open.spotify.com/artist/326UBkWhn2XgCcjIhjtmr7' },
+              { title: 'Drip',               artist: 'African Boy',                     cover: null,             spotify: 'https://open.spotify.com/artist/25bc1K8fnRXnOG0lyKOCEl' },
+              { title: 'My Life',            artist: 'Normal Donzee ft. Bella Shmurda', cover: null,             spotify: 'https://open.spotify.com/artist/7uOVdfoFMg0FbFmc1Xp7Ye' },
+              { title: 'All for You',        artist: 'Karmarr',                         cover: null,             spotify: 'https://open.spotify.com/artist/1eesfZPQ3CCwy2qKdifzY9' },
+              { title: 'Where You Dey',      artist: 'Jah Lingo',                       cover: null,             spotify: 'https://open.spotify.com/artist/4j7tdwUsMU9Y8PxeQrmCE1' },
+              { title: 'Oja Men',            artist: 'Ysteve ft. Ojadilichukwu',        cover: null,             spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
+              { title: 'Who is Akiib? EP',   artist: 'Akiib',                           cover: whoIsAkiibCover,  spotify: 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG' },
+              { title: 'Love Letter',        artist: 'Valid Patema',                    cover: null,             spotify: 'https://open.spotify.com/artist/2AwcOuICLKuwxBoftfCpMQ' },
+              { title: 'Oya Egbu Onwu',      artist: 'Uche Onye Egwu',                 cover: null,             spotify: 'https://open.spotify.com/artist/1GiPtQPB6UOfSHDiedkkl9' },
+              { title: 'Naija',              artist: 'Solotone',                        cover: null,             spotify: 'https://open.spotify.com/artist/5TR5ha19awStaDcqWGnwHU' },
+              { title: 'Ohema Remix',        artist: 'Nokyes ft Sugarboi',              cover: null,             spotify: 'https://open.spotify.com/artist/1nJ9LK9SJxdYAFUGy4FYuI' },
             ].map((s, i) => (
               <a
                 key={s.title}
@@ -233,8 +239,11 @@ export default function SpotlightPage() {
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <div className="rounded-full flex-shrink-0 flex items-center justify-center border" style={{ width: '44px', height: '44px', borderColor: 'var(--color-line-strong)', background: 'var(--color-bg-2)' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', color: 'var(--color-gold)' }}>{s.artist[0].toUpperCase()}</span>
+                <div className="rounded-full overflow-hidden shrink-0 flex items-center justify-center border" style={{ width: '44px', height: '44px', borderColor: 'var(--color-line-strong)', background: 'var(--color-bg-2)' }}>
+                  {s.cover
+                    ? <img src={s.cover} alt={s.title} className="w-full h-full object-cover" />
+                    : <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', color: 'var(--color-gold)' }}>{s.artist[0].toUpperCase()}</span>
+                  }
                 </div>
                 <div className="flex-1 min-w-0">
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 32px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.1 }}>{s.title}</div>

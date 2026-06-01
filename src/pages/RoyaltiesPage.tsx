@@ -345,14 +345,14 @@ export default function RoyaltiesPage() {
                 className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
               >
-                Go to Publishing<Arrow />
+                Set up publishing<Arrow />
               </button>
               <button
                 onClick={() => navigate('/distro')}
                 className="inline-flex items-center gap-3 transition-colors duration-250 hover:text-[var(--color-gold)]"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', border: '1px solid var(--color-line)', color: 'var(--color-ink)' }}
               >
-                See Distribution<Arrow />
+                Set up distribution<Arrow />
               </button>
             </div>
           </div>

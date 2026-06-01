@@ -42,7 +42,7 @@ export default function HomePage() {
                 Dwad Music
               </h1>
               <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '560px' }}>
-                Everything you Need in One Place. From Production to Promotion to Distribution…<br /><br />
+                Everything you Need in One Place. From Production to Distribution to Promotion…<br /><br />
                 A full-service music platform built for Independent Artists and Labels worldwide.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">

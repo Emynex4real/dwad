@@ -75,6 +75,61 @@ export default function DistroPage() {
         </div>
       </section>
 
+      {/* ── UPLOAD YOUR MUSIC ── */}
+      <section className="py-16 sm:py-25 px-5 sm:px-14 border-b" style={{ borderColor: 'var(--color-line)' }}>
+        <div className="max-w-[1440px] mx-auto">
+          <div className="flex items-center gap-6 mb-12">
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', whiteSpace: 'nowrap' }}>
+              ✦ Upload your music
+            </span>
+            <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
+          </div>
+          <div className="grid gap-10 sm:gap-20 items-end grid-cols-1 min-[900px]:grid-cols-2">
+            <div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
+                Your music.<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Everywhere.</span>
+              </h2>
+              <p className="mt-6" style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '520px' }}>
+                Send us your track and artwork — we upload it to Apple Music, Spotify, Boomplay, TikTok and 200+ platforms worldwide. No technical setup required.
+              </p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <a
+                  href="https://wa.me/message/VYJP7JFQPZXSN1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                >
+                  Upload your music<Arrow />
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
+              {['Apple Music', 'Spotify', 'Boomplay', 'Audiomack', 'TikTok', 'YouTube Music'].map((platform, i) => (
+                <div
+                  key={platform}
+                  className="flex items-center gap-6"
+                  style={{ background: 'var(--color-bg)', padding: '18px 20px' }}
+                >
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-gold)', minWidth: '28px' }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 28px)', color: 'var(--color-ink)' }}>{platform}</span>
+                </div>
+              ))}
+              <div
+                className="flex items-center gap-6"
+                style={{ background: 'var(--color-bg)', padding: '18px 20px' }}
+              >
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-gold)', minWidth: '28px' }}>✦</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.2em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>+ 200 more platforms</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Two-col */}
       <section className="py-16 sm:py-[120px] px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
@@ -150,6 +205,215 @@ export default function DistroPage() {
         </div>
       </section>
 
+      {/* ── DISTRIBUTION PLANS ── */}
+      <section className="py-16 sm:py-[120px] px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="flex items-center gap-6 mb-4">
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', whiteSpace: 'nowrap' }}>
+              ✦ Distribution Plans
+            </span>
+            <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
+          </div>
+          <h2 className="mt-5 mb-14" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
+            Choose your <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>plan.</span>
+          </h2>
+
+          {/* ── Basic Plans ── */}
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '16px' }}>
+            Basic
+          </div>
+          <div className="grid gap-4 grid-cols-1 min-[640px]:grid-cols-3 mb-14">
+
+            {/* A — $10 */}
+            <div className="flex flex-col border" style={{ borderColor: 'var(--color-line)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '16px' }}>
+                A · 1 Song Upload
+              </div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$10</div>
+              <div className="mt-6 flex flex-col gap-3 flex-1">
+                {['1 song upload', 'Spotify, Apple Music + all music apps', 'No TikTok or Instagram upload'].map((f, i) => (
+                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: i === 2 ? 'var(--color-muted)' : 'var(--color-ink-2)', lineHeight: 1.5 }}>
+                    <span style={{ color: i === 2 ? 'var(--color-muted)' : 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>{i === 2 ? '—' : '✦'}</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
+                Get started<Arrow />
+              </a>
+            </div>
+
+            {/* B — $15 */}
+            <div className="flex flex-col border" style={{ borderColor: 'var(--color-line)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '16px' }}>
+                B · 1 Song Upload Pro
+              </div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$15</div>
+              <div className="mt-6 flex flex-col gap-3 flex-1">
+                {['1 song upload', 'Spotify, Apple Music + 200 more apps', 'TikTok, Instagram + all social media apps'].map(f => (
+                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>✦</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
+                Get started<Arrow />
+              </a>
+            </div>
+
+            {/* C — $30 */}
+            <div className="flex flex-col border" style={{ borderColor: 'var(--color-line)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '16px' }}>
+                C · Unlimited
+              </div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$30</div>
+              <div className="mt-6 flex flex-col gap-3 flex-1">
+                {['Unlimited song uploads per year', 'Spotify, Apple Music + 200 more apps', 'TikTok, Instagram + all social media apps'].map(f => (
+                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>✦</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
+                Get started<Arrow />
+              </a>
+            </div>
+
+          </div>
+
+          {/* ── Special Packages ── */}
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>
+            ✦ Special Packages
+          </div>
+          <div className="grid gap-4 grid-cols-1 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-4">
+
+            {/* Gold $150 */}
+            <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Gold</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$150</div>
+              <div className="mt-6 flex flex-col gap-3 flex-1">
+                {[
+                  'Unlimited upload a year',
+                  'All music apps',
+                  'All social media apps',
+                  '1 free radio promotion',
+                  'Free editorial playlist pitching',
+                  '1 free cover art graphics',
+                ].map(f => (
+                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>✦</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
+                Get started<Arrow />
+              </a>
+            </div>
+
+            {/* Diamond $500 */}
+            <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Diamond</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$500</div>
+              <div className="mt-6 flex flex-col gap-3 flex-1">
+                {[
+                  'Unlimited upload a year',
+                  'All music apps',
+                  'All social media apps',
+                  '3 free radio promotions',
+                  'Free editorial playlist pitching',
+                  '2 free cover art graphics',
+                  '10 free web blog placements',
+                ].map(f => (
+                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>✦</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
+                Get started<Arrow />
+              </a>
+            </div>
+
+            {/* Platinum $1,000 */}
+            <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Platinum</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$1,000</div>
+              <div className="mt-6 flex flex-col gap-3 flex-1">
+                {[
+                  'Unlimited upload a year',
+                  'All music apps',
+                  'All social media apps',
+                  '5 free radio promotions',
+                  'Free editorial playlist pitching',
+                  '5 free cover art graphics',
+                  '50 free web blog placements',
+                  'Free promo on TikTok, Instagram & Facebook',
+                ].map(f => (
+                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>✦</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
+                Get started<Arrow />
+              </a>
+            </div>
+
+            {/* Platinum Pro $5,000 */}
+            <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Platinum Pro</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$5,000</div>
+              <div className="mt-6 flex flex-col gap-3 flex-1">
+                {[
+                  'Unlimited upload a year',
+                  'All music apps',
+                  'All social media apps',
+                  '10 free radio promotions',
+                  'Free editorial playlist pitching',
+                  '10 free cover art graphics',
+                  '100 free web blog placements',
+                  'Free promo on TikTok, Instagram & Facebook',
+                  'Free promo on Spotify, Audiomack & YouTube',
+                  'Free management service',
+                  'Free music video',
+                ].map(f => (
+                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>✦</span>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
+                Get started<Arrow />
+              </a>
+            </div>
+
+          </div>
+
+          {/* Custom budget CTA */}
+          <div className="mt-10 border-t pt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6" style={{ borderColor: 'var(--color-line)' }}>
+            <p style={{ fontSize: '16px', color: 'var(--color-ink-2)', fontWeight: 300, lineHeight: 1.5, maxWidth: '560px' }}>
+              Have a bigger budget and want bigger results?{' '}
+              <span style={{ color: 'var(--color-ink)' }}>Contact us and we'll build you a personal promo plan.</span>
+            </p>
+            <a
+              href="https://wa.me/message/VYJP7JFQPZXSN1"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-3 shrink-0 transition-colors duration-250 hover:text-gold"
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', border: '1px solid var(--color-line)', color: 'var(--color-ink)' }}
+            >
+              Contact us<Arrow />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Bundle */}
       <section className="py-12 sm:py-20 px-5 sm:px-14">
         <div className="max-w-[1440px] mx-auto">
@@ -181,7 +445,7 @@ export default function DistroPage() {
                 href="https://wa.me/message/VYJP7JFQPZXSN1"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-3 transition-colors duration-250 hover:text-[var(--color-gold)]"
+                className="inline-flex items-center gap-3 transition-colors duration-250 hover:text-gold"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', border: '1px solid var(--color-line)', color: 'var(--color-ink)' }}
               >
                 Talk to a Rep<Arrow />

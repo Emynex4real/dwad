@@ -1,0 +1,53 @@
+import type { Notification } from '../../types/dashboard';
+
+export const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: 'notif-001',
+    artistId: 'artist-001',
+    type: 'upload_approved',
+    title: 'Upload Approved',
+    message: 'Your track "Midnight Frequency" has been approved and is now live on all platforms.',
+    isRead: true,
+    createdAt: '2025-05-25T10:00:00Z',
+    metadata: { trackId: 'track-001', trackTitle: 'Midnight Frequency' },
+  },
+  {
+    id: 'notif-002',
+    artistId: 'artist-001',
+    type: 'release_alert',
+    title: 'Release Tomorrow',
+    message: 'Your track "Lagos Nights" is scheduled to release tomorrow, August 1st. Make sure your promotional assets are ready.',
+    isRead: false,
+    createdAt: '2025-07-31T08:00:00Z',
+    metadata: { trackId: 'track-002', trackTitle: 'Lagos Nights' },
+  },
+  {
+    id: 'notif-003',
+    artistId: 'artist-002',
+    type: 'upload_submitted',
+    title: 'Upload Received',
+    message: 'We have received your upload for "Soul in the Rain". Our team will review it within 2-3 business days.',
+    isRead: true,
+    createdAt: '2025-06-05T09:20:00Z',
+    metadata: { trackId: 'track-003', trackTitle: 'Soul in the Rain' },
+  },
+  {
+    id: 'notif-004',
+    artistId: 'artist-003',
+    type: 'subscription_expired',
+    title: 'Subscription Expired',
+    message: 'Your Starter plan expired on May 20, 2025. Renew now to regain upload access and keep your music live.',
+    isRead: false,
+    createdAt: '2025-05-20T00:00:00Z',
+  },
+  {
+    id: 'notif-005',
+    artistId: 'artist-004',
+    type: 'upload_submitted',
+    title: 'Upload Received',
+    message: 'We have received your upload for "Ayakata". Our team will review it within 2-3 business days.',
+    isRead: false,
+    createdAt: '2025-06-01T17:00:00Z',
+    metadata: { trackId: 'track-005', trackTitle: 'Ayakata' },
+  },
+];

@@ -1,0 +1,157 @@
+import type { TrackUpload, ArtistAnalytics, TrackStats } from '../../types/dashboard';
+
+export const MOCK_TRACKS: TrackUpload[] = [
+  {
+    id: 'track-001',
+    artistId: 'artist-001',
+    title: 'Midnight Frequency',
+    genre: 'Alt Pop',
+    releaseDate: '2025-06-15',
+    upcCode: '00602507339654',
+    isrcCode: 'NGAKB2500001',
+    releaseLink: 'https://open.spotify.com/track/midnight-frequency',
+    status: 'live',
+    submittedAt: '2025-05-20T10:30:00Z',
+    platforms: ['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music'],
+  },
+  {
+    id: 'track-002',
+    artistId: 'artist-001',
+    title: 'Lagos Nights',
+    featuring: 'M Day Yor',
+    genre: 'Alt Pop',
+    releaseDate: '2025-08-01',
+    upcCode: '00602507339655',
+    isrcCode: 'NGAKB2500002',
+    status: 'approved',
+    submittedAt: '2025-06-01T14:00:00Z',
+    platforms: ['Spotify', 'Apple Music', 'Boomplay', 'TikTok'],
+  },
+  {
+    id: 'track-003',
+    artistId: 'artist-002',
+    title: 'Soul in the Rain',
+    genre: 'Afro Soul',
+    releaseDate: '2025-07-10',
+    upcCode: '00602507339656',
+    isrcCode: 'NGMDY2500001',
+    releaseLink: 'https://open.spotify.com/track/soul-in-rain',
+    status: 'live',
+    submittedAt: '2025-06-05T09:15:00Z',
+    platforms: ['Spotify', 'Apple Music', 'Boomplay', 'Audiomack'],
+  },
+  {
+    id: 'track-004',
+    artistId: 'artist-003',
+    title: 'Hush Little Boys',
+    genre: 'Afrobeats',
+    releaseDate: '2024-12-01',
+    upcCode: '00602507339650',
+    isrcCode: 'NGDJB2400001',
+    releaseLink: 'https://open.spotify.com/track/hush-little-boys',
+    status: 'live',
+    submittedAt: '2024-11-01T11:00:00Z',
+    platforms: ['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack'],
+  },
+  {
+    id: 'track-005',
+    artistId: 'artist-004',
+    title: 'Ayakata',
+    genre: 'Hip Hop',
+    releaseDate: '2025-09-15',
+    upcCode: '00602507339657',
+    isrcCode: 'NGLYY2500001',
+    status: 'pending',
+    submittedAt: '2025-06-01T16:45:00Z',
+    platforms: ['Spotify', 'Apple Music', 'Boomplay', 'Audiomack', 'Tidal'],
+  },
+  {
+    id: 'track-006',
+    artistId: 'artist-005',
+    title: 'Oya Egbu Onwu',
+    genre: 'Gospel',
+    releaseDate: '2025-10-01',
+    status: 'pending',
+    submittedAt: '2025-06-01T18:00:00Z',
+    platforms: ['Spotify', 'Apple Music', 'Boomplay', 'YouTube Music'],
+  },
+];
+
+const buildMonthly = (base: number, variance: number) =>
+  ['Jan 25','Feb 25','Mar 25','Apr 25','May 25','Jun 25'].map((month, i) => ({
+    month,
+    streams: Math.round(base + Math.sin(i) * variance + i * (variance / 4)),
+    revenue: parseFloat((((base + Math.sin(i) * variance + i * (variance / 4)) / 1000) * 3.5).toFixed(2)),
+  }));
+
+const TRACK_STATS_001: TrackStats = {
+  trackId: 'track-001',
+  title: 'Midnight Frequency',
+  totalStreams: 84200,
+  totalRevenue: 294.70,
+  platforms: [
+    { name: 'Spotify', streams: 42000 },
+    { name: 'Apple Music', streams: 18000 },
+    { name: 'Boomplay', streams: 14200 },
+    { name: 'TikTok', streams: 7000 },
+    { name: 'YouTube Music', streams: 3000 },
+  ],
+  monthly: buildMonthly(12000, 4000),
+};
+
+const TRACK_STATS_003: TrackStats = {
+  trackId: 'track-003',
+  title: 'Soul in the Rain',
+  totalStreams: 51000,
+  totalRevenue: 178.50,
+  platforms: [
+    { name: 'Spotify', streams: 26000 },
+    { name: 'Apple Music', streams: 12000 },
+    { name: 'Boomplay', streams: 9000 },
+    { name: 'Audiomack', streams: 4000 },
+  ],
+  monthly: buildMonthly(7000, 3000),
+};
+
+export const MOCK_ANALYTICS: ArtistAnalytics[] = [
+  {
+    artistId: 'artist-001',
+    totalStreams: 124600,
+    totalRevenue: 436.10,
+    pendingPayout: 218.05,
+    monthly: buildMonthly(18000, 6000),
+    topTracks: [TRACK_STATS_001],
+  },
+  {
+    artistId: 'artist-002',
+    totalStreams: 51000,
+    totalRevenue: 178.50,
+    pendingPayout: 89.25,
+    monthly: buildMonthly(7000, 3000),
+    topTracks: [TRACK_STATS_003],
+  },
+  {
+    artistId: 'artist-003',
+    totalStreams: 210000,
+    totalRevenue: 735.00,
+    pendingPayout: 0,
+    monthly: buildMonthly(30000, 10000),
+    topTracks: [],
+  },
+  {
+    artistId: 'artist-004',
+    totalStreams: 8400,
+    totalRevenue: 29.40,
+    pendingPayout: 29.40,
+    monthly: buildMonthly(1200, 400),
+    topTracks: [],
+  },
+  {
+    artistId: 'artist-005',
+    totalStreams: 3200,
+    totalRevenue: 11.20,
+    pendingPayout: 11.20,
+    monthly: buildMonthly(450, 150),
+    topTracks: [],
+  },
+];
