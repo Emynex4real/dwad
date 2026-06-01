@@ -6,16 +6,17 @@ import { logoDark } from '../data';
 interface NavItem {
   to: string;
   label: string;
+  shortLabel: string;
   icon: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/admin',              label: 'Overview',      icon: '◈' },
-  { to: '/admin/artists',     label: 'Artists',        icon: '♪' },
-  { to: '/admin/subscriptions', label: 'Subscriptions', icon: '◇' },
-  { to: '/admin/uploads',     label: 'Uploads',        icon: '↑' },
-  { to: '/admin/reports',     label: 'Reports',        icon: '▦' },
-  { to: '/admin/notifications', label: 'Notifications', icon: '◎' },
+  { to: '/admin',               label: 'Overview',       shortLabel: 'Home',    icon: '◈' },
+  { to: '/admin/artists',       label: 'Artists',         shortLabel: 'Artists', icon: '♪' },
+  { to: '/admin/subscriptions', label: 'Subscriptions',   shortLabel: 'Subs',    icon: '◇' },
+  { to: '/admin/uploads',       label: 'Uploads',         shortLabel: 'Uploads', icon: '↑' },
+  { to: '/admin/reports',       label: 'Reports',         shortLabel: 'Reports', icon: '▦' },
+  { to: '/admin/notifications', label: 'Notifications',   shortLabel: 'Alerts',  icon: '◎' },
 ];
 
 export default function AdminLayout() {
@@ -99,6 +100,9 @@ export default function AdminLayout() {
           </div>
           <div className="dash-topbar__right">
             <span className="dash-topbar__badge">Admin Portal</span>
+            <div className="dash-topbar__user-chip" onClick={handleLogout} title="Sign out">
+              <div className="dash-avatar dash-avatar--sm">{user?.name.charAt(0)}</div>
+            </div>
           </div>
         </header>
 
@@ -107,6 +111,21 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile bottom nav */}
+      <nav className="dash-mobile-nav" aria-label="Main navigation">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/admin'}
+            className={({ isActive }) => `dash-mobile-nav__item ${isActive ? 'dash-mobile-nav__item--active' : ''}`}
+          >
+            <span className="dash-mobile-nav__icon">{item.icon}</span>
+            <span className="dash-mobile-nav__label">{item.shortLabel}</span>
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 }

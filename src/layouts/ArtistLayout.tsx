@@ -7,15 +7,16 @@ import { logoDark } from '../data';
 interface NavItem {
   to: string;
   label: string;
+  shortLabel: string;
   icon: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/artist/home',      label: 'Home',      icon: '⌂' },
-  { to: '/artist/releases',  label: 'Releases',  icon: '♫' },
-  { to: '/artist/analytics', label: 'Analytics', icon: '◈' },
-  { to: '/artist/income',    label: 'Income',    icon: '◇' },
-  { to: '/artist/upload',    label: 'Upload',    icon: '↑' },
+  { to: '/artist/home',      label: 'Home',      shortLabel: 'Home',     icon: '⌂' },
+  { to: '/artist/releases',  label: 'Releases',  shortLabel: 'Releases', icon: '♫' },
+  { to: '/artist/analytics', label: 'Analytics', shortLabel: 'Stats',    icon: '◈' },
+  { to: '/artist/income',    label: 'Income',    shortLabel: 'Income',   icon: '◇' },
+  { to: '/artist/upload',    label: 'Upload',    shortLabel: 'Upload',   icon: '↑' },
 ];
 
 export default function ArtistLayout() {
@@ -102,6 +103,12 @@ export default function ArtistLayout() {
           </div>
           <div className="dash-topbar__right">
             <span className="dash-topbar__badge">Artist Portal</span>
+            {unreadCount > 0 && (
+              <div className="dash-topbar__notif-dot">{unreadCount}</div>
+            )}
+            <div className="dash-topbar__user-chip" onClick={handleLogout} title="Sign out">
+              <div className="dash-avatar dash-avatar--sm">{user?.name.charAt(0)}</div>
+            </div>
           </div>
         </header>
 
@@ -109,6 +116,23 @@ export default function ArtistLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile bottom nav */}
+      <nav className="dash-mobile-nav" aria-label="Main navigation">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) => `dash-mobile-nav__item ${isActive ? 'dash-mobile-nav__item--active' : ''}`}
+          >
+            <span className="dash-mobile-nav__icon">{item.icon}</span>
+            {item.to === '/artist/home' && unreadCount > 0 && (
+              <span className="dash-mobile-nav__badge">{unreadCount}</span>
+            )}
+            <span className="dash-mobile-nav__label">{item.shortLabel}</span>
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 }
