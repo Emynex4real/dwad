@@ -17,23 +17,21 @@ export default function AdminNotificationsPage() {
   const artists = useMemo(() => getAllArtists(), []);
   const [notifications, setNotifications] = useState<Notification[]>(() => getAllNotifications());
 
-  const [target, setTarget] = useState<'individual' | 'all'>('individual');
+  const [target,   setTarget]   = useState<'individual' | 'all'>('individual');
   const [artistId, setArtistId] = useState(artists[0]?.id ?? '');
-  const [type, setType] = useState<NotificationType>('general');
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [sent, setSent] = useState(false);
+  const [type,     setType]     = useState<NotificationType>('general');
+  const [title,    setTitle]    = useState('');
+  const [message,  setMessage]  = useState('');
+  const [sent,     setSent]     = useState(false);
 
   function handleSend(e: FormEvent) {
     e.preventDefault();
     if (!title.trim() || !message.trim()) return;
-
     if (target === 'all') {
       broadcastNotification(artists.map((a) => a.id), type, title, message);
     } else {
       sendNotification(artistId, type, title, message);
     }
-
     setNotifications(getAllNotifications());
     setTitle('');
     setMessage('');
@@ -42,55 +40,58 @@ export default function AdminNotificationsPage() {
   }
 
   return (
-    <div className="dash-page">
-      <div className="dash-page__header">
-        <h1 className="dash-page__title">Notifications</h1>
-        <p className="dash-page__sub">Send alerts to individual artists or all artists at once.</p>
+    <div className="flex flex-col gap-5 max-w-300">
+
+      {/* Header */}
+      <div>
+        <h1 className="font-serif text-2xl sm:text-3xl font-normal text-ink">Notifications</h1>
+        <p className="text-sm text-muted mt-1">Send alerts to individual artists or broadcast to all.</p>
       </div>
 
-      <div className="dash-two-col">
-        {/* Compose form */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        {/* Compose */}
         <div className="dash-panel">
-          <h2 className="dash-panel__title">Compose Notification</h2>
-          <form className="dash-form" onSubmit={handleSend}>
+          <h2 className="text-sm font-semibold text-ink mb-4">Compose Notification</h2>
+          <form className="flex flex-col gap-4" onSubmit={handleSend}>
 
             {/* Target */}
-            <div className="dash-form__field">
-              <label>Send to</label>
-              <div className="dash-radio-group">
-                <label className="dash-radio">
-                  <input type="radio" value="individual" checked={target === 'individual'} onChange={() => setTarget('individual')} />
-                  Individual artist
-                </label>
-                <label className="dash-radio">
-                  <input type="radio" value="all" checked={target === 'all'} onChange={() => setTarget('all')} />
-                  All artists ({artists.length})
-                </label>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-medium text-ink-2">Send to</label>
+              <div className="flex gap-4">
+                {(['individual', 'all'] as const).map((v) => (
+                  <label key={v} className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      value={v}
+                      checked={target === v}
+                      onChange={() => setTarget(v)}
+                      className="accent-gold"
+                    />
+                    {v === 'individual' ? 'Individual artist' : `All artists (${artists.length})`}
+                  </label>
+                ))}
               </div>
             </div>
 
             {target === 'individual' && (
-              <div className="dash-form__field">
-                <label>Artist</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-ink-2">Artist</label>
                 <select className="dash-input select-field" value={artistId} onChange={(e) => setArtistId(e.target.value)}>
-                  {artists.map((a) => (
-                    <option key={a.id} value={a.id}>{a.name}</option>
-                  ))}
+                  {artists.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
               </div>
             )}
 
-            <div className="dash-form__field">
-              <label>Type</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-ink-2">Type</label>
               <select className="dash-input select-field" value={type} onChange={(e) => setType(e.target.value as NotificationType)}>
-                {NOTIFICATION_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
-                ))}
+                {NOTIFICATION_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
 
-            <div className="dash-form__field">
-              <label>Title</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-ink-2">Title</label>
               <input
                 className="dash-input"
                 value={title}
@@ -101,8 +102,8 @@ export default function AdminNotificationsPage() {
               />
             </div>
 
-            <div className="dash-form__field">
-              <label>Message</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-ink-2">Message</label>
               <textarea
                 className="dash-input dash-textarea"
                 value={message}
@@ -112,12 +113,12 @@ export default function AdminNotificationsPage() {
                 rows={4}
                 maxLength={500}
               />
-              <span className="dash-form__hint">{message.length}/500</span>
+              <span className="text-xs text-muted">{message.length}/500</span>
             </div>
 
-            <div className="dash-form__footer">
-              {sent && <span className="dash-saved">Sent ✓</span>}
-              <button type="submit" className="dash-btn dash-btn--gold">
+            <div className="flex items-center justify-between pt-2 border-t border-line">
+              {sent && <span className="text-xs text-green-400">Sent ✓</span>}
+              <button type="submit" className="dash-btn dash-btn--gold ml-auto">
                 {target === 'all' ? `Send to All (${artists.length})` : 'Send Notification'}
               </button>
             </div>
@@ -125,28 +126,31 @@ export default function AdminNotificationsPage() {
         </div>
 
         {/* Recent notifications */}
-        <div className="dash-panel">
-          <h2 className="dash-panel__title">Recent Notifications</h2>
-          <div className="dash-notif-list">
+        <div className="dash-panel p-0!">
+          <h2 className="text-sm font-semibold text-ink px-5 pt-5 pb-3">Recent Notifications</h2>
+          <div className="divide-y divide-line max-h-130 overflow-y-auto">
             {notifications.slice(0, 20).map((n) => {
               const artist = artists.find((a) => a.id === n.artistId);
               return (
-                <div key={n.id} className={`dash-notif-item ${!n.isRead ? 'dash-notif-item--unread' : ''}`}>
-                  <div className="dash-notif-item__meta">
-                    <span className="font-medium">{artist?.name ?? n.artistId}</span>
-                    <span className="text-muted text-sm">{new Date(n.createdAt).toLocaleDateString()}</span>
+                <div key={n.id} className={`px-5 py-3 ${!n.isRead ? 'bg-gold/3' : ''}`}>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-xs font-medium text-ink truncate">{artist?.name ?? n.artistId}</span>
+                    <span className="text-[11px] text-muted shrink-0">{new Date(n.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <div className="dash-notif-item__title">{n.title}</div>
-                  <div className="dash-notif-item__msg">{n.message}</div>
-                  <span className={`dash-badge dash-badge--${n.isRead ? 'live' : 'pending'}`}>
+                  <div className="text-xs font-medium text-ink-2 mb-0.5">{n.title}</div>
+                  <div className="text-xs text-muted leading-relaxed line-clamp-2">{n.message}</div>
+                  <span className={`dash-badge dash-badge--${n.isRead ? 'live' : 'pending'} mt-2`}>
                     {n.isRead ? 'Read' : 'Unread'}
                   </span>
                 </div>
               );
             })}
-            {notifications.length === 0 && <p className="dash-empty">No notifications sent yet.</p>}
+            {notifications.length === 0 && (
+              <p className="px-5 py-5 text-sm text-muted">No notifications sent yet.</p>
+            )}
           </div>
         </div>
+
       </div>
     </div>
   );

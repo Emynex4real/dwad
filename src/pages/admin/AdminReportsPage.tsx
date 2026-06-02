@@ -10,10 +10,10 @@ interface CsvRow {
 }
 
 export default function AdminReportsPage() {
-  const [reports, setReports] = useState<ReportUpload[]>([]);
-  const [dragOver, setDragOver] = useState(false);
+  const [reports, setReports]     = useState<ReportUpload[]>([]);
+  const [dragOver, setDragOver]   = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [log, setLog] = useState<string[]>([]);
+  const [log, setLog]             = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function addLog(msg: string) {
@@ -23,8 +23,7 @@ export default function AdminReportsPage() {
   function processFile(file: File) {
     setProcessing(true);
     const type = file.name.endsWith('.csv') ? 'csv' : 'html';
-
-    const reportEntry: ReportUpload = {
+    const entry: ReportUpload = {
       id: `report-${Date.now()}`,
       filename: file.name,
       type,
@@ -33,7 +32,7 @@ export default function AdminReportsPage() {
       affectedArtists: 0,
       uploadedBy: 'admin-001',
     };
-    setReports((r) => [reportEntry, ...r]);
+    setReports((r) => [entry, ...r]);
     addLog(`Processing ${file.name}…`);
 
     if (type === 'csv') {
@@ -50,22 +49,19 @@ export default function AdminReportsPage() {
             }
           }
           const count = applyReportData(data);
-          setReports((r) =>
-            r.map((rep) => rep.id === reportEntry.id ? { ...rep, status: 'applied', affectedArtists: count } : rep),
-          );
+          setReports((r) => r.map((rep) => rep.id === entry.id ? { ...rep, status: 'applied', affectedArtists: count } : rep));
           addLog(`Applied ${file.name} — ${count} artists updated, ${results.data.length} rows parsed.`);
           setProcessing(false);
         },
         error(err) {
-          setReports((r) => r.map((rep) => rep.id === reportEntry.id ? { ...rep, status: 'failed' } : rep));
+          setReports((r) => r.map((rep) => rep.id === entry.id ? { ...rep, status: 'failed' } : rep));
           addLog(`Error parsing ${file.name}: ${err.message}`);
           setProcessing(false);
         },
       });
     } else {
-      // HTML files are stored as-is (rendered in artist dashboard via raw HTML injection)
       setTimeout(() => {
-        setReports((r) => r.map((rep) => rep.id === reportEntry.id ? { ...rep, status: 'applied', affectedArtists: 0 } : rep));
+        setReports((r) => r.map((rep) => rep.id === entry.id ? { ...rep, status: 'applied' } : rep));
         addLog(`HTML report ${file.name} stored successfully.`);
         setProcessing(false);
       }, 800);
@@ -78,7 +74,7 @@ export default function AdminReportsPage() {
       if (f.name.endsWith('.csv') || f.name.endsWith('.html') || f.name.endsWith('.htm')) {
         processFile(f);
       } else {
-        addLog(`Skipped ${f.name} — only .csv and .html files are supported.`);
+        addLog(`Skipped ${f.name} — only .csv and .html supported.`);
       }
     });
   }
@@ -95,84 +91,103 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <div className="dash-page">
-      <div className="dash-page__header">
-        <h1 className="dash-page__title">Reports</h1>
-        <p className="dash-page__sub">Upload CSV or HTML files to update artist analytics dashboards.</p>
+    <div className="flex flex-col gap-5 max-w-300">
+
+      {/* Header */}
+      <div>
+        <h1 className="font-serif text-2xl sm:text-3xl font-normal text-ink">Reports</h1>
+        <p className="text-sm text-muted mt-1">Upload CSV or HTML files to update artist analytics dashboards.</p>
       </div>
 
-      {/* CSV format reference */}
+      {/* CSV format */}
       <div className="dash-panel">
-        <h2 className="dash-panel__title">CSV Format</h2>
-        <p className="text-muted text-sm" style={{ marginBottom: 12 }}>
-          Your CSV must have these exact column headers. Each row updates one artist's analytics.
-        </p>
-        <pre className="dash-code">artistId,streams,revenue
-artist-001,12400,43.40
-artist-002,8200,28.70</pre>
+        <h2 className="text-sm font-semibold text-ink mb-2">CSV Format</h2>
+        <p className="text-xs text-muted mb-3">Your CSV must use these exact column headers. Each row updates one artist.</p>
+        <pre className="dash-code text-xs sm:text-sm overflow-x-auto">{'artistId,streams,revenue\nartist-001,12400,43.40\nartist-002,8200,28.70'}</pre>
       </div>
 
       {/* Drop zone */}
       <div
-        className={`dash-dropzone ${dragOver ? 'dash-dropzone--active' : ''} ${processing ? 'dash-dropzone--processing' : ''}`}
+        className={[
+          'rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 py-10 px-6 text-center cursor-pointer transition-colors',
+          dragOver || processing
+            ? 'border-gold bg-gold/5'
+            : 'border-line-strong hover:border-gold hover:bg-gold/5',
+          processing ? 'pointer-events-none opacity-60' : '',
+        ].join(' ')}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".csv,.html,.htm"
-          multiple
-          className="hidden"
-          onChange={handleChange}
-        />
-        <div className="dash-dropzone__icon">↑</div>
-        <div className="dash-dropzone__label">
-          {processing ? 'Processing…' : 'Drop CSV or HTML files here, or click to browse'}
+        <input ref={fileInputRef} type="file" accept=".csv,.html,.htm" multiple className="hidden" onChange={handleChange} />
+        <div className="text-3xl text-gold">↑</div>
+        <div className="text-sm text-ink-2">
+          {processing ? 'Processing…' : (
+            <>
+              <span className="hidden sm:inline">Drop CSV or HTML files here, or </span>
+              <span className="text-gold font-medium">tap to browse</span>
+            </>
+          )}
         </div>
-        <div className="dash-dropzone__hint">.csv · .html · .htm supported</div>
+        <div className="text-xs text-muted">.csv · .html · .htm supported</div>
       </div>
 
-      {/* History */}
+      {/* Upload history */}
       {reports.length > 0 && (
-        <div className="dash-panel">
-          <h2 className="dash-panel__title">Upload History</h2>
-          <table className="dash-table">
-            <thead>
-              <tr>
-                <th>File</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Artists Updated</th>
-                <th>Uploaded At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reports.map((r) => (
-                <tr key={r.id}>
-                  <td className="font-medium">{r.filename}</td>
-                  <td><span className="dash-badge dash-badge--plan">{r.type.toUpperCase()}</span></td>
-                  <td><span className={`dash-badge dash-badge--${r.status === 'applied' ? 'live' : r.status === 'failed' ? 'rejected' : 'pending'}`}>{r.status}</span></td>
-                  <td>{r.affectedArtists}</td>
-                  <td className="text-muted text-sm">{new Date(r.uploadedAt).toLocaleTimeString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="dash-panel p-0!">
+          <h2 className="text-sm font-semibold text-ink px-5 pt-5 pb-3">Upload History</h2>
+
+          {/* Mobile */}
+          <div className="sm:hidden divide-y divide-line">
+            {reports.map((r) => (
+              <div key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-ink truncate">{r.filename}</div>
+                  <div className="text-xs text-muted">{new Date(r.uploadedAt).toLocaleTimeString()} · {r.affectedArtists} artists</div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="dash-badge dash-badge--plan">{r.type.toUpperCase()}</span>
+                  <span className={`dash-badge dash-badge--${r.status === 'applied' ? 'live' : r.status === 'failed' ? 'rejected' : 'pending'}`}>{r.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop */}
+          <div className="hidden sm:block overflow-x-auto pb-2">
+            <table className="dash-table">
+              <thead>
+                <tr><th>File</th><th>Type</th><th>Status</th><th>Artists Updated</th><th>Uploaded At</th></tr>
+              </thead>
+              <tbody>
+                {reports.map((r) => (
+                  <tr key={r.id}>
+                    <td className="font-medium">{r.filename}</td>
+                    <td><span className="dash-badge dash-badge--plan">{r.type.toUpperCase()}</span></td>
+                    <td><span className={`dash-badge dash-badge--${r.status === 'applied' ? 'live' : r.status === 'failed' ? 'rejected' : 'pending'}`}>{r.status}</span></td>
+                    <td>{r.affectedArtists}</td>
+                    <td className="text-muted text-sm">{new Date(r.uploadedAt).toLocaleTimeString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* Activity log */}
       {log.length > 0 && (
         <div className="dash-panel">
-          <h2 className="dash-panel__title">Activity Log</h2>
-          <div className="dash-log">
-            {log.map((entry, i) => <div key={i} className="dash-log__entry">{entry}</div>)}
+          <h2 className="text-sm font-semibold text-ink mb-3">Activity Log</h2>
+          <div className="bg-bg rounded-md border border-line p-3 max-h-40 overflow-y-auto flex flex-col gap-1">
+            {log.map((entry, i) => (
+              <div key={i} className="font-mono text-xs text-muted">{entry}</div>
+            ))}
           </div>
         </div>
       )}
+
     </div>
   );
 }
