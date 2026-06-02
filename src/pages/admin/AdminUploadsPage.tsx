@@ -35,23 +35,23 @@ export default function AdminUploadsPage() {
 
   function refresh() { setTracks(getAllTracks()); setSelected([]); }
 
-  function handleApprove(track: TrackUpload) {
-    updateTrackStatus(track.id, 'approved');
-    sendNotification(track.artistId, 'upload_approved', 'Upload Approved',
-      `Your track "${track.title}" has been approved.`, { trackId: track.id, trackTitle: track.title });
+  function handleApprove(t: TrackUpload) {
+    updateTrackStatus(t.id, 'approved');
+    sendNotification(t.artistId, 'upload_approved', 'Upload Approved',
+      `Your track "${t.title}" has been approved.`, { trackId: t.id, trackTitle: t.title });
     refresh();
   }
 
-  function handleReject(track: TrackUpload) {
+  function handleReject(t: TrackUpload) {
     const note = window.prompt('Rejection reason (shown to artist):') ?? '';
-    updateTrackStatus(track.id, 'rejected', note || undefined);
-    sendNotification(track.artistId, 'upload_rejected', 'Upload Rejected',
-      `Your track "${track.title}" was not approved.${note ? ` Reason: ${note}` : ''}`,
-      { trackId: track.id, trackTitle: track.title });
+    updateTrackStatus(t.id, 'rejected', note || undefined);
+    sendNotification(t.artistId, 'upload_rejected', 'Upload Rejected',
+      `Your track "${t.title}" was not approved.${note ? ` Reason: ${note}` : ''}`,
+      { trackId: t.id, trackTitle: t.title });
     refresh();
   }
 
-  function handleMarkLive(trackId: string) { updateTrackStatus(trackId, 'live'); refresh(); }
+  function handleMarkLive(id: string) { updateTrackStatus(id, 'live'); refresh(); }
 
   function toggleSelect(id: string) {
     setSelected((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
@@ -73,16 +73,16 @@ export default function AdminUploadsPage() {
   }), [tracks]);
 
   return (
-    <div className="flex flex-col gap-5 max-w-300">
+    <div className="w-full flex flex-col gap-4">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="font-serif text-2xl sm:text-3xl font-normal text-ink">Uploads</h1>
           <p className="text-sm text-muted mt-0.5">{tracks.length} total submissions</p>
         </div>
         {selected.length > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs text-muted">{selected.length} selected</span>
             <button className="dash-btn dash-btn--gold" onClick={bulkApprove}>Bulk Approve</button>
             <button className="dash-btn dash-btn--ghost" onClick={() => setSelected([])}>Clear</button>
@@ -100,13 +100,13 @@ export default function AdminUploadsPage() {
       />
 
       {/* Filter tabs */}
-      <div className="flex gap-1 overflow-x-auto pb-1 flex-nowrap -mt-1">
+      <div className="flex gap-1 overflow-x-auto flex-nowrap pb-0.5 w-full">
         {STATUS_TABS.map((s) => (
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
             className={[
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors border',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors border shrink-0',
               statusFilter === s
                 ? 'bg-gold/10 text-gold border-gold/30'
                 : 'text-muted border-transparent hover:bg-white/5 hover:text-ink',
@@ -114,7 +114,7 @@ export default function AdminUploadsPage() {
           >
             {s.charAt(0).toUpperCase() + s.slice(1)}
             <span className={[
-              'inline-flex items-center justify-center rounded-full px-1.5 py-px text-[10px] font-semibold min-w-4.5',
+              'inline-flex items-center justify-center rounded-full min-w-4.5 px-1 text-[10px] font-semibold',
               statusFilter === s ? 'bg-gold/20 text-gold' : 'bg-white/8 text-muted',
             ].join(' ')}>
               {counts[s]}
@@ -123,97 +123,93 @@ export default function AdminUploadsPage() {
         ))}
       </div>
 
-      {/* ── Mobile cards ─────────────────────────────────────────────────── */}
-      <div className="sm:hidden flex flex-col gap-3">
+      {/* ── Mobile cards ─────────────────────────────────────────────────────── */}
+      <div className="sm:hidden w-full space-y-2.5">
         {filtered.map((t) => {
-          const artist   = artists.find((a) => a.id === t.artistId);
-          const selected_ = selected.includes(t.id);
+          const artist     = artists.find((a) => a.id === t.artistId);
+          const isSelected = selected.includes(t.id);
 
           return (
             <div
               key={t.id}
               className={[
-                'rounded-xl border-t-2 border border-line bg-bg-2 overflow-hidden transition-colors',
+                'w-full rounded-xl border-t-2 border border-line bg-bg-2',
                 STATUS_ACCENT[t.status] ?? '',
-                selected_ ? 'ring-1 ring-gold/40' : '',
+                isSelected ? 'ring-1 ring-gold/40' : '',
               ].join(' ')}
             >
-              <div className="p-4">
-                {/* Top row */}
-                <div className="flex items-start gap-3">
+              <div className="p-3 space-y-2.5">
+
+                {/* Checkbox + title + badge */}
+                <div className="flex items-start gap-2.5 w-full">
                   <input
                     type="checkbox"
-                    checked={selected_}
+                    checked={isSelected}
                     onChange={() => toggleSelect(t.id)}
-                    className="mt-1 accent-gold shrink-0 w-3.5 h-3.5"
+                    className="mt-0.5 accent-gold shrink-0"
+                    onClick={(e) => e.stopPropagation()}
                   />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold text-ink leading-tight truncate">{t.title}</div>
-                        {t.featuring && (
-                          <div className="text-xs text-muted mt-0.5">ft. {t.featuring}</div>
-                        )}
-                      </div>
-                      <span className={`dash-badge dash-badge--${t.status} shrink-0 capitalize`}>{t.status}</span>
+                  <div className="flex items-start justify-between gap-2 flex-1 min-w-0">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-ink leading-snug truncate">{t.title}</p>
+                      {t.featuring && <p className="text-[11px] text-muted">ft. {t.featuring}</p>}
                     </div>
-
-                    {/* Meta chips */}
-                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                      <span className="text-[11px] text-muted font-medium">{artist?.name ?? '—'}</span>
-                      <span className="text-muted/40 text-xs">·</span>
-                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-bg-3 border border-line text-muted">{t.genre}</span>
-                      <span className="text-muted/40 text-xs">·</span>
-                      <span className="text-[11px] text-muted">{new Date(t.releaseDate).toLocaleDateString()}</span>
-                    </div>
-
-                    {/* Review note */}
-                    {t.reviewNote && (
-                      <div className="mt-2 text-[11px] text-amber-400 flex items-start gap-1">
-                        <span>⚠</span><span>{t.reviewNote}</span>
-                      </div>
-                    )}
+                    <span className={`dash-badge dash-badge--${t.status} shrink-0 capitalize`}>{t.status}</span>
                   </div>
                 </div>
 
-                {/* Action row */}
+                {/* Meta */}
+                <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-muted pl-6">
+                  <span className="font-medium">{artist?.name ?? '—'}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-bg-3 border border-line leading-none">{t.genre}</span>
+                  <span>{new Date(t.releaseDate).toLocaleDateString()}</span>
+                </div>
+
+                {/* Review note */}
+                {t.reviewNote && (
+                  <p className="text-[11px] text-amber-400 pl-6">⚠ {t.reviewNote}</p>
+                )}
+
+                {/* Actions — grid ensures equal 50/50 split */}
                 {t.status === 'pending' && (
-                  <div className="flex gap-2 mt-3 pt-3 border-t border-line">
+                  <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-line w-full">
                     <button
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg bg-green-500/10 text-green-400 border border-green-500/25 hover:bg-green-500/20 transition-colors"
+                      className="py-2 text-xs font-semibold rounded-lg bg-green-500/10 text-green-400 border border-green-500/25 active:bg-green-500/20"
                       onClick={() => handleApprove(t)}
                     >
                       ✓ Approve
                     </button>
                     <button
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg bg-red-500/10 text-red-400 border border-red-500/25 hover:bg-red-500/20 transition-colors"
+                      className="py-2 text-xs font-semibold rounded-lg bg-red-500/10 text-red-400 border border-red-500/25 active:bg-red-500/20"
                       onClick={() => handleReject(t)}
                     >
                       ✕ Reject
                     </button>
                   </div>
                 )}
+
                 {t.status === 'approved' && (
-                  <div className="mt-3 pt-3 border-t border-line">
+                  <div className="pt-2.5 border-t border-line w-full">
                     <button
-                      className="w-full py-2 text-xs font-semibold rounded-lg bg-gold/10 text-gold border border-gold/25 hover:bg-gold/20 transition-colors"
+                      className="w-full py-2 text-xs font-semibold rounded-lg bg-gold/10 text-gold border border-gold/25 active:bg-gold/20"
                       onClick={() => handleMarkLive(t.id)}
                     >
                       ↑ Mark Live
                     </button>
                   </div>
                 )}
+
               </div>
             </div>
           );
         })}
 
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-sm text-muted">No uploads found.</div>
+          <p className="text-center text-sm text-muted py-12">No uploads found.</p>
         )}
       </div>
 
-      {/* ── Desktop table ─────────────────────────────────────────────────── */}
+      {/* ── Desktop table ──────────────────────────────────────────────────── */}
       <div className="hidden sm:block dash-panel p-0!">
         <div className="overflow-x-auto pb-2">
           <table className="dash-table dash-table--hover">
@@ -234,7 +230,9 @@ export default function AdminUploadsPage() {
                 const artist = artists.find((a) => a.id === t.artistId);
                 return (
                   <tr key={t.id}>
-                    <td><input type="checkbox" checked={selected.includes(t.id)} onChange={() => toggleSelect(t.id)} /></td>
+                    <td>
+                      <input type="checkbox" checked={selected.includes(t.id)} onChange={() => toggleSelect(t.id)} />
+                    </td>
                     <td>
                       <div className="font-medium">{t.title}</div>
                       {t.featuring && <div className="text-muted text-sm">ft. {t.featuring}</div>}

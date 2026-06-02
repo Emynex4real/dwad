@@ -358,7 +358,7 @@ img { display: block; max-width: 100%; }
   }
 
   /* Content */
-  .dash-content { flex: 1; padding: 32px 28px; }
+  .dash-content { flex: 1; padding: 32px 28px; width: 0; min-width: 100%; box-sizing: border-box; overflow-x: hidden; }
   @media (max-width: 600px) { .dash-content { padding: 20px 16px; } }
 
   /* Page header */
