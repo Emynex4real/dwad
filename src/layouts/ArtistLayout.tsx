@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { logoDark } from '../data';
+import ErrorBoundary from '../components/ui/ErrorBoundary';
 
 interface NavItem {
   to: string;
@@ -113,7 +114,13 @@ export default function ArtistLayout() {
         </header>
 
         <main className="dash-content">
-          <Outlet />
+          <ErrorBoundary fallback={
+            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--color-muted)', fontSize: '14px' }}>
+              Something went wrong loading this page. Try refreshing.
+            </div>
+          }>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
 
