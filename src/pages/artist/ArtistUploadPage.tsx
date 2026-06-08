@@ -134,6 +134,8 @@ export default function ArtistUploadPage() {
     const today = new Date().toISOString().split('T')[0];
     if (single.releaseDate < today) { setError('Release date must be in the future.'); return; }
 
+    if (!artist) { setError('Artist profile not found.'); return; }
+
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 700));
 
@@ -175,6 +177,8 @@ export default function ArtistUploadPage() {
 
     const today = new Date().toISOString().split('T')[0];
     if (album.releaseDate < today) { setError('Release date must be in the future.'); return; }
+
+    if (!artist) { setError('Artist profile not found.'); return; }
 
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 700));
