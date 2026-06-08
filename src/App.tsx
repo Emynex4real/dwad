@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Topbar from './components/layout/Topbar';
 import Footer from './components/layout/Footer';
-import { logoDark } from './data';
+import { logoWhite } from './data';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import AdminRoute from './routes/AdminRoute';
@@ -54,7 +54,7 @@ function PageLoader() {
       className="fixed inset-0 z-200 flex items-center justify-center"
       style={{ background: 'var(--color-bg)' }}
     >
-      <img src={logoDark} alt="Dwad Music" className="w-40 opacity-80" />
+      <img src={logoWhite} alt="Dwad Music" className="w-40 opacity-80" />
     </div>
   );
 }

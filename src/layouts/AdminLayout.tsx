@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { logoDark } from '../data';
+import { logoWhite } from '../data';
 
 interface NavItem {
   to: string;
@@ -44,7 +44,7 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className={`dash-sidebar ${collapsed ? 'dash-sidebar--collapsed' : ''} ${mobileOpen ? 'dash-sidebar--mobile-open' : ''}`}>
         <div className="dash-sidebar__header">
-          <img src={logoDark} alt="Dwad Music" className="dash-logo" />
+          <img src={logoWhite} alt="Dwad Music" className="dash-logo" />
           {!collapsed && <span className="dash-sidebar__role">Admin</span>}
         </div>
 
