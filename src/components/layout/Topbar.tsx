@@ -34,7 +34,7 @@ export default function Topbar() {
         }}
       >
         {/* Logo */}
-        <button onClick={() => { setMenuOpen(false); navigate('/'); }} className="cursor-pointer flex-shrink-0">
+        <button onClick={() => { setMenuOpen(false); navigate('/'); }} className="cursor-pointer shrink-0">
           <img src={logoWhite} alt="Dwad Music" className="h-28 w-28 object-contain" />
         </button>
 
@@ -58,11 +58,24 @@ export default function Topbar() {
               {n.label}
             </NavLink>
           ))}
+          <NavLink
+            to="/login"
+            className="transition-colors duration-250 hover:text-gold"
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: 'var(--color-ink-2)',
+            }}
+          >
+            Dashboard
+          </NavLink>
           <a
             href="https://wa.me/message/VYJP7JFQPZXSN1"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 border rounded-full transition-all duration-250 hover:bg-[var(--color-gold)] hover:text-[var(--color-bg)]"
+            className="flex items-center gap-3 border rounded-full transition-all duration-250 hover:bg-gold hover:text-bg"
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '11px',
@@ -84,7 +97,7 @@ export default function Topbar() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setMenuOpen(false)}
-            className="flex items-center gap-2 border rounded-full transition-all duration-250 hover:bg-[var(--color-gold)] hover:text-[var(--color-bg)]"
+            className="flex items-center gap-2 border rounded-full transition-all duration-250 hover:bg-gold hover:text-bg"
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '10px',
@@ -99,7 +112,7 @@ export default function Topbar() {
           </a>
 
           <button
-            className="flex flex-col justify-center gap-[6px] w-8 h-8 cursor-pointer"
+            className="flex flex-col justify-center gap-1.5 w-8 h-8 cursor-pointer"
             onClick={() => setMenuOpen(v => !v)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           >
@@ -136,7 +149,7 @@ export default function Topbar() {
 
       {/* Mobile overlay menu */}
       <div
-        className={`fixed inset-0 z-[99] flex flex-col min-[820px]:hidden transition-opacity duration-300 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-99 flex flex-col min-[820px]:hidden transition-opacity duration-300 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         style={{ background: 'var(--color-bg)', paddingTop: '128px' }}
       >
         <nav className="flex flex-col px-5 pt-6 flex-1 overflow-y-auto">
@@ -144,7 +157,7 @@ export default function Topbar() {
             <button
               key={n.slug}
               onClick={() => handleMobileNav(n.slug === 'home' ? '/' : `/${n.slug}`)}
-              className="text-left py-3 border-b transition-colors duration-250 hover:text-[var(--color-gold)]"
+              className="text-left py-3 border-b transition-colors duration-250 hover:text-gold"
               style={{
                 fontFamily: 'var(--font-serif)',
                 fontSize: '20px',
@@ -156,6 +169,19 @@ export default function Topbar() {
               {n.label}
             </button>
           ))}
+          <button
+            onClick={() => handleMobileNav('/login')}
+            className="text-left py-3 border-b transition-colors duration-250 hover:text-gold"
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '20px',
+              fontWeight: 400,
+              color: 'var(--color-ink)',
+              borderColor: 'var(--color-line)',
+            }}
+          >
+            Dashboard
+          </button>
         </nav>
         <div className="px-5 pb-10 pt-8">
           <a
@@ -163,7 +189,7 @@ export default function Topbar() {
             target="_blank"
             rel="noreferrer"
             onClick={() => setMenuOpen(false)}
-            className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+            className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '11px',

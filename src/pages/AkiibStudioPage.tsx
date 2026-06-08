@@ -169,10 +169,10 @@ export default function AkiibStudioPage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <a
-                href="https://wa.me/message/VYJP7JFQPZXSN1"
+                href="https://wa.me/message/5DCJVMDJRU2SE1"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
               >
                 Book a session<Arrow />
@@ -225,10 +225,10 @@ export default function AkiibStudioPage() {
               </p>
               <div className="mt-8">
                 <a
-                  href="https://wa.me/message/VYJP7JFQPZXSN1"
+                  href="https://wa.me/message/5DCJVMDJRU2SE1"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
                   style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
                 >
                   Book a session<Arrow />
@@ -268,10 +268,10 @@ export default function AkiibStudioPage() {
               <div style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>₦50,000</div>
               <div style={{ fontSize: '13px', color: 'var(--color-muted)', lineHeight: 1.5 }}>Beat lease · Recording · Mixing &amp; Mastering</div>
               <a
-                href="https://wa.me/message/VYJP7JFQPZXSN1"
+                href="https://wa.me/message/5DCJVMDJRU2SE1"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 24px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
               >
                 Get started<Arrow />
@@ -312,10 +312,10 @@ export default function AkiibStudioPage() {
                   ))}
                 </ul>
                 <a
-                  href="https://wa.me/message/VYJP7JFQPZXSN1"
+                  href="https://wa.me/message/5DCJVMDJRU2SE1"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
                   style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '11px',
@@ -350,10 +350,10 @@ export default function AkiibStudioPage() {
                 Listen to some songs recently produced here. Send a message and let's work on your next hit.
               </p>
               <a
-                href="https://wa.me/message/VYJP7JFQPZXSN1"
+                href="https://wa.me/message/5DCJVMDJRU2SE1"
                 target="_blank"
                 rel="noreferrer"
-                className="mt-8 inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                className="mt-8 inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
               >
                 Contact us today<Arrow />
@@ -432,10 +432,10 @@ export default function AkiibStudioPage() {
               </p>
               <div className="mt-8">
                 <a
-                  href="https://wa.me/message/VYJP7JFQPZXSN1"
+                  href="https://wa.me/message/5DCJVMDJRU2SE1"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
                   style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
                 >
                   Book a session<Arrow />

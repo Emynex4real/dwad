@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { getArtistById } from '../../services/artists.service';
-import { getTracksByArtist } from '../../services/tracks.service';
+import { getTracksByArtist, getAnalyticsByArtist } from '../../services/tracks.service';
 import { getPlanDefinition } from '../../services/subscriptions.service';
 
 export default function ArtistHomePage() {
@@ -12,6 +12,7 @@ export default function ArtistHomePage() {
 
   const artist = useMemo(() => (user?.artistId ? getArtistById(user.artistId) : undefined), [user]);
   const tracks = useMemo(() => (user?.artistId ? getTracksByArtist(user.artistId) : []), [user]);
+  const analytics = useMemo(() => (user?.artistId ? getAnalyticsByArtist(user.artistId) : undefined), [user]);
   const planDef = useMemo(() => artist ? getPlanDefinition(artist.subscription.plan) : undefined, [artist]);
 
   if (!artist) return null;
@@ -105,8 +106,8 @@ export default function ArtistHomePage() {
           <div className="stat-card__value">{tracks.filter((t) => t.status === 'live').length}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-card__label">Pending</div>
-          <div className="stat-card__value">{tracks.filter((t) => t.status === 'pending').length}</div>
+          <div className="stat-card__label">Available Balance</div>
+          <div className="stat-card__value">${analytics?.pendingPayout.toFixed(2) ?? '0.00'}</div>
         </div>
         <div className="stat-card">
           <div className="stat-card__label">Notifications</div>

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAnalyticsByArtist } from '../../services/tracks.service';
 import { getArtistById } from '../../services/artists.service';
@@ -11,9 +11,8 @@ export default function ArtistIncomePage() {
   if (!analytics || !artist) return null;
 
   const earned = analytics.totalRevenue;
-  const pending = analytics.pendingPayout;
-  const paid = +(earned - pending).toFixed(2);
-  const rate = earned > 0 ? ((paid / earned) * 100).toFixed(0) : '0';
+  const paid = +(earned - analytics.pendingPayout).toFixed(2);
+  const [bankNote, setBankNote] = useState('');
 
   return (
     <div className="dash-page">
@@ -23,7 +22,7 @@ export default function ArtistIncomePage() {
       </div>
 
       {/* Summary cards */}
-      <div className="stat-grid stat-grid--4">
+      <div className="stat-grid stat-grid--2">
         <div className="stat-card stat-card--gold">
           <div className="stat-card__label">Total Earned</div>
           <div className="stat-card__value">${earned.toFixed(2)}</div>
@@ -31,14 +30,6 @@ export default function ArtistIncomePage() {
         <div className="stat-card">
           <div className="stat-card__label">Paid Out</div>
           <div className="stat-card__value">${paid.toFixed(2)}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card__label">Pending Payout</div>
-          <div className="stat-card__value">${pending.toFixed(2)}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card__label">Payout Rate</div>
-          <div className="stat-card__value">{rate}%</div>
         </div>
       </div>
 
@@ -118,24 +109,68 @@ export default function ArtistIncomePage() {
         <div className="income-info">
           <div className="income-info__item">
             <span className="income-info__label">Payment Cycle</span>
-            <span>Monthly — processed on the 1st of each month</span>
+            <span>Monthly</span>
           </div>
           <div className="income-info__item">
             <span className="income-info__label">Minimum Payout</span>
-            <span>$10.00 USD</span>
+            <span>$100.00 USD</span>
           </div>
           <div className="income-info__item">
             <span className="income-info__label">Payment Methods</span>
             <span>Bank Transfer · PayPal · Mobile Money</span>
           </div>
-          <div className="income-info__item">
-            <span className="income-info__label">Royalty Rate</span>
-            <span>~$3.50 per 1,000 streams (varies by platform)</span>
-          </div>
         </div>
-        <p className="text-muted text-sm" style={{ marginTop: 16 }}>
-          For payout issues or bank details, contact <strong>support@dwadmusic.com</strong>
-        </p>
+
+        <div style={{ marginTop: 20 }}>
+          <label className="income-info__label" htmlFor="bank-note" style={{ display: 'block', marginBottom: 8 }}>
+            Note — Bank Details
+          </label>
+          <textarea
+            id="bank-note"
+            value={bankNote}
+            onChange={(e) => setBankNote(e.target.value)}
+            placeholder="Enter your bank name, account number, account name..."
+            rows={4}
+            style={{
+              width: '100%',
+              background: 'var(--color-bg)',
+              border: '1px solid var(--color-line)',
+              color: 'var(--color-ink)',
+              padding: '12px 14px',
+              fontSize: '14px',
+              lineHeight: 1.6,
+              resize: 'vertical',
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+            }}
+          />
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <p className="text-muted text-sm" style={{ marginBottom: 10 }}>
+            For payment support, contact us directly.
+          </p>
+          <a
+            href="https://wa.me/message/VYJP7JFQPZXSN1"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 20px',
+              background: 'var(--color-gold)',
+              color: 'var(--color-bg)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+            }}
+          >
+            Contact us on WhatsApp
+          </a>
+        </div>
       </div>
     </div>
   );

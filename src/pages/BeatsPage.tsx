@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import Arrow from '../components/ui/Arrow';
-import akiibPhoto from '../assets/artists/akiib.jpg';
+import studioPhoto from '../assets/studio/console-main.jpg';
 
 interface Beat {
   num: string;
@@ -97,7 +97,7 @@ export default function BeatsPage() {
       {/* ── HERO ── */}
       <section className="relative border-b" style={{ borderColor: 'var(--color-line)' }}>
         <div className="relative h-[50vh] min-h-[320px] overflow-hidden">
-          <img src={akiibPhoto} alt="Akiib" className="w-full h-full object-cover object-top" />
+          <img src={studioPhoto} alt="Dwad Music Studio" className="w-full h-full object-cover object-top" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(11,9,7,0.4) 0%, rgba(11,9,7,0.85) 100%)' }} />
           <div className="absolute bottom-10 left-5 sm:left-14">
             <div
@@ -123,7 +123,7 @@ export default function BeatsPage() {
               }}
             >
               Beats by{' '}
-              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Akiib.</span>
+              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Dwad.</span>
             </h1>
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function BeatsPage() {
         <div className="max-w-[1440px] mx-auto grid gap-10 items-start grid-cols-1 min-[820px]:grid-cols-2">
           <div>
             <p style={{ fontSize: '17px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '520px' }}>
-              Check out some dope instrumentals made by Akiib — crafted for artists who want something real.
+              Browse Dwad's catalogue of original instrumentals — crafted in-house for artists who want something real and ready for release.
             </p>
             <ul className="mt-8 flex flex-col gap-4">
               {[
@@ -156,7 +156,7 @@ export default function BeatsPage() {
               className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
               style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
             >
-              Contact Akiib<Arrow />
+              Get a Beat<Arrow />
             </a>
           </div>
         </div>
@@ -250,11 +250,11 @@ export default function BeatsPage() {
               ✦ Get a Beat
             </div>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 5vw, 84px)', lineHeight: 1.05, letterSpacing: '-0.015em', maxWidth: '14ch' }}>
-              Ready to work with{' '}
-              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Akiib?</span>
+              Ready to get a{' '}
+              <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>beat?</span>
             </h2>
             <p className="mt-6" style={{ fontSize: '17px', lineHeight: 1.6, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '520px' }}>
-              Lease a beat, purchase exclusive rights, or commission a fully custom instrumental. Reach out to get started.
+              Lease a beat, purchase exclusive rights, or commission a fully custom instrumental from Dwad's production team. Reach out to get started.
             </p>
             <div className="mt-10">
               <a
@@ -264,7 +264,7 @@ export default function BeatsPage() {
                 className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
                 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
               >
-                Contact Akiib<Arrow />
+                Get a Beat<Arrow />
               </a>
             </div>
           </div>

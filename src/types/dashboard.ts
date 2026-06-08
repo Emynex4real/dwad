@@ -10,7 +10,7 @@ export interface AuthUser {
 }
 
 // ── Subscription ──────────────────────────────────────────────────────────────
-export type SubscriptionPlan = 'starter' | 'pro' | 'elite';
+export type SubscriptionPlan = 'plan-a' | 'plan-b' | 'unlimited' | 'gold' | 'diamond' | 'platinum' | 'platinum-pro';
 export type SubscriptionStatus = 'active' | 'expired' | 'suspended';
 
 export interface Subscription {

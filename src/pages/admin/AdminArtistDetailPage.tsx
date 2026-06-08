@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getArtistById, updateArtist, setUploadAccess } from '../../services/artists.service';
 import { getTracksByArtist, updateTrackStatus } from '../../services/tracks.service';
 import { sendNotification } from '../../services/notifications.service';
-import type { ArtistProfile, TrackUpload } from '../../types/dashboard';
+import { PLAN_DEFINITIONS, updateSubscription } from '../../services/subscriptions.service';
+import type { ArtistProfile, TrackUpload, SubscriptionPlan, SubscriptionStatus } from '../../types/dashboard';
 
 export default function AdminArtistDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,16 @@ export default function AdminArtistDetailPage() {
     genre: artist?.genre ?? '',
     bio: artist?.bio ?? '',
   }));
+
+  const [editSub, setEditSub] = useState(false);
+  const [subForm, setSubForm] = useState(() => ({
+    plan: artist?.subscription.plan ?? 'plan-a' as SubscriptionPlan,
+    status: artist?.subscription.status ?? 'active' as SubscriptionStatus,
+    price: String(artist?.subscription.price ?? ''),
+    expiryDate: artist?.subscription.expiryDate ?? '',
+    autoRenew: artist?.subscription.autoRenew ?? false,
+  }));
+
   const [saved, setSaved] = useState(false);
 
   if (!artist) {
@@ -36,6 +47,21 @@ export default function AdminArtistDetailPage() {
     updateArtist(id, form);
     setArtist(getArtistById(id));
     setEditMode(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  }
+
+  function handleSaveSub() {
+    if (!id) return;
+    updateSubscription(id, {
+      plan: subForm.plan,
+      status: subForm.status,
+      price: parseFloat(subForm.price) || 0,
+      expiryDate: subForm.expiryDate,
+      autoRenew: subForm.autoRenew,
+    });
+    setArtist(getArtistById(id));
+    setEditSub(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   }
@@ -146,22 +172,88 @@ export default function AdminArtistDetailPage() {
 
         {/* Subscription */}
         <div className="dash-panel">
-          <h2 className="text-sm font-semibold text-ink mb-4">Subscription</h2>
-          <div className="divide-y divide-line">
-            {[
-              { label: 'Plan',       value: <span className="dash-badge dash-badge--plan">{artist.subscription.plan}</span> },
-              { label: 'Status',     value: <span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span> },
-              { label: 'Price',      value: `$${artist.subscription.price}/mo` },
-              { label: 'Start',      value: new Date(artist.subscription.startDate).toLocaleDateString() },
-              { label: 'Expires',    value: new Date(artist.subscription.expiryDate).toLocaleDateString() },
-              { label: 'Auto Renew', value: artist.subscription.autoRenew ? 'Yes' : 'No' },
-            ].map((row) => (
-              <div key={row.label} className="flex justify-between items-center py-2.5 text-sm">
-                <span className="text-muted">{row.label}</span>
-                <span className="text-ink">{row.value}</span>
-              </div>
-            ))}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-ink">Subscription</h2>
+            {!editSub
+              ? <button className="dash-btn text-xs py-1.5 px-3" onClick={() => setEditSub(true)}>Edit</button>
+              : <div className="flex gap-2">
+                  <button className="dash-btn dash-btn--ghost text-xs py-1.5 px-3" onClick={() => setEditSub(false)}>Cancel</button>
+                  <button className="dash-btn dash-btn--gold text-xs py-1.5 px-3" onClick={handleSaveSub}>Save</button>
+                </div>
+            }
           </div>
+
+          {editSub ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-ink-2">Plan</label>
+                <select
+                  className="dash-input select-field"
+                  value={subForm.plan}
+                  onChange={(e) => setSubForm((f) => ({ ...f, plan: e.target.value as SubscriptionPlan }))}
+                >
+                  {PLAN_DEFINITIONS.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} — ${p.price}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-ink-2">Status</label>
+                <select
+                  className="dash-input select-field"
+                  value={subForm.status}
+                  onChange={(e) => setSubForm((f) => ({ ...f, status: e.target.value as SubscriptionStatus }))}
+                >
+                  <option value="active">Active</option>
+                  <option value="expired">Expired</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-ink-2">Price (USD)</label>
+                <input
+                  type="number"
+                  className="dash-input"
+                  value={subForm.price}
+                  onChange={(e) => setSubForm((f) => ({ ...f, price: e.target.value }))}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-ink-2">Expiry Date</label>
+                <input
+                  type="date"
+                  className="dash-input"
+                  value={subForm.expiryDate}
+                  onChange={(e) => setSubForm((f) => ({ ...f, expiryDate: e.target.value }))}
+                />
+              </div>
+              <label className="flex items-center gap-3 cursor-pointer text-sm text-ink-2">
+                <input
+                  type="checkbox"
+                  checked={subForm.autoRenew}
+                  onChange={(e) => setSubForm((f) => ({ ...f, autoRenew: e.target.checked }))}
+                  className="accent-gold"
+                />
+                Auto Renew
+              </label>
+            </div>
+          ) : (
+            <div className="divide-y divide-line">
+              {[
+                { label: 'Plan',       value: <span className="dash-badge dash-badge--plan">{artist.subscription.plan}</span> },
+                { label: 'Status',     value: <span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span> },
+                { label: 'Price',      value: `$${artist.subscription.price}` },
+                { label: 'Start',      value: new Date(artist.subscription.startDate).toLocaleDateString() },
+                { label: 'Expires',    value: new Date(artist.subscription.expiryDate).toLocaleDateString() },
+                { label: 'Auto Renew', value: artist.subscription.autoRenew ? 'Yes' : 'No' },
+              ].map((row) => (
+                <div key={row.label} className="flex justify-between items-center py-2.5 text-sm">
+                  <span className="text-muted">{row.label}</span>
+                  <span className="text-ink">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

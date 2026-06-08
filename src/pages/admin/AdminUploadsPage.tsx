@@ -53,6 +53,36 @@ export default function AdminUploadsPage() {
 
   function handleMarkLive(id: string) { updateTrackStatus(id, 'live'); refresh(); }
 
+  function downloadSubmission(t: TrackUpload) {
+    const artist = artists.find((a) => a.id === t.artistId);
+    const lines = [
+      '=== DWAD MUSIC — UPLOAD SUBMISSION ===',
+      '',
+      `Track Title   : ${t.title}`,
+      `Featuring     : ${t.featuring ?? '—'}`,
+      `Artist        : ${artist?.name ?? '—'}`,
+      `Artist Email  : ${artist?.email ?? '—'}`,
+      `Artist Phone  : ${artist?.phone ?? '—'}`,
+      `Genre         : ${t.genre}`,
+      `Release Date  : ${t.releaseDate}`,
+      `Status        : ${t.status}`,
+      `Submitted At  : ${new Date(t.submittedAt).toLocaleString()}`,
+      `UPC Code      : ${t.upcCode ?? '—'}`,
+      `ISRC Code     : ${t.isrcCode ?? '—'}`,
+      `Release Link  : ${t.releaseLink ?? '—'}`,
+      `Platforms     : ${t.platforms.join(', ')}`,
+      t.reviewNote ? `Review Note   : ${t.reviewNote}` : '',
+    ].filter((l) => l !== '').join('\n');
+
+    const blob = new Blob([lines], { type: 'text/plain' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `submission-${t.id}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function toggleSelect(id: string) {
     setSelected((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
   }
@@ -198,6 +228,14 @@ export default function AdminUploadsPage() {
                     </button>
                   </div>
                 )}
+                <div className="pt-2 w-full">
+                  <button
+                    className="w-full py-2 text-xs font-semibold rounded-lg bg-white/5 text-muted border border-line active:bg-white/10"
+                    onClick={() => downloadSubmission(t)}
+                  >
+                    ↓ Download Details
+                  </button>
+                </div>
 
               </div>
             </div>
@@ -257,6 +295,7 @@ export default function AdminUploadsPage() {
                         {(t.status === 'live' || t.status === 'rejected') && (
                           <span className="text-muted text-sm">—</span>
                         )}
+                        <button className="dash-action-btn" onClick={() => downloadSubmission(t)} title="Download submission details">↓</button>
                       </div>
                     </td>
                   </tr>

@@ -36,6 +36,7 @@ const AdminArtistsPage        = lazy(() => import('./pages/admin/AdminArtistsPag
 const AdminArtistDetailPage   = lazy(() => import('./pages/admin/AdminArtistDetailPage'));
 const AdminSubscriptionsPage  = lazy(() => import('./pages/admin/AdminSubscriptionsPage'));
 const AdminUploadsPage        = lazy(() => import('./pages/admin/AdminUploadsPage'));
+const AdminStatsPage          = lazy(() => import('./pages/admin/AdminStatsPage'));
 const AdminReportsPage        = lazy(() => import('./pages/admin/AdminReportsPage'));
 const AdminNotificationsPage  = lazy(() => import('./pages/admin/AdminNotificationsPage'));
 
@@ -138,6 +139,7 @@ function AppRouter() {
             <Route index element={<AdminOverviewPage />} />
             <Route path="artists" element={<AdminArtistsPage />} />
             <Route path="artists/:id" element={<AdminArtistDetailPage />} />
+            <Route path="stats" element={<AdminStatsPage />} />
             <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
             <Route path="uploads" element={<AdminUploadsPage />} />
             <Route path="reports" element={<AdminReportsPage />} />

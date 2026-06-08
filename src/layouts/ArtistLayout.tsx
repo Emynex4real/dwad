@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
-import { logoDark } from '../data';
+import { logoWhite } from '../data';
 import ErrorBoundary from '../components/ui/ErrorBoundary';
 
 interface NavItem {
@@ -16,7 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/artist/home',      label: 'Home',      shortLabel: 'Home',     icon: '⌂' },
   { to: '/artist/releases',  label: 'Releases',  shortLabel: 'Releases', icon: '♫' },
   { to: '/artist/analytics', label: 'Analytics', shortLabel: 'Stats',    icon: '◈' },
-  { to: '/artist/income',    label: 'Income',    shortLabel: 'Income',   icon: '◇' },
+  { to: '/artist/income',    label: 'Income',    shortLabel: 'Income',   icon: '$' },
   { to: '/artist/upload',    label: 'Upload',    shortLabel: 'Upload',   icon: '↑' },
 ];
 
@@ -47,7 +47,7 @@ export default function ArtistLayout() {
 
       <aside className={`dash-sidebar ${collapsed ? 'dash-sidebar--collapsed' : ''} ${mobileOpen ? 'dash-sidebar--mobile-open' : ''}`}>
         <div className="dash-sidebar__header">
-          <img src={logoDark} alt="Dwad Music" className="dash-logo" />
+          <img src={logoWhite} alt="Dwad Music" className="dash-logo" />
           {!collapsed && <span className="dash-sidebar__role">Artist</span>}
         </div>
 

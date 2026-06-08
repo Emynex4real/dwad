@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import PageHero from '../components/ui/PageHero';
 import { studioMain, HOF_ARTISTS } from '../data';
@@ -262,6 +262,45 @@ export default function StudioPage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BEAT STORE ── */}
+      <section className="py-12 sm:py-20 px-5 sm:px-14">
+        <div className="max-w-[1440px] mx-auto">
+          <div
+            className="cta-card relative border overflow-hidden grid gap-10 sm:gap-20 items-center grid-cols-1 min-[900px]:grid-cols-2 py-12 sm:py-24 px-6 sm:px-14"
+            style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-gold)' }}
+          >
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>✦ Beat Store</div>
+              <h2 className="mt-4" style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(36px, 4vw, 72px)', lineHeight: 1 }}>
+                Browse our<br />
+                <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>beat catalogue.</span>
+              </h2>
+            </div>
+            <div>
+              <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
+                Over 50 original instrumentals available for lease and purchase — Afrobeats, Afro Soul, Pop, Hip Hop and more. Find your sound, get cleared, and release.
+              </p>
+              <ul className="mt-6 flex flex-col gap-3">
+                {['All beats available for lease & purchase', 'Custom beats on request', 'Instant clearance on purchase'].map(pt => (
+                  <li key={pt} className="flex items-center gap-3" style={{ fontSize: '14px', color: 'var(--color-ink-2)' }}>
+                    <span style={{ color: 'var(--color-gold)', flexShrink: 0 }}>✦</span>{pt}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8">
+                <Link
+                  to="/beats"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                >
+                  Browse Beat Store<Arrow />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

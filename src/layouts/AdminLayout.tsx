@@ -13,9 +13,10 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/admin',               label: 'Overview',       shortLabel: 'Home',    icon: '◈' },
   { to: '/admin/artists',       label: 'Artists',         shortLabel: 'Artists', icon: '♪' },
+  { to: '/admin/stats',         label: 'Statistics',      shortLabel: 'Stats',   icon: '▦' },
   { to: '/admin/subscriptions', label: 'Subscriptions',   shortLabel: 'Subs',    icon: '◇' },
   { to: '/admin/uploads',       label: 'Uploads',         shortLabel: 'Uploads', icon: '↑' },
-  { to: '/admin/reports',       label: 'Reports',         shortLabel: 'Reports', icon: '▦' },
+  { to: '/admin/reports',       label: 'Reports',         shortLabel: 'Reports', icon: '◫' },
   { to: '/admin/notifications', label: 'Notifications',   shortLabel: 'Alerts',  icon: '◎' },
 ];
 

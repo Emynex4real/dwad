@@ -18,12 +18,12 @@ export const MOCK_ARTISTS: ArtistProfile[] = [
     subscription: {
       id: 'sub-001',
       artistId: 'artist-001',
-      plan: 'elite',
+      plan: 'gold',
       status: 'active',
       startDate: '2025-01-01',
       expiryDate: '2026-01-01',
       autoRenew: true,
-      price: 49,
+      price: 150,
     },
   },
   {
@@ -43,12 +43,12 @@ export const MOCK_ARTISTS: ArtistProfile[] = [
     subscription: {
       id: 'sub-002',
       artistId: 'artist-002',
-      plan: 'pro',
+      plan: 'unlimited',
       status: 'active',
       startDate: '2025-03-01',
       expiryDate: '2026-03-01',
       autoRenew: true,
-      price: 29,
+      price: 30,
     },
   },
   {
@@ -67,12 +67,12 @@ export const MOCK_ARTISTS: ArtistProfile[] = [
     subscription: {
       id: 'sub-003',
       artistId: 'artist-003',
-      plan: 'starter',
+      plan: 'plan-a',
       status: 'expired',
       startDate: '2024-05-20',
       expiryDate: '2025-05-20',
       autoRenew: false,
-      price: 9,
+      price: 10,
     },
   },
   {
@@ -92,12 +92,12 @@ export const MOCK_ARTISTS: ArtistProfile[] = [
     subscription: {
       id: 'sub-004',
       artistId: 'artist-004',
-      plan: 'pro',
+      plan: 'unlimited',
       status: 'active',
       startDate: '2025-07-01',
       expiryDate: '2026-07-01',
       autoRenew: true,
-      price: 29,
+      price: 30,
     },
   },
   {
@@ -116,12 +116,12 @@ export const MOCK_ARTISTS: ArtistProfile[] = [
     subscription: {
       id: 'sub-005',
       artistId: 'artist-005',
-      plan: 'starter',
+      plan: 'plan-a',
       status: 'active',
       startDate: '2025-09-01',
       expiryDate: '2026-09-01',
       autoRenew: false,
-      price: 9,
+      price: 10,
     },
   },
 ];

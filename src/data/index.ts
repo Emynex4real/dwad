@@ -22,8 +22,8 @@ import samad         from '../assets/artists/artist-6004.webp';
 import raybekah      from '../assets/artists/raybekah.jpg';
 
 // general
-import logoDark      from '../assets/logo-dark.png';
-import logoWhite     from '../assets/logo-white.png';
+import logoDark      from '../assets/black logo.PNG';
+import logoWhite     from '../assets/white logo.PNG';
 import distroHero    from '../assets/IMG_6223.PNG';
 import studioMain    from '../assets/studio/console-main.jpg';
 import studioDetail  from '../assets/studio/console-detail.jpg';

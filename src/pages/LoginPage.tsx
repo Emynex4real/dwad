@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { logoDark } from '../data';
+import { logoWhite } from '../data';
 
 export default function LoginPage() {
   const { user, login, isLoading } = useAuth();
@@ -33,7 +33,7 @@ export default function LoginPage() {
   return (
     <div className="login-root">
       <div className="login-card">
-        <img src={logoDark} alt="Dwad Music" className="login-logo" />
+        <img src={logoWhite} alt="Dwad Music" className="login-logo" />
 
         <div className="login-heading">
           <h1>Sign In</h1>

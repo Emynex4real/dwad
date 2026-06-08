@@ -7,7 +7,7 @@ const documents = [
     title: 'Master Split Sheet',
     desc: 'Sign a split sheet for Masters royalty sharing for Artists and Music Producers.',
     detail: 'Defines ownership percentages of the master recording — the actual sound file — between all contributing parties. Required before distribution.',
-    href: '#',
+    href: 'https://forms.gle/XhaeQrP9Yw4S5wex7',
   },
   {
     id: 'publishing',
@@ -15,7 +15,7 @@ const documents = [
     title: 'Publishing Split Sheet',
     desc: 'Sign a split sheet for Publishing royalty sharing for Artists and Music Producers.',
     detail: 'Defines ownership percentages of the underlying composition — melody and lyrics — between all songwriters and producers. Required for publishing registration.',
-    href: '#',
+    href: 'https://forms.gle/VhJ6Xi3euVaC1oyc6',
   },
 ];
 
@@ -143,7 +143,9 @@ export default function LegalPage() {
                 <div className="mt-10">
                   <a
                     href={doc.href}
-                    className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-gold-2"
                     style={{
                       fontFamily: 'var(--font-mono)',
                       fontSize: '11px',
@@ -202,7 +204,7 @@ export default function LegalPage() {
           </div>
           <a
             href="mailto:Contact@Dwadmusic.com"
-            className="inline-flex items-center gap-3 transition-colors duration-250 hover:text-[var(--color-gold)] flex-shrink-0"
+            className="inline-flex items-center gap-3 transition-colors duration-250 hover:text-gold shrink-0"
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '13px',
