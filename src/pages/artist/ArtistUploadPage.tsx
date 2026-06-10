@@ -23,6 +23,8 @@ const TERMS = [
 
 interface SingleForm {
   artistName: string;
+  realName: string;
+  country: string;
   whatsapp: string;
   title: string;
   featuring: string;
@@ -36,6 +38,8 @@ interface SingleForm {
 
 interface AlbumForm {
   artistName: string;
+  realName: string;
+  country: string;
   whatsapp: string;
   albumTitle: string;
   albumType: '' | 'Album' | 'EP' | 'Mixtape';
@@ -49,13 +53,13 @@ interface AlbumForm {
 }
 
 const SINGLE_INIT: SingleForm = {
-  artistName: '', whatsapp: '', title: '', featuring: '', producer: '',
-  genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
+  artistName: '', realName: '', country: '', whatsapp: '', title: '', featuring: '',
+  producer: '', genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
 };
 
 const ALBUM_INIT: AlbumForm = {
-  artistName: '', whatsapp: '', albumTitle: '', albumType: '', trackCount: '',
-  producer: '', genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
+  artistName: '', realName: '', country: '', whatsapp: '', albumTitle: '', albumType: '',
+  trackCount: '', producer: '', genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
 };
 
 export default function ArtistUploadPage() {
@@ -76,6 +80,9 @@ export default function ArtistUploadPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [termsSigned, setTermsSigned] = useState([false, false, false, false]);
+  const [pendingSubmit, setPendingSubmit] = useState<'single' | 'album' | null>(null);
 
   if (!artist) return null;
 
@@ -118,10 +125,12 @@ export default function ArtistUploadPage() {
     setAlbum((f) => ({ ...f, [name]: value }));
   }
 
-  async function handleSingleSubmit(e: FormEvent) {
+  function handleSingleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
 
+    if (!single.realName.trim())   { setError('Artist real name is required.'); return; }
+    if (!single.country.trim())    { setError('Country is required.'); return; }
     if (!single.whatsapp.trim())   { setError('WhatsApp number is required.'); return; }
     if (!single.title.trim())      { setError('Track title is required.'); return; }
     if (!single.producer.trim())   { setError('Producer name is required.'); return; }
@@ -134,8 +143,13 @@ export default function ArtistUploadPage() {
     const today = new Date().toISOString().split('T')[0];
     if (single.releaseDate < today) { setError('Release date must be in the future.'); return; }
 
-    if (!artist) { setError('Artist profile not found.'); return; }
+    setTermsSigned([false, false, false]);
+    setPendingSubmit('single');
+    setTermsOpen(true);
+  }
 
+  async function doSingleSubmit() {
+    if (!artist) return;
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 700));
 
@@ -160,26 +174,34 @@ export default function ArtistUploadPage() {
     navigate('/artist/releases');
   }
 
-  async function handleAlbumSubmit(e: FormEvent) {
+  function handleAlbumSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
 
-    if (!album.whatsapp.trim())   { setError('WhatsApp number is required.'); return; }
-    if (!album.albumTitle.trim()) { setError('Album title is required.'); return; }
-    if (!album.albumType)         { setError('Please select Album, EP, or Mixtape.'); return; }
-    if (!album.trackCount.trim()) { setError('Number of tracks is required.'); return; }
-    if (!album.producer.trim())   { setError('Producer name is required.'); return; }
-    if (!album.genre)             { setError('Genre is required.'); return; }
-    if (!album.releaseDate)       { setError('Release date is required.'); return; }
+    if (!album.realName.trim())    { setError('Artist real name is required.'); return; }
+    if (!album.country.trim())     { setError('Country is required.'); return; }
+    if (!album.whatsapp.trim())    { setError('WhatsApp number is required.'); return; }
+    if (!album.albumTitle.trim())  { setError('Album title is required.'); return; }
+    if (!album.albumType)          { setError('Please select Album, EP, or Mixtape.'); return; }
+    if (!album.trackCount.trim())  { setError('Number of tracks is required.'); return; }
+    if (!album.producer.trim())    { setError('Producer name is required.'); return; }
+    if (!album.genre)              { setError('Genre is required.'); return; }
+    if (!album.releaseDate)        { setError('Release date is required.'); return; }
     if (!album.previouslyReleased) { setError('Please indicate if this was previously released.'); return; }
-    if (!audioFiles?.length)      { setError('Please upload your audio files.'); return; }
-    if (!coverArt)                { setError('Please upload your cover art.'); return; }
+    if (!album.notes.trim())       { setError('Track list is required.'); return; }
+    if (!audioFiles?.length)       { setError('Please upload your audio files.'); return; }
+    if (!coverArt)                 { setError('Please upload your cover art.'); return; }
 
     const today = new Date().toISOString().split('T')[0];
     if (album.releaseDate < today) { setError('Release date must be in the future.'); return; }
 
-    if (!artist) { setError('Artist profile not found.'); return; }
+    setTermsSigned([false, false, false]);
+    setPendingSubmit('album');
+    setTermsOpen(true);
+  }
 
+  async function doAlbumSubmit() {
+    if (!artist) return;
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 700));
 
@@ -201,6 +223,13 @@ export default function ArtistUploadPage() {
 
     setSubmitting(false);
     navigate('/artist/releases');
+  }
+
+  async function handleTermsConfirm() {
+    setTermsOpen(false);
+    if (pendingSubmit === 'single') await doSingleSubmit();
+    else if (pendingSubmit === 'album') await doAlbumSubmit();
+    setPendingSubmit(null);
   }
 
   const tomorrow = new Date(Date.now() + 86_400_000).toISOString().split('T')[0];
@@ -286,6 +315,12 @@ export default function ArtistUploadPage() {
                 <Field label="Artist Stage Name" required>
                   <input name="artistName" className="dash-input" value={single.artistName} onChange={handleSingle} placeholder="Your stage name" maxLength={100} required />
                 </Field>
+                <Field label="Artist Real Name (Surname & First Name)" required>
+                  <input name="realName" className="dash-input" value={single.realName} onChange={handleSingle} placeholder="e.g. Okafor Emmanuel" maxLength={100} required />
+                </Field>
+                <Field label="Country" required>
+                  <input name="country" className="dash-input" value={single.country} onChange={handleSingle} placeholder="e.g. Nigeria" maxLength={60} required />
+                </Field>
                 <Field label="Active WhatsApp Number" required>
                   <input name="whatsapp" className="dash-input" value={single.whatsapp} onChange={handleSingle} placeholder="e.g. +234 801 234 5678" maxLength={20} required />
                 </Field>
@@ -316,7 +351,7 @@ export default function ArtistUploadPage() {
                 <Field label="Release Date" required>
                   <input name="releaseDate" type="date" className="dash-input" value={single.releaseDate} onChange={handleSingle} min={tomorrow} required />
                 </Field>
-                <Field label="Previously released on streaming platforms?" required>
+                <Field label="Have you released music on streaming platforms before?" required>
                   <select name="previouslyReleased" className="dash-input select-field" value={single.previouslyReleased} onChange={handleSingle} required>
                     <option value="">Select an option</option>
                     <option value="no">No</option>
@@ -398,6 +433,12 @@ export default function ArtistUploadPage() {
                 <Field label="Artist Stage Name" required>
                   <input name="artistName" className="dash-input" value={album.artistName} onChange={handleAlbum} placeholder="Your stage name" maxLength={100} required />
                 </Field>
+                <Field label="Artist Real Name (Surname & First Name)" required>
+                  <input name="realName" className="dash-input" value={album.realName} onChange={handleAlbum} placeholder="e.g. Okafor Emmanuel" maxLength={100} required />
+                </Field>
+                <Field label="Country" required>
+                  <input name="country" className="dash-input" value={album.country} onChange={handleAlbum} placeholder="e.g. Nigeria" maxLength={60} required />
+                </Field>
                 <Field label="Active WhatsApp Number" required>
                   <input name="whatsapp" className="dash-input" value={album.whatsapp} onChange={handleAlbum} placeholder="e.g. +234 801 234 5678" maxLength={20} required />
                 </Field>
@@ -436,7 +477,7 @@ export default function ArtistUploadPage() {
                 <Field label="Release Date" required>
                   <input name="releaseDate" type="date" className="dash-input" value={album.releaseDate} onChange={handleAlbum} min={tomorrow} required />
                 </Field>
-                <Field label="Previously released on streaming platforms?" required>
+                <Field label="Have you released music on streaming platforms before?" required>
                   <select name="previouslyReleased" className="dash-input select-field" value={album.previouslyReleased} onChange={handleAlbum} required>
                     <option value="">Select an option</option>
                     <option value="no">No</option>
@@ -485,8 +526,8 @@ export default function ArtistUploadPage() {
                 </Field>
               </div>
               <div className="mt-4">
-                <Field label="Additional Notes (optional)">
-                  <textarea name="notes" className="dash-input" value={album.notes} onChange={handleAlbum} placeholder="Track listing, featured artists per track, special instructions…" rows={4} style={{ resize: 'vertical', fontFamily: 'var(--font-sans)' }} />
+                <Field label="Track List" required>
+                  <textarea name="notes" className="dash-input" value={album.notes} onChange={handleAlbum} placeholder={"01. Track Title ft. Featured Artist — Produced by Producer Name\n02. Track Title — Produced by Producer Name\n03. Track Title ft. Artist A, Artist B — Produced by Producer Name"} rows={6} style={{ resize: 'vertical', fontFamily: 'var(--font-sans)' }} required />
                 </Field>
               </div>
             </div>
@@ -503,6 +544,131 @@ export default function ArtistUploadPage() {
             </div>
 
           </form>
+        </div>
+      )}
+
+      {/* ── Terms & Confirmation Modal ── */}
+      {termsOpen && (
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
+          <div className="w-full max-w-lg max-h-[92vh] overflow-y-auto flex flex-col rounded-xl border" style={{ background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}>
+
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b" style={{ borderColor: 'var(--color-line)' }}>
+              <h2 className="font-serif text-xl font-normal text-ink">Confirmation Required</h2>
+              <p className="text-sm text-muted mt-1">You are about to submit this release to the following services:</p>
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono tracking-wide" style={{ borderColor: 'var(--color-gold)', color: 'var(--color-gold)', background: 'rgba(184,142,67,0.1)' }}>
+                ✦ 25 Services
+              </div>
+              <p className="text-xs text-muted mt-3">Please confirm the following:</p>
+            </div>
+
+            {/* Declarations */}
+            <div className="px-6 py-5 flex flex-col gap-4">
+
+              {/* Section 1 — Copyright */}
+              <div className="border rounded-lg p-4" style={{ borderColor: termsSigned[0] ? 'var(--color-gold)' : 'var(--color-line)', background: 'var(--color-bg)' }}>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={termsSigned[0]}
+                    onChange={() => setTermsSigned(prev => prev.map((v, idx) => idx === 0 ? !v : v))}
+                    className="w-4 h-4 accent-gold cursor-pointer mt-0.5 shrink-0"
+                  />
+                  <p className="text-sm text-ink leading-relaxed">
+                    I own or have legally licensed all copyrights to the sound recordings, compositions, and artwork embodied in this release, and furthermore abide and agree to all terms as set forth in our distribution agreement.
+                  </p>
+                </label>
+                <a href="/legal#distribution" target="_blank" rel="noreferrer" className="mt-3 ml-7 inline-flex items-center gap-1 text-xs font-medium rounded px-2 py-1 border transition-colors hover:border-gold" style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-2)' }}>
+                  Distribution Agreement ↗
+                </a>
+              </div>
+
+              {/* Section 2 — Track Properties */}
+              <div className="border rounded-lg p-4" style={{ borderColor: termsSigned[1] ? 'var(--color-gold)' : 'var(--color-line)', background: 'var(--color-bg)' }}>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={termsSigned[1]}
+                    onChange={() => setTermsSigned(prev => prev.map((v, idx) => idx === 1 ? !v : v))}
+                    className="w-4 h-4 accent-gold cursor-pointer mt-0.5 shrink-0"
+                  />
+                  <p className="text-sm text-ink leading-relaxed">
+                    I confirm that I have truthfully indicated the Track Origin and Track Properties that apply for each of my tracks in order to ensure compliance with the various DSPs' requirements. I understand that there are serious consequences to misrepresenting my tracks and/or not declaring all the appropriate Track Properties.
+                  </p>
+                </label>
+                <a href="/legal#section-consequences" target="_blank" rel="noreferrer" className="mt-3 ml-7 inline-flex items-center gap-1 text-xs font-medium rounded px-2 py-1 border transition-colors hover:border-gold" style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-2)' }}>
+                  Consequences of Misrepresentation ↗
+                </a>
+              </div>
+
+              {/* Section 3 — Artificial Streaming */}
+              <div className="border rounded-lg p-4" style={{ borderColor: termsSigned[2] ? 'var(--color-gold)' : 'var(--color-line)', background: 'var(--color-bg)' }}>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={termsSigned[2]}
+                    onChange={() => setTermsSigned(prev => prev.map((v, idx) => idx === 2 ? !v : v))}
+                    className="w-4 h-4 accent-gold cursor-pointer mt-0.5 shrink-0"
+                  />
+                  <p className="text-sm text-ink leading-relaxed">
+                    I acknowledge and understand that playlisting services guaranteeing "increased streams" use techniques that result in artificial streaming, which violates music services' terms of use.{' '}
+                    <a href="https://youtu.be/gTXO0QNEXgE?si=uzWlNTBgh2_bW7Ij" target="_blank" rel="noreferrer" style={{ color: 'var(--color-gold)', textDecoration: 'underline' }}>
+                      Watch this video to learn more.
+                    </a>
+                  </p>
+                </label>
+                <div className="mt-3 ml-7 flex flex-col gap-2">
+                  <a href="https://youtu.be/gTXO0QNEXgE?si=uzWlNTBgh2_bW7Ij" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium rounded px-2 py-1 border w-fit transition-colors hover:border-gold" style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-2)' }}>
+                    What is Artificial Streaming? ↗
+                  </a>
+                  <a href="https://music-tomorrow.com/blog/the-negative-impact-of-fake-streams-on-artists-algorithmic-performance" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium rounded px-2 py-1 border w-fit transition-colors hover:border-gold" style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-2)' }}>
+                    The (Negative) Impact of Fake Streams on Artists' Algorithmic Performance ↗
+                  </a>
+                </div>
+
+                {/* Warning box */}
+                <div className="mt-4 ml-7 flex items-start gap-2 rounded-lg p-3 border" style={{ background: 'rgba(251,146,60,0.1)', borderColor: 'rgba(251,146,60,0.4)' }}>
+                  <span style={{ fontSize: '16px', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+                  <p className="text-xs leading-relaxed" style={{ color: '#fb923c' }}>
+                    Using playlisting services may actually ruin your chances of gaining more streams, and may also result in your music being banned and/or your royalties withheld.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 pb-6 pt-2 flex gap-3 justify-end border-t" style={{ borderColor: 'var(--color-line)' }}>
+              <button
+                type="button"
+                className="dash-btn dash-btn--ghost"
+                onClick={() => { setTermsOpen(false); setPendingSubmit(null); }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!termsSigned.every(Boolean) || submitting}
+                onClick={handleTermsConfirm}
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  padding: '12px 24px',
+                  background: termsSigned.every(Boolean) ? '#dc2626' : 'var(--color-bg-3)',
+                  color: termsSigned.every(Boolean) ? '#fff' : 'var(--color-muted)',
+                  border: 'none',
+                  cursor: termsSigned.every(Boolean) ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s',
+                  borderRadius: '4px',
+                }}
+              >
+                {submitting ? 'Submitting…' : 'Confirm'}
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 

@@ -1,13 +1,13 @@
 import Arrow from '../components/ui/Arrow';
 import akiibPhoto from '../assets/artists/akiib.jpg';
-import c1 from '../assets/c1.jpeg';
-import c2 from '../assets/c2.jpeg';
-import c3 from '../assets/c3.jpeg';
-import c4 from '../assets/c4.jpeg';
-import c5 from '../assets/c5.jpeg';
-import c6 from '../assets/c6.jpeg';
-import c7 from '../assets/c7.jpeg';
-import c8 from '../assets/c8.jpeg';
+import c1 from '../assets/covers/1.jpeg';
+import c2 from '../assets/covers/2.jpeg';
+import c3 from '../assets/covers/3.jpeg';
+import c4 from '../assets/covers/4.jpeg';
+import c5 from '../assets/covers/5.jpeg';
+import c6 from '../assets/covers/6.jpeg';
+import c7 from '../assets/covers/7.jpeg';
+import c8 from '../assets/covers/8.jpeg';
 
 const streamingLinks = [
   {

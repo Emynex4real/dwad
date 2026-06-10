@@ -49,7 +49,7 @@ export default function ArtistHomePage() {
                 <div className="sub-card__plan">{planDef?.name ?? sub.plan} Plan</div>
                 <div className={`dash-badge dash-badge--${sub.status}`}>{sub.status}</div>
               </div>
-              <div className="sub-card__price">${sub.price}<span>/mo</span></div>
+              <div className="sub-card__price">${sub.price}<span>/yr</span></div>
             </div>
             <div className="sub-card__expiry">
               {isExpired ? (

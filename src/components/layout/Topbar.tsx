@@ -35,7 +35,7 @@ export default function Topbar() {
       >
         {/* Logo */}
         <button onClick={() => { setMenuOpen(false); navigate('/'); }} className="cursor-pointer shrink-0">
-          <img src={logoWhite} alt="Dwad Music" className="h-28 w-28 object-contain" />
+          <img src={logoWhite} alt="Dwad Music" className="h-14 w-14 sm:h-20 sm:w-20 object-contain" />
         </button>
 
         {/* Desktop nav */}
@@ -150,7 +150,7 @@ export default function Topbar() {
       {/* Mobile overlay menu */}
       <div
         className={`fixed inset-0 z-99 flex flex-col min-[820px]:hidden transition-opacity duration-300 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        style={{ background: 'var(--color-bg)', paddingTop: '128px' }}
+        style={{ background: 'var(--color-bg)', paddingTop: '80px' }}
       >
         <nav className="flex flex-col px-5 pt-6 flex-1 overflow-y-auto">
           {NAV.filter(n => n.slug !== 'home').map(n => (
@@ -160,7 +160,7 @@ export default function Topbar() {
               className="text-left py-3 border-b transition-colors duration-250 hover:text-gold"
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '20px',
+                fontSize: '16px',
                 fontWeight: 400,
                 color: 'var(--color-ink)',
                 borderColor: 'var(--color-line)',

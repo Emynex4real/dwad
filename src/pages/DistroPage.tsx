@@ -84,8 +84,7 @@ export default function DistroPage() {
             </span>
             <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
           </div>
-          <div className="grid gap-10 sm:gap-20 items-end grid-cols-1 min-[900px]:grid-cols-2">
-            <div>
+          <div className="max-w-160">
               <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: 'clamp(40px, 5vw, 84px)', lineHeight: 1, letterSpacing: '-0.015em' }}>
                 Your music.<br />
                 <span className="italic font-light" style={{ color: 'var(--color-gold-2)' }}>Everywhere.</span>
@@ -104,28 +103,6 @@ export default function DistroPage() {
                   Upload your music<Arrow />
                 </a>
               </div>
-            </div>
-            <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
-              {['Apple Music', 'Spotify', 'Boomplay', 'Audiomack', 'TikTok', 'YouTube Music'].map((platform, i) => (
-                <div
-                  key={platform}
-                  className="flex items-center gap-6"
-                  style={{ background: 'var(--color-bg)', padding: '18px 20px' }}
-                >
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-gold)', minWidth: '28px' }}>
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(18px, 2.5vw, 28px)', color: 'var(--color-ink)' }}>{platform}</span>
-                </div>
-              ))}
-              <div
-                className="flex items-center gap-6"
-                style={{ background: 'var(--color-bg)', padding: '18px 20px' }}
-              >
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-gold)', minWidth: '28px' }}>✦</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.2em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>+ 200 more platforms</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -287,7 +264,7 @@ export default function DistroPage() {
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>
             ✦ Special Packages
           </div>
-          <div className="grid gap-4 grid-cols-1 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-3">
 
             {/* Gold $150 */}
             <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
@@ -364,34 +341,6 @@ export default function DistroPage() {
               </a>
             </div>
 
-            {/* Platinum Pro $5,000 */}
-            <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Platinum Pro</div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>$5,000</div>
-              <div className="mt-6 flex flex-col gap-3 flex-1">
-                {[
-                  'Unlimited upload a year',
-                  'All music apps',
-                  'All social media apps',
-                  '10 free radio promotions',
-                  'Free editorial playlist pitching',
-                  '10 free cover art graphics',
-                  '100 free web blog placements',
-                  'Free promo on TikTok, Instagram & Facebook',
-                  'Free promo on Spotify, Audiomack & YouTube',
-                  'Free management service',
-                  'Free music video',
-                ].map(f => (
-                  <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
-                    <span style={{ color: 'var(--color-gold)', fontSize: '9px', marginTop: '4px', flexShrink: 0 }}>✦</span>
-                    {f}
-                  </div>
-                ))}
-              </div>
-              <a href="https://wa.me/message/VYJP7JFQPZXSN1" target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 transition-colors duration-250 hover:bg-gold-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '14px 20px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}>
-                Get started<Arrow />
-              </a>
-            </div>
 
           </div>
 

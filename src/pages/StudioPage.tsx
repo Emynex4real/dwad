@@ -282,7 +282,7 @@ export default function StudioPage() {
             </div>
             <div>
               <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--color-ink-2)', fontWeight: 300, maxWidth: '480px' }}>
-                Over 50 original instrumentals available for lease and purchase — Afrobeats, Afro Soul, Pop, Hip Hop and more. Find your sound, get cleared, and release.
+                Hundreds of original instrumentals available for lease and purchase — Afrobeats, Afro Soul, Pop, Hip Hop and more. Find your sound, get cleared, and release.
               </p>
               <ul className="mt-6 flex flex-col gap-3">
                 {['All beats available for lease & purchase', 'Custom beats on request', 'Instant clearance on purchase'].map(pt => (
