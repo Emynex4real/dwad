@@ -6,7 +6,7 @@ import mdayPhoto from '../assets/artists/mday.jpg';
 import badessKidPhoto from '../assets/badess kid .jpeg';
 import gallivantCover from '../assets/gallivant.jpeg';
 import whoIsAkiibCover from '../assets/who is akiib.jpeg';
-import watinDeyCover from '../assets/15.jpeg';
+import watinDeyCover from '../assets/6.jpeg';
 import ucheOnyeEgwuCover from '../assets/covers/uche-onye-egwu.jpg';
 import cover1 from '../assets/1.jpeg';
 import cover2 from '../assets/2.jpeg';
@@ -240,17 +240,17 @@ export default function SpotlightPage() {
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {[
               { title: 'Gallivant',          artist: 'Youngzy',                         cover: gallivantCover as string | null,   spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
-              { title: 'A Cry to God',       artist: 'King Yungzil',                    cover: null,             spotify: 'https://open.spotify.com/artist/326UBkWhn2XgCcjIhjtmr7' },
-              { title: 'Drip',               artist: 'African Boy',                     cover: null,             spotify: 'https://open.spotify.com/artist/25bc1K8fnRXnOG0lyKOCEl' },
-              { title: 'My Life',            artist: 'Normal Donzee ft. Bella Shmurda', cover: null,             spotify: 'https://open.spotify.com/artist/7uOVdfoFMg0FbFmc1Xp7Ye' },
-              { title: 'All for You',        artist: 'Karmarr',                         cover: null,             spotify: 'https://open.spotify.com/artist/1eesfZPQ3CCwy2qKdifzY9' },
-              { title: 'Where You Dey',      artist: 'Jah Lingo',                       cover: null,             spotify: 'https://open.spotify.com/artist/4j7tdwUsMU9Y8PxeQrmCE1' },
-              { title: 'Oja Men',            artist: 'Ysteve ft. Ojadilichukwu',        cover: null,             spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
+              { title: 'A Cry to God',       artist: 'King Yungzil',                    cover: cover17 as string | null, spotify: 'https://open.spotify.com/artist/326UBkWhn2XgCcjIhjtmr7' },
+              { title: 'Drip',               artist: 'African Boy',                     cover: cover20 as string | null, spotify: 'https://open.spotify.com/artist/25bc1K8fnRXnOG0lyKOCEl' },
+              { title: 'My Life',            artist: 'Normal Donzee ft. Bella Shmurda', cover: cover16 as string | null, spotify: 'https://open.spotify.com/artist/7uOVdfoFMg0FbFmc1Xp7Ye' },
+              { title: 'All for You',        artist: 'Karmarr',                         cover: cover21 as string | null, spotify: 'https://open.spotify.com/artist/1eesfZPQ3CCwy2qKdifzY9' },
+              { title: 'Where You Dey',      artist: 'Jah Lingo',                       cover: cover15 as string | null, spotify: 'https://open.spotify.com/artist/4j7tdwUsMU9Y8PxeQrmCE1' },
+              { title: 'Oja Men',            artist: 'Ysteve ft. Ojadilichukwu',        cover: cover19 as string | null, spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
               { title: 'Who is Akiib? EP',   artist: 'Akiib',                           cover: whoIsAkiibCover as string | null,  spotify: 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG' },
-              { title: 'Love Letter',        artist: 'Valid Patema',                    cover: null,             spotify: 'https://open.spotify.com/artist/2AwcOuICLKuwxBoftfCpMQ' },
+              { title: 'Love Letter',        artist: 'Valid Patema',                    cover: cover18 as string | null, spotify: 'https://open.spotify.com/artist/2AwcOuICLKuwxBoftfCpMQ' },
               { title: 'Oya Egbu Onwu',      artist: 'Uche Onye Egwu',                 cover: ucheOnyeEgwuCover as string | null, spotify: 'https://open.spotify.com/artist/1GiPtQPB6UOfSHDiedkkl9' },
               { title: 'Naija',              artist: 'Solotone',                        cover: null,             spotify: 'https://open.spotify.com/artist/5TR5ha19awStaDcqWGnwHU' },
-              { title: 'Ohema Remix',        artist: 'Nokyes ft Sugarboi',              cover: null,             spotify: 'https://open.spotify.com/artist/1nJ9LK9SJxdYAFUGy4FYuI' },
+              { title: 'Ohema Remix',        artist: 'Nokyes ft Sugarboi',              cover: cover14 as string | null, spotify: 'https://open.spotify.com/artist/1nJ9LK9SJxdYAFUGy4FYuI' },
             ].map((s, i) => (
               <a
                 key={s.title}
@@ -340,17 +340,17 @@ export default function SpotlightPage() {
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {[
               { title: 'Gallivant',     artist: 'Youngzy',                  cover: gallivantCover as string | null, spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
-              { title: 'Oja Men',       artist: 'Ysteve ft. Ojadilichukwu', cover: null,            spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
-              { title: 'Party Animal',  artist: 'Nature Republiq',          cover: null,            spotify: 'https://open.spotify.com/artist/0XMntmvSwcr9AjpRgZ9cQ4' },
-              { title: 'Grace Time',    artist: 'Omo Oluwa Badboi Kp',      cover: null,            spotify: 'https://open.spotify.com/artist/2WgKuGjjR3RfKpzBxTyAX0' },
+              { title: 'Oja Men',       artist: 'Ysteve ft. Ojadilichukwu', cover: cover19 as string | null, spotify: 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT' },
+              { title: 'Party Animal',  artist: 'Nature Republiq',          cover: cover11 as string | null, spotify: 'https://open.spotify.com/artist/0XMntmvSwcr9AjpRgZ9cQ4' },
+              { title: 'Grace Time',    artist: 'Omo Oluwa Badboi Kp',      cover: cover3 as string | null,  spotify: 'https://open.spotify.com/artist/2WgKuGjjR3RfKpzBxTyAX0' },
               { title: 'Watin Dey',     artist: 'Jazzydking',               cover: watinDeyCover as string | null, spotify: 'https://open.spotify.com/artist/4Lde6MtzI4hIWwobB5Wc46' },
-              { title: 'Yehowa Ye',     artist: 'Empaya Vybez',             cover: null,            spotify: 'https://open.spotify.com/album/2YWVKEc1cPnYdHFw0ox2rZ' },
-              { title: 'Crazy',         artist: 'BThree',                   cover: null,            spotify: 'https://open.spotify.com/album/1pW6nzt5pPCpAcQEYHQHau' },
-              { title: 'Omo Oloja',     artist: 'Akiib',                    cover: null,            spotify: 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG' },
-              { title: 'Mommy',         artist: 'Mhuftybwoy',               cover: null,            spotify: 'https://open.spotify.com/artist/48WsE4LHxumfAOmy7hI1Z8' },
-              { title: 'Flenjo',        artist: 'Brown Spice',              cover: null,            spotify: 'https://open.spotify.com/artist/0d9ezg07OhJowFemqUo7ax' },
+              { title: 'Yehowa Ye',     artist: 'Empaya Vybez',             cover: cover9 as string | null,  spotify: 'https://open.spotify.com/album/2YWVKEc1cPnYdHFw0ox2rZ' },
+              { title: 'Crazy',         artist: 'BThree',                   cover: cover8 as string | null,  spotify: 'https://open.spotify.com/album/1pW6nzt5pPCpAcQEYHQHau' },
+              { title: 'Omo Oloja',     artist: 'Akiib',                    cover: null,                     spotify: 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG' },
+              { title: 'Mommy',         artist: 'Mhuftybwoy',               cover: cover10 as string | null, spotify: 'https://open.spotify.com/artist/48WsE4LHxumfAOmy7hI1Z8' },
+              { title: 'Flenjo',        artist: 'Brown Spice',              cover: cover7 as string | null,  spotify: 'https://open.spotify.com/artist/0d9ezg07OhJowFemqUo7ax' },
               { title: 'Gallivant',     artist: 'Youngzy',                  cover: gallivantCover as string | null, spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
-              { title: 'Bianca',        artist: 'Boldmanhs',                cover: null,            spotify: 'https://open.spotify.com/artist/24grl33UR73dBjbqGSRp8n' },
+              { title: 'Bianca',        artist: 'Boldmanhs',                cover: cover4 as string | null,  spotify: 'https://open.spotify.com/artist/24grl33UR73dBjbqGSRp8n' },
             ].map((s, i) => (
               <a
                 key={`${s.title}-${i}`}

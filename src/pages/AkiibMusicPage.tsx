@@ -1,5 +1,5 @@
 import Arrow from '../components/ui/Arrow';
-import akiibPhoto from '../assets/artists/akiib.jpg';
+import akiibPhoto from '../assets/who is akiib.jpeg';
 import c1 from '../assets/covers/1.jpeg';
 import c2 from '../assets/covers/2.jpeg';
 import c3 from '../assets/covers/3.jpeg';

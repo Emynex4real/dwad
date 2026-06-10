@@ -1,5 +1,4 @@
 import Arrow from '../components/ui/Arrow';
-import termsVideo from '../assets/term and condition .mp4';
 
 const agreementSections = [
   {
@@ -278,36 +277,6 @@ export default function LegalPage() {
               Artiste Distribution Agreement
             </span>
           </h2>
-
-          {/* Video explainer */}
-          <div
-            className="mb-16 border"
-            style={{ borderColor: 'var(--color-line)', background: 'var(--color-bg-2)' }}
-          >
-            <div
-              className="px-6 py-4 border-b flex items-center gap-3"
-              style={{ borderColor: 'var(--color-line)' }}
-            >
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '10px',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-gold)',
-                }}
-              >
-                ▶ Agreement Overview — Watch Before Signing
-              </span>
-            </div>
-            <video
-              controls
-              className="w-full"
-              style={{ display: 'block', maxHeight: '540px', background: '#000' }}
-            >
-              <source src={termsVideo} type="video/mp4" />
-            </video>
-          </div>
 
           {/* Preamble */}
           <div
