@@ -23,7 +23,7 @@ import raybekah      from '../assets/artists/raybekah.jpg';
 
 // general
 import logoDark      from '../assets/black logo.PNG';
-import logoWhite     from '../assets/logo-transparent.png';
+import logoWhite     from '../assets/new logo.PNG';
 import distroHero    from '../assets/IMG_6223.PNG';
 import studioMain    from '../assets/studio/console-main.jpg';
 import studioDetail  from '../assets/studio/console-detail.jpg';
