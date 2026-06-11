@@ -65,7 +65,7 @@ export default function AdminSubscriptionsPage() {
               <div key={plan.id} className="rounded-lg border border-line bg-bg-3 p-4 flex flex-col gap-2">
                 <div className="text-[11px] tracking-widest uppercase text-gold">{plan.name}</div>
                 <div className="font-serif text-2xl text-ink">
-                  ${plan.price}<span className="text-sm font-sans text-muted">/mo</span>
+                  ${plan.price}<span className="text-sm font-sans text-muted">/yr</span>
                 </div>
                 <div className="text-xs text-muted">{count} active artists</div>
                 <ul className="flex flex-col gap-1 pt-2 border-t border-line">
@@ -99,7 +99,7 @@ export default function AdminSubscriptionsPage() {
               </div>
               <div className="flex items-center justify-between text-xs text-muted">
                 <span>Expires {new Date(sub.expiryDate).toLocaleDateString()}</span>
-                <span>${sub.price}/mo</span>
+                <span>${sub.price}/yr</span>
               </div>
               <div className="flex gap-2 flex-wrap pt-1 border-t border-line">
                 <select
@@ -146,7 +146,7 @@ export default function AdminSubscriptionsPage() {
                     <td><span className="dash-badge dash-badge--plan">{sub.plan}</span></td>
                     <td><span className={`dash-badge dash-badge--${sub.status}`}>{sub.status}{isExpiring ? ' ⚠' : ''}</span></td>
                     <td className="text-muted text-sm">{new Date(sub.expiryDate).toLocaleDateString()}</td>
-                    <td>${sub.price}/mo</td>
+                    <td>${sub.price}/yr</td>
                     <td className="text-muted">{sub.autoRenew ? 'Yes' : 'No'}</td>
                     <td>
                       <div className="dash-row-actions">

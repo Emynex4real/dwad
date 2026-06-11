@@ -2,11 +2,28 @@ import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import PageHero from '../components/ui/PageHero';
+import SEO from '../components/ui/SEO';
 import { studioMain, HOF_ARTISTS } from '../data';
 import hallelujahCover from '../assets/hallelujah.jpeg';
 import gbeseCover      from '../assets/gbese.jpeg';
 import badessKidCover  from '../assets/badess kid .jpeg';
 import gallivantCover  from '../assets/gallivant.jpeg';
+
+const studioJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Music Production — Recording, Mixing & Mastering',
+  serviceType: 'Music Production',
+  provider: { '@type': 'Organization', name: 'Dwad Music', url: 'https://dwadmusic.com' },
+  description: 'Professional beats, recording, mixing and mastering. Industry-standard production delivering distribution-ready masters.',
+  areaServed: 'Worldwide',
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'USD',
+    lowPrice: '150',
+    highPrice: '1000',
+  },
+};
 
 const whyPoints = [
   {
@@ -146,6 +163,7 @@ const terms = [
 export default function StudioPage() {
   const navigate = useNavigate();
   const [activeIdx, setActiveIdx] = useState(-1);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -165,6 +183,12 @@ export default function StudioPage() {
 
   return (
     <div className="page-enter">
+      <SEO
+        title="Music Production — Recording, Mixing & Mastering | Dwad Music"
+        description="Professional beats, recording, mixing and mastering. Our in-house studio team delivers distribution-ready masters — then ships them worldwide the same day."
+        canonical="/studio"
+        jsonLd={studioJsonLd}
+      />
       <PageHero
         crumb=""
         title="Music"

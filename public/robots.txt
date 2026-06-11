@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Block authenticated-only areas — no SEO value, save crawl budget
+Disallow: /admin
+Disallow: /admin/
+Disallow: /artist
+Disallow: /artist/
+Disallow: /login
+
+Sitemap: https://dwadmusic.com/sitemap.xml

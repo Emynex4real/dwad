@@ -25,6 +25,7 @@ const LegalPage        = lazy(() => import('./pages/LegalPage'));
 const BeatsPage        = lazy(() => import('./pages/BeatsPage'));
 const RadioPage        = lazy(() => import('./pages/RadioPage'));
 const LoginPage        = lazy(() => import('./pages/LoginPage'));
+const NotFoundPage     = lazy(() => import('./pages/NotFoundPage'));
 
 // ── Dashboard layouts ──────────────────────────────────────────────────────────
 const AdminLayout  = lazy(() => import('./layouts/AdminLayout'));
@@ -116,7 +117,7 @@ function PublicLayout() {
             <Route path="/radio"     element={<RadioPage />} />
             <Route path="/contact"   element={<ContactPage />} />
             <Route path="/login"     element={<LoginPage />} />
-            <Route path="*"          element={<HomePage />} />
+            <Route path="*"          element={<NotFoundPage />} />
           </Routes>
         </Suspense>
       </AnimatedPage>

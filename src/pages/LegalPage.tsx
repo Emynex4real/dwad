@@ -1,4 +1,5 @@
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 
 const agreementSections = [
   {
@@ -193,6 +194,11 @@ const splitSheets = [
 export default function LegalPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Terms & Conditions — Legal Agreements | Dwad Music"
+        description="Read Dwad Music's terms of service, upload agreement, privacy policy and legal terms for artists and clients using the Dwad platform."
+        canonical="/legal"
+      />
 
       {/* ── HEADER ── */}
       <section

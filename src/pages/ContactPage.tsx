@@ -1,5 +1,6 @@
 import Arrow from '../components/ui/Arrow';
 import PageHero from '../components/ui/PageHero';
+import SEO from '../components/ui/SEO';
 import Ticker from '../components/ui/Ticker';
 
 const contactItems = [
@@ -12,6 +13,11 @@ const contactItems = [
 export default function ContactPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Contact Dwad Music — Get in Touch"
+        description="Reach the Dwad Music team by phone, WhatsApp or email. Based in Lagos, Nigeria. Available Mon–Sat. WhatsApp replies 7 days. We reply within 24 hours."
+        canonical="/contact"
+      />
       <PageHero
         crumb="✦ Contact"
         title="Let's work on"

@@ -1,4 +1,5 @@
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 import Ticker from '../components/ui/Ticker';
 import ProjectCard from '../components/ui/ProjectCard';
 import { HOF_ARTISTS, PROJECTS } from '../data';
@@ -39,6 +40,11 @@ const packages = [
 export default function GraphicsPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Music Cover Art & Graphic Design | Dwad Music"
+        description="DSP-ready cover art, album packaging, social media kits and press assets — delivered within 48 hours. Professional design for Spotify, Apple Music and beyond."
+        canonical="/graphics"
+      />
 
       {/* ── HERO ── */}
       <section

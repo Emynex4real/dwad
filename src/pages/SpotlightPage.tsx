@@ -1,5 +1,6 @@
 import Arrow from '../components/ui/Arrow';
 import Marquee from '../components/ui/Marquee';
+import SEO from '../components/ui/SEO';
 import Ticker from '../components/ui/Ticker';
 import { ROSTER_ARTISTS, HOF_ARTISTS, ARTIST_NAMES } from '../data';
 import mdayPhoto from '../assets/artists/mday.jpg';
@@ -39,6 +40,11 @@ const ALL_COVERS = [
 export default function SpotlightPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Artist Spotlight — Dwad Music Roster & Catalogue"
+        description="Browse the Dwad Music artist roster, recent releases and editorial features. Independent artists distributed, produced and promoted through Dwad Music."
+        canonical="/spotlight"
+      />
 
       {/* ── HERO ── */}
       <section className="border-b pt-32 pb-14 px-5 sm:pt-[180px] sm:pb-20 sm:px-14" style={{ borderColor: 'var(--color-line)' }}>

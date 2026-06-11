@@ -1,4 +1,5 @@
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 import { studioMain } from '../data';
 import akiibPhoto from '../assets/artists/akiib.jpg';
 import youngzyPhoto from '../assets/artists/youngzy.jpg';
@@ -129,6 +130,11 @@ const terms = [
 export default function AkiibStudioPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Akiib Studio — Professional Music Studio in Lagos | Dwad Music"
+        description="Record, mix and master at Akiib Studio in Lagos. Professional studio sessions with Dwad's in-house engineers. Book a session starting from ₦50,000."
+        canonical="/akiibstudio"
+      />
 
       {/* ── HERO ── */}
       <section

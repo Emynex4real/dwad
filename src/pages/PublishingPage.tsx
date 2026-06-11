@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 
 const steps = [
   {
@@ -47,6 +48,11 @@ export default function PublishingPage() {
 
   return (
     <div className="page-enter">
+      <SEO
+        title="Music Publishing & Rights Management | Dwad Music"
+        description="Register your songs, collect every royalty type you're owed and manage your publishing rights. Simple setup, transparent accounting, 95%+ territory coverage."
+        canonical="/publishing"
+      />
 
       {/* ── HERO ── */}
       <section

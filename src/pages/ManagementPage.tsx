@@ -1,4 +1,5 @@
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 import Ticker from '../components/ui/Ticker';
 
 const services = [
@@ -44,6 +45,11 @@ const process = [
 export default function ManagementPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Artist Management & Career Development | Dwad Music"
+        description="Artist development, deal negotiations, release strategy, tour booking and project management for independent artists and labels. Based in Lagos, Nigeria."
+        canonical="/management"
+      />
 
       {/* ── HERO ── */}
       <section

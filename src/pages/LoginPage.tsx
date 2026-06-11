@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
+import SEO from '../components/ui/SEO';
 import { useAuth } from '../contexts/AuthContext';
 import { logoWhite } from '../data';
 
@@ -32,6 +33,12 @@ export default function LoginPage() {
 
   return (
     <div className="login-root">
+      <SEO
+        title="Log In to Your Artist Dashboard | Dwad Music"
+        description="Sign in to your Dwad Music account. Access your personal artist dashboard to manage releases, track streams and view royalty earnings."
+        canonical="/login"
+        noIndex
+      />
       <div className="login-card">
         <img src={logoWhite} alt="Dwad Music" className="login-logo" />
 

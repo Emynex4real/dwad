@@ -1,4 +1,5 @@
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 
 const eligibility = [
   {
@@ -27,6 +28,11 @@ const steps = [
 export default function RadioPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Free Radio Airplay for Independent Artists | Dwad Music"
+        description="Get your music on radio stations across Nigeria, Ghana, Kenya and beyond — free. Available on qualifying Dwad distribution and production packages."
+        canonical="/radio"
+      />
 
       {/* ── HERO ── */}
       <section

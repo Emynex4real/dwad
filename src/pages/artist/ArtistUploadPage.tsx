@@ -26,6 +26,7 @@ interface SingleForm {
   realName: string;
   country: string;
   whatsapp: string;
+  audiomackId: string;
   title: string;
   featuring: string;
   producer: string;
@@ -41,6 +42,7 @@ interface AlbumForm {
   realName: string;
   country: string;
   whatsapp: string;
+  audiomackId: string;
   albumTitle: string;
   albumType: '' | 'Album' | 'EP' | 'Mixtape';
   trackCount: string;
@@ -53,12 +55,12 @@ interface AlbumForm {
 }
 
 const SINGLE_INIT: SingleForm = {
-  artistName: '', realName: '', country: '', whatsapp: '', title: '', featuring: '',
+  artistName: '', realName: '', country: '', whatsapp: '', audiomackId: '', title: '', featuring: '',
   producer: '', genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
 };
 
 const ALBUM_INIT: AlbumForm = {
-  artistName: '', realName: '', country: '', whatsapp: '', albumTitle: '', albumType: '',
+  artistName: '', realName: '', country: '', whatsapp: '', audiomackId: '', albumTitle: '', albumType: '',
   trackCount: '', producer: '', genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
 };
 
@@ -324,6 +326,9 @@ export default function ArtistUploadPage() {
                 <Field label="Active WhatsApp Number" required>
                   <input name="whatsapp" className="dash-input" value={single.whatsapp} onChange={handleSingle} placeholder="e.g. +234 801 234 5678" maxLength={20} required />
                 </Field>
+                <Field label="Audiomack Artist ID (optional)">
+                  <input name="audiomackId" className="dash-input" value={single.audiomackId} onChange={handleSingle} placeholder="e.g. audiomack.com/your-name" maxLength={200} />
+                </Field>
               </div>
             </div>
 
@@ -441,6 +446,9 @@ export default function ArtistUploadPage() {
                 </Field>
                 <Field label="Active WhatsApp Number" required>
                   <input name="whatsapp" className="dash-input" value={album.whatsapp} onChange={handleAlbum} placeholder="e.g. +234 801 234 5678" maxLength={20} required />
+                </Field>
+                <Field label="Audiomack Artist ID (optional)">
+                  <input name="audiomackId" className="dash-input" value={album.audiomackId} onChange={handleAlbum} placeholder="e.g. audiomack.com/your-name" maxLength={200} />
                 </Field>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 import studioPhoto from '../assets/studio/console-main.jpg';
 
 interface Beat {
@@ -93,6 +94,11 @@ export default function BeatsPage() {
 
   return (
     <div className="page-enter">
+      <SEO
+        title="Beat Store — Afrobeats & Hip Hop Instrumentals | Dwad Music"
+        description="Browse and license original beats — Afrobeats, Afro Soul, Pop and Hip Hop. Lease or buy outright. Custom beats on request. Instant clearance on purchase."
+        canonical="/beats"
+      />
 
       {/* ── HERO ── */}
       <section className="relative border-b" style={{ borderColor: 'var(--color-line)' }}>

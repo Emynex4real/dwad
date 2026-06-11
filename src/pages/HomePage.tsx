@@ -2,14 +2,41 @@ import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import Marquee from '../components/ui/Marquee';
 import ProjectCard from '../components/ui/ProjectCard';
+import SEO from '../components/ui/SEO';
 import { SERVICES, PROJECTS, REVIEWS, HOF_ARTISTS, ARTIST_NAMES } from '../data';
 import mdayHero from '../assets/artists/mday.jpg';
+
+const homeJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Dwad Music',
+  url: 'https://dwadmusic.com',
+  logo: 'https://dwadmusic.com/og-image.jpg',
+  description: 'A full-service music platform for independent artists — distribution, production and promotion worldwide.',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Lagos',
+    addressCountry: 'NG',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+2348030845751',
+    contactType: 'customer service',
+    availableLanguage: 'English',
+  },
+};
 
 export default function HomePage() {
   const navigate = useNavigate();
 
   return (
     <div className="page-enter">
+      <SEO
+        title="Dwad Music — Distribution, Production & Promotion"
+        description="Your all-in-one music platform. Distribute to 200+ platforms worldwide, record in a professional studio, and promote your music on radio. Built for independent artists."
+        canonical="/"
+        jsonLd={homeJsonLd}
+      />
 
       {/* ── HERO ── */}
       <section className="relative flex flex-col overflow-hidden min-h-screen pt-32 pb-14 px-5 sm:pt-[140px] sm:pb-14 sm:px-14">

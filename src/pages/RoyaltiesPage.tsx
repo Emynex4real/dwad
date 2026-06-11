@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 import Ticker from '../components/ui/Ticker';
 
 interface RoyaltyType {
@@ -122,6 +123,11 @@ export default function RoyaltiesPage() {
 
   return (
     <div className="page-enter">
+      <SEO
+        title="How Music Royalties Work — Mechanical, Performance & Sync | Dwad Music"
+        description="Learn how mechanical, performance, print and sync royalties work. Understand every income stream your music can earn and how Dwad collects them on your behalf."
+        canonical="/royalties"
+      />
 
       {/* ── HERO ── */}
       <section

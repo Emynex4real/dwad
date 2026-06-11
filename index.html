@@ -2,11 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no" />
-    <meta name="description" content="Dwad Music — Distribution, Production & Promotion. A Lagos-based music house placing independent artists on 200+ platforms across 50+ countries." />
-    <title>Dwad Music — Distribution, Production & Promotion</title>
+
+    <!-- Default title & description — overridden per-page by react-helmet-async -->
+    <title>Dwad Music — Distribution, Production &amp; Promotion</title>
+    <meta name="description" content="Your all-in-one music platform. Distribute to 200+ platforms worldwide, record in a professional studio, and promote your music on radio. Built for independent artists." />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Canonical (fallback; per-page canonical is injected by SEO component) -->
+    <link rel="canonical" href="https://dwadmusic.com/" />
+
+    <!-- Open Graph fallback — overridden per-page -->
+    <meta property="og:site_name" content="Dwad Music" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dwad Music — Distribution, Production &amp; Promotion" />
+    <meta property="og:description" content="Your all-in-one music platform. Distribute to 200+ platforms worldwide, record in a professional studio, and promote your music on radio. Built for independent artists." />
+    <meta property="og:url" content="https://dwadmusic.com/" />
+    <meta property="og:image" content="https://dwadmusic.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X Card fallback -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dwad Music — Distribution, Production &amp; Promotion" />
+    <meta name="twitter:description" content="Your all-in-one music platform. Distribute to 200+ platforms worldwide, record in a professional studio, and promote your music on radio. Built for independent artists." />
+    <meta name="twitter:image" content="https://dwadmusic.com/og-image.jpg" />
+
+    <!-- Icons & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#c4972f" />
+
+    <!-- Preconnect to external origins used at runtime -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://wa.me" />
   </head>
   <body>
     <div id="root"></div>

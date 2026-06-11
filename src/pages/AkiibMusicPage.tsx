@@ -1,4 +1,5 @@
 import Arrow from '../components/ui/Arrow';
+import SEO from '../components/ui/SEO';
 import akiibPhoto from '../assets/who is akiib.jpeg';
 import c1 from '../assets/covers/1.jpeg';
 import c2 from '../assets/covers/2.jpeg';
@@ -59,6 +60,11 @@ const videos = [
 export default function AkiibMusicPage() {
   return (
     <div className="page-enter">
+      <SEO
+        title="Akiib — Artist Profile | Dwad Music"
+        description="Stream Akiib's music on Spotify, Apple Music, Audiomack and Boomplay. Lagos-based independent artist distributed and produced through Dwad Music."
+        canonical="/akiibmusic"
+      />
 
       {/* ── HERO ── */}
       <section

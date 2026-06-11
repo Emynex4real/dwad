@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import PageHero from '../components/ui/PageHero';
+import SEO from '../components/ui/SEO';
 import Ticker from '../components/ui/Ticker';
 
 const steps = [
@@ -33,6 +34,11 @@ export default function PromotionPage() {
 
   return (
     <div className="page-enter">
+      <SEO
+        title="Music Promotion — Radio, Playlists & Social Campaigns | Dwad Music"
+        description="Get your music on radio, editorial playlists and TikTok. Campaigns across Nigeria, Ghana, Kenya and the UK diaspora — run by people who know the gatekeepers."
+        canonical="/promotion"
+      />
       <PageHero
         crumb=""
         title="Music"

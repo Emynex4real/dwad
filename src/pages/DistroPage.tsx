@@ -2,7 +2,24 @@ import { useNavigate } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import ProjectCard from '../components/ui/ProjectCard';
 import Ticker from '../components/ui/Ticker';
+import SEO from '../components/ui/SEO';
 import { PROJECTS, HOF_ARTISTS, distroHero } from '../data';
+
+const distroJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Music Distribution',
+  serviceType: 'Music Distribution',
+  provider: { '@type': 'Organization', name: 'Dwad Music', url: 'https://dwadmusic.com' },
+  description: 'Distribute music to 200+ platforms including Spotify, Apple Music, Boomplay and TikTok worldwide.',
+  areaServed: 'Worldwide',
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'USD',
+    lowPrice: '10',
+    highPrice: '1000',
+  },
+};
 
 const features = [
   { idx: '01', title: 'Apple, Spotify, Boomplay, TikTok', desc: '200+ stores worldwide, one delivery.' },
@@ -17,6 +34,12 @@ export default function DistroPage() {
 
   return (
     <div className="page-enter">
+      <SEO
+        title="Music Distribution to 200+ Platforms | Dwad Music"
+        description="Distribute your music to Spotify, Apple Music, Boomplay, TikTok and 200+ platforms. Real dashboards, real royalties. Plans from $10. Worldwide delivery."
+        canonical="/distro"
+        jsonLd={distroJsonLd}
+      />
 
       {/* ── DISTRO HERO ── */}
       <section
