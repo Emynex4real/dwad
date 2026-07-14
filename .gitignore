@@ -30,3 +30,4 @@ api/storage/audio/*
 *.njsproj
 *.sln
 *.sw?
+.vercel
