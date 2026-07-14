@@ -15,6 +15,16 @@ RUN { \
     echo 'post_max_size=200M'; \
     } > /usr/local/etc/php/conf.d/uploads.ini
 
+# By default PHP errors go to Apache's own error log FILE inside the container,
+# which `docker logs` / Render's log viewer never see (they only capture
+# stdout/stderr). Force PHP to log straight to stderr instead, so real errors
+# are actually visible in production logs instead of swallowed silently.
+RUN { \
+    echo 'log_errors=On'; \
+    echo 'error_log=/dev/stderr'; \
+    echo 'display_errors=Off'; \
+    } > /usr/local/etc/php/conf.d/error-logging.ini
+
 # The existing storage/audio/.htaccess "Require all denied" rule would be silently
 # shadowed if a persistent disk ever gets mounted at storage/ (the mount starts
 # empty, hiding the file). A vhost-level Directory rule survives that regardless.

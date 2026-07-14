@@ -111,5 +111,6 @@ try {
 } catch (HttpException $e) {
     Response::error($e->getMessage(), $e->status);
 } catch (Throwable $e) {
+    error_log($e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() . "\n" . $e->getTraceAsString());
     Response::error('Internal server error', 500);
 }
