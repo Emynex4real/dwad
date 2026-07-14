@@ -1,15 +1,23 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllArtists } from '../../services/artists.service';
-import { getAllTracks, getPendingTracks } from '../../services/tracks.service';
+import { getAllTracks } from '../../services/tracks.service';
 import { getAllSubscriptions, getExpiringSubscriptions } from '../../services/subscriptions.service';
+import type { ArtistProfile, Subscription, TrackUpload } from '../../types/dashboard';
 
 export default function AdminOverviewPage() {
-  const artists  = useMemo(() => getAllArtists(), []);
-  const tracks   = useMemo(() => getAllTracks(), []);
-  const pending  = useMemo(() => getPendingTracks(), []);
-  const subs     = useMemo(() => getAllSubscriptions(), []);
-  const expiring = useMemo(() => getExpiringSubscriptions(30), []);
+  const [artists, setArtists]   = useState<ArtistProfile[]>([]);
+  const [subs, setSubs]         = useState<Subscription[]>([]);
+  const [expiring, setExpiring] = useState<Subscription[]>([]);
+  const [tracks, setTracks]     = useState<TrackUpload[]>([]);
+  const pending  = useMemo(() => tracks.filter((t) => t.status === 'pending'), [tracks]);
+
+  useEffect(() => {
+    void getAllArtists().then(setArtists);
+    void getAllSubscriptions().then(setSubs);
+    void getExpiringSubscriptions(30).then(setExpiring);
+    void getAllTracks().then(setTracks);
+  }, []);
 
   const active  = subs.filter((s) => s.status === 'active').length;
   const expired = subs.filter((s) => s.status === 'expired').length;

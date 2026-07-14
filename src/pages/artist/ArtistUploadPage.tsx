@@ -1,9 +1,10 @@
-import { useState, useRef, type FormEvent, type ChangeEvent } from 'react';
+import { useState, useRef, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { getArtistById } from '../../services/artists.service';
 import { submitTrack } from '../../services/tracks.service';
 import { sendNotification } from '../../services/notifications.service';
+import type { ArtistProfile } from '../../types/dashboard';
 
 const GENRES = [
   'Afrobeats', 'Afro Soul', 'Alt Pop', 'Hip Hop', 'R&B', 'Gospel',
@@ -67,13 +68,13 @@ const ALBUM_INIT: AlbumForm = {
 export default function ArtistUploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const artist = user?.artistId ? getArtistById(user.artistId) : undefined;
+  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
 
   const [agreed, setAgreed] = useState(false);
   const [uploadType, setUploadType] = useState<'single' | 'album' | null>(null);
 
-  const [single, setSingle] = useState<SingleForm>({ ...SINGLE_INIT, artistName: artist?.name ?? '' });
-  const [album, setAlbum] = useState<AlbumForm>({ ...ALBUM_INIT, artistName: artist?.name ?? '' });
+  const [single, setSingle] = useState<SingleForm>(SINGLE_INIT);
+  const [album, setAlbum] = useState<AlbumForm>(ALBUM_INIT);
 
   const [audioFiles, setAudioFiles] = useState<FileList | null>(null);
   const [coverArt, setCoverArt] = useState<File | null>(null);
@@ -85,6 +86,18 @@ export default function ArtistUploadPage() {
   const [termsOpen, setTermsOpen] = useState(false);
   const [termsSigned, setTermsSigned] = useState([false, false, false, false]);
   const [pendingSubmit, setPendingSubmit] = useState<'single' | 'album' | null>(null);
+  const [tomorrow] = useState(() => new Date(Date.now() + 86_400_000).toISOString().split('T')[0]);
+
+  useEffect(() => {
+    if (!user?.artistId) return;
+    void getArtistById(user.artistId).then((a) => {
+      setArtist(a);
+      if (a) {
+        setSingle((f) => ({ ...f, artistName: f.artistName || a.name }));
+        setAlbum((f) => ({ ...f, artistName: f.artistName || a.name }));
+      }
+    });
+  }, [user]);
 
   if (!artist) return null;
 
@@ -150,21 +163,28 @@ export default function ArtistUploadPage() {
     setTermsOpen(true);
   }
 
+  function buildUploadFormData(fields: Record<string, string>): FormData {
+    const formData = new FormData();
+    Object.entries(fields).forEach(([key, value]) => formData.append(key, value));
+    Array.from(audioFiles ?? []).forEach((file) => formData.append('audio[]', file));
+    if (coverArt) formData.append('cover', coverArt);
+    return formData;
+  }
+
   async function doSingleSubmit() {
     if (!artist) return;
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 700));
 
-    const track = submitTrack({
+    const track = await submitTrack(buildUploadFormData({
       artistId: artist.id,
       title: single.title.trim(),
       genre: single.genre,
       releaseDate: single.releaseDate,
-      platforms: ['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music'],
+      platforms: JSON.stringify(['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music']),
       ...(single.featuring.trim() ? { featuring: single.featuring.trim() } : {}),
-    });
+    }));
 
-    sendNotification(
+    void sendNotification(
       artist.id,
       'upload_submitted',
       'Upload Received',
@@ -205,17 +225,16 @@ export default function ArtistUploadPage() {
   async function doAlbumSubmit() {
     if (!artist) return;
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 700));
 
-    const track = submitTrack({
+    const track = await submitTrack(buildUploadFormData({
       artistId: artist.id,
       title: album.albumTitle.trim(),
       genre: album.genre,
       releaseDate: album.releaseDate,
-      platforms: ['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music'],
-    });
+      platforms: JSON.stringify(['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music']),
+    }));
 
-    sendNotification(
+    void sendNotification(
       artist.id,
       'upload_submitted',
       'Album Upload Received',
@@ -233,8 +252,6 @@ export default function ArtistUploadPage() {
     else if (pendingSubmit === 'album') await doAlbumSubmit();
     setPendingSubmit(null);
   }
-
-  const tomorrow = new Date(Date.now() + 86_400_000).toISOString().split('T')[0];
 
   return (
     <div className="flex flex-col gap-5 max-w-300">

@@ -1,0 +1,17 @@
+.git
+node_modules
+dist
+src
+public
+*.md
+
+# Never bake real local secrets into the image, even though config.php is
+# already gitignored from the repo itself.
+api/config/config.php
+
+# Local test upload artifacts — not meant to ship in the image.
+api/storage/covers/*
+api/storage/audio/*
+!api/storage/covers/.gitkeep
+!api/storage/audio/.gitkeep
+!api/storage/audio/.htaccess

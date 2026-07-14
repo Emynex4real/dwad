@@ -1,19 +1,28 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNotifications } from '../../contexts/NotificationContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useNotifications } from '../../hooks/useNotifications';
 import { getArtistById } from '../../services/artists.service';
-import { getTracksByArtist, getAnalyticsByArtist } from '../../services/tracks.service';
+import { getTracksByArtist } from '../../services/tracks.service';
+import { getArtistAnalytics } from '../../services/analytics.service';
 import { getPlanDefinition } from '../../services/subscriptions.service';
+import type { ArtistProfile, TrackUpload, ArtistAnalytics } from '../../types/dashboard';
 
 export default function ArtistHomePage() {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
-  const artist = useMemo(() => (user?.artistId ? getArtistById(user.artistId) : undefined), [user]);
-  const tracks = useMemo(() => (user?.artistId ? getTracksByArtist(user.artistId) : []), [user]);
-  const analytics = useMemo(() => (user?.artistId ? getAnalyticsByArtist(user.artistId) : undefined), [user]);
+  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
+  const [tracks, setTracks] = useState<TrackUpload[]>([]);
+  const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
   const planDef = useMemo(() => artist ? getPlanDefinition(artist.subscription.plan) : undefined, [artist]);
+
+  useEffect(() => {
+    if (!user?.artistId) return;
+    void getArtistById(user.artistId).then(setArtist);
+    void getTracksByArtist(user.artistId).then(setTracks);
+    void getArtistAnalytics(user.artistId).then(setAnalytics);
+  }, [user]);
 
   if (!artist) return null;
 

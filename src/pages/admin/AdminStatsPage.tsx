@@ -1,17 +1,33 @@
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { getAllArtists } from '../../services/artists.service';
 import { getAllTracks } from '../../services/tracks.service';
 import { getAllSubscriptions } from '../../services/subscriptions.service';
-import { MOCK_ANALYTICS } from '../../data/mock/tracks';
+import { getAllAnalytics } from '../../services/analytics.service';
+import type { ArtistProfile, Subscription, TrackUpload, ArtistAnalytics } from '../../types/dashboard';
+
+const MONTH_INDEX: Record<string, number> = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+
+function monthSortKey(label: string): number {
+  const [mon, yr] = label.split(' ');
+  return parseInt(yr, 10) * 12 + (MONTH_INDEX[mon] ?? 0);
+}
 
 export default function AdminStatsPage() {
-  const artists = useMemo(() => getAllArtists(), []);
-  const tracks  = useMemo(() => getAllTracks(), []);
-  const subs    = useMemo(() => getAllSubscriptions(), []);
+  const [artists, setArtists] = useState<ArtistProfile[]>([]);
+  const [subs, setSubs]       = useState<Subscription[]>([]);
+  const [tracks, setTracks]   = useState<TrackUpload[]>([]);
+  const [analytics, setAnalytics] = useState<ArtistAnalytics[]>([]);
 
-  const totalStreams  = MOCK_ANALYTICS.reduce((s, a) => s + a.totalStreams, 0);
-  const totalRevenue  = MOCK_ANALYTICS.reduce((s, a) => s + a.totalRevenue, 0);
-  const totalPending  = MOCK_ANALYTICS.reduce((s, a) => s + a.pendingPayout, 0);
+  useEffect(() => {
+    void getAllArtists().then(setArtists);
+    void getAllSubscriptions().then(setSubs);
+    void getAllTracks().then(setTracks);
+    void getAllAnalytics().then(setAnalytics);
+  }, []);
+
+  const totalStreams  = analytics.reduce((s, a) => s + a.totalStreams, 0);
+  const totalRevenue  = analytics.reduce((s, a) => s + a.totalRevenue, 0);
+  const totalPending  = analytics.reduce((s, a) => s + a.pendingPayout, 0);
   const activeSubs    = subs.filter((s) => s.status === 'active').length;
   const liveCount     = tracks.filter((t) => t.status === 'live').length;
   const pendingCount  = tracks.filter((t) => t.status === 'pending').length;
@@ -19,7 +35,7 @@ export default function AdminStatsPage() {
 
   // Monthly aggregated across all artists
   const monthlyMap = new Map<string, { streams: number; revenue: number }>();
-  MOCK_ANALYTICS.forEach((a) => {
+  analytics.forEach((a) => {
     a.monthly.forEach((m) => {
       const existing = monthlyMap.get(m.month) ?? { streams: 0, revenue: 0 };
       monthlyMap.set(m.month, {
@@ -30,10 +46,11 @@ export default function AdminStatsPage() {
   });
   const monthly = Array.from(monthlyMap.entries())
     .map(([month, data]) => ({ month, ...data }))
+    .sort((a, b) => monthSortKey(a.month) - monthSortKey(b.month))
     .slice(-6);
 
   // Per-artist revenue table
-  const artistRevenue = MOCK_ANALYTICS.map((a) => {
+  const artistRevenue = analytics.map((a) => {
     const artist = artists.find((ar) => ar.id === a.artistId);
     return {
       name: artist?.name ?? '—',

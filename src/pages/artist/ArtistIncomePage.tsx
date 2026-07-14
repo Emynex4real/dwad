@@ -1,18 +1,41 @@
-import { useMemo, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { getAnalyticsByArtist } from '../../services/tracks.service';
-import { getArtistById } from '../../services/artists.service';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { getArtistAnalytics } from '../../services/analytics.service';
+import { getArtistById, updatePayout } from '../../services/artists.service';
+import { getPayoutHistory } from '../../services/payouts.service';
+import type { ArtistProfile, ArtistAnalytics, PayoutMethod, Payout } from '../../types/dashboard';
 
 export default function ArtistIncomePage() {
   const { user } = useAuth();
-  const analytics = useMemo(() => (user?.artistId ? getAnalyticsByArtist(user.artistId) : undefined), [user]);
-  const artist = useMemo(() => (user?.artistId ? getArtistById(user.artistId) : undefined), [user]);
+  const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
+  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [payoutMethod, setPayoutMethod] = useState<PayoutMethod | ''>('');
+  const [payoutDetails, setPayoutDetails] = useState('');
+  const [payoutSaved, setPayoutSaved] = useState(false);
+
+  useEffect(() => {
+    if (!user?.artistId) return;
+    void getArtistById(user.artistId).then((a) => {
+      setArtist(a);
+      setPayoutMethod(a?.payoutMethod ?? '');
+      setPayoutDetails(a?.payoutDetails ?? '');
+    });
+    void getArtistAnalytics(user.artistId).then(setAnalytics);
+    void getPayoutHistory(user.artistId).then(setPayouts);
+  }, [user]);
+
+  async function handleSavePayout() {
+    if (!user?.artistId) return;
+    await updatePayout(user.artistId, payoutMethod || null, payoutDetails);
+    setPayoutSaved(true);
+    setTimeout(() => setPayoutSaved(false), 3000);
+  }
 
   if (!analytics || !artist) return null;
 
   const earned = analytics.totalRevenue;
   const paid = +(earned - analytics.pendingPayout).toFixed(2);
-  const [bankNote, setBankNote] = useState('');
 
   return (
     <div className="dash-page">
@@ -49,17 +72,17 @@ export default function ArtistIncomePage() {
           <tbody>
             {[...analytics.monthly].reverse().map((m) => {
               const perStream = m.streams > 0 ? (m.revenue / m.streams * 1000).toFixed(3) : '—';
-              const isRecent = analytics.monthly.indexOf(m) >= analytics.monthly.length - 2;
+              const status = m.revenue <= 0 ? null : m.pendingUsd <= 0 ? 'Paid' : m.paidUsd > 0 ? 'Partially Paid' : 'Pending';
               return (
-                <tr key={m.month}>
+                <tr key={m.period}>
                   <td className="font-medium">{m.month}</td>
                   <td>{m.streams.toLocaleString()}</td>
                   <td className="income-amount">${m.revenue.toFixed(2)}</td>
                   <td className="text-muted text-sm">${perStream}/1K</td>
                   <td>
-                    <span className={`dash-badge dash-badge--${isRecent ? 'pending' : 'live'}`}>
-                      {isRecent ? 'Processing' : 'Paid'}
-                    </span>
+                    {status && (
+                      <span className={`dash-badge dash-badge--${status === 'Paid' ? 'live' : 'pending'}`}>{status}</span>
+                    )}
                   </td>
                 </tr>
               );
@@ -122,14 +145,31 @@ export default function ArtistIncomePage() {
         </div>
 
         <div style={{ marginTop: 20 }}>
-          <label className="income-info__label" htmlFor="bank-note" style={{ display: 'block', marginBottom: 8 }}>
-            Note — Bank Details
+          <label className="income-info__label" htmlFor="payout-method" style={{ display: 'block', marginBottom: 8 }}>
+            Payout Method
+          </label>
+          <select
+            id="payout-method"
+            className="dash-input select-field"
+            value={payoutMethod}
+            onChange={(e) => setPayoutMethod(e.target.value as PayoutMethod)}
+          >
+            <option value="">Select a method…</option>
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="paypal">PayPal</option>
+            <option value="mobile_money">Mobile Money</option>
+          </select>
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <label className="income-info__label" htmlFor="payout-details" style={{ display: 'block', marginBottom: 8 }}>
+            Payout Details
           </label>
           <textarea
-            id="bank-note"
-            value={bankNote}
-            onChange={(e) => setBankNote(e.target.value)}
-            placeholder="Enter your bank name, account number, account name..."
+            id="payout-details"
+            value={payoutDetails}
+            onChange={(e) => setPayoutDetails(e.target.value)}
+            placeholder="Enter your bank name and account number, PayPal email, or mobile money number..."
             rows={4}
             style={{
               width: '100%',
@@ -144,6 +184,10 @@ export default function ArtistIncomePage() {
               fontFamily: 'var(--font-sans)',
             }}
           />
+          <div className="flex items-center gap-3" style={{ marginTop: 12 }}>
+            <button className="dash-btn dash-btn--gold" onClick={handleSavePayout}>Save Payout Info</button>
+            {payoutSaved && <span className="dash-saved">Saved ✓</span>}
+          </div>
         </div>
 
         <div style={{ marginTop: 20 }}>
@@ -172,6 +216,27 @@ export default function ArtistIncomePage() {
           </a>
         </div>
       </div>
+
+      {/* Payout history */}
+      {payouts.length > 0 && (
+        <div className="dash-panel">
+          <h2 className="dash-panel__title">Payout History</h2>
+          <div className="divide-y divide-line">
+            {payouts.map((p) => (
+              <div key={p.id} className="flex justify-between items-center py-2.5 text-sm">
+                <div>
+                  <div className="text-ink">
+                    {new Date(p.paidAt).toLocaleDateString()}
+                    {p.period && <span className="text-muted"> · for {p.period}</span>}
+                  </div>
+                  {p.note && <div className="text-xs text-muted">{p.note}</div>}
+                </div>
+                <span className="income-amount font-medium">${p.amountUsd.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

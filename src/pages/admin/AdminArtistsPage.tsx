@@ -1,12 +1,53 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllArtists, setUploadAccess } from '../../services/artists.service';
+import { getAllArtists, setUploadAccess, approveArtist, deleteArtist } from '../../services/artists.service';
+import { createInvite } from '../../services/invites.service';
+import AddArtistForm from '../../components/admin/AddArtistForm';
 import type { ArtistProfile } from '../../types/dashboard';
 
 export default function AdminArtistsPage() {
-  const [artists, setArtists] = useState<ArtistProfile[]>(() => getAllArtists());
+  const [artists, setArtists] = useState<ArtistProfile[]>([]);
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'expired'>('all');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [inviteLink, setInviteLink] = useState('');
+  const [inviteCopied, setInviteCopied] = useState(false);
+
+  useEffect(() => {
+    void getAllArtists().then(setArtists);
+  }, []);
+
+  async function refreshArtists() {
+    setArtists(await getAllArtists());
+  }
+
+  async function handleGenerateInvite() {
+    const token = await createInvite();
+    setInviteLink(`${window.location.origin}/join/${token}`);
+    setInviteCopied(false);
+  }
+
+  async function copyInviteLink() {
+    await navigator.clipboard.writeText(inviteLink);
+    setInviteCopied(true);
+    setTimeout(() => setInviteCopied(false), 2000);
+  }
+
+  function whatsappShareUrl(): string {
+    const message = `Hi! Please create your Dwad Music artist account using this link: ${inviteLink}`;
+    return `https://wa.me/?text=${encodeURIComponent(message)}`;
+  }
+
+  async function handleApprove(id: string) {
+    await approveArtist(id);
+    await refreshArtists();
+  }
+
+  async function handleReject(id: string) {
+    if (!window.confirm('Reject and delete this pending account?')) return;
+    await deleteArtist(id);
+    await refreshArtists();
+  }
 
   const filtered = useMemo(() => {
     let list = artists;
@@ -18,21 +59,52 @@ export default function AdminArtistsPage() {
     return list;
   }, [artists, search, filterStatus]);
 
-  function toggleAccess(artistId: string) {
+  async function toggleAccess(artistId: string) {
     const artist = artists.find((a) => a.id === artistId);
     if (!artist) return;
-    setUploadAccess(artistId, artist.uploadAccess === 'granted' ? 'locked' : 'granted');
-    setArtists(getAllArtists());
+    await setUploadAccess(artistId, artist.uploadAccess === 'granted' ? 'locked' : 'granted');
+    setArtists(await getAllArtists());
   }
 
   return (
     <div className="flex flex-col gap-5 max-w-300">
 
       {/* Header */}
-      <div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-normal text-ink">Artists</h1>
-        <p className="text-sm text-muted mt-1">{artists.length} registered artists</p>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="font-serif text-2xl sm:text-3xl font-normal text-ink">Artists</h1>
+          <p className="text-sm text-muted mt-1">{artists.length} registered artists</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button className="dash-btn dash-btn--ghost" onClick={handleGenerateInvite}>Generate Invite Link</button>
+          {!showAddForm && (
+            <button className="dash-btn dash-btn--gold" onClick={() => setShowAddForm(true)}>+ Add Artist</button>
+          )}
+        </div>
       </div>
+
+      {inviteLink && (
+        <div className="dash-panel flex items-center gap-3 flex-wrap">
+          <span className="text-xs text-muted shrink-0">Invite link (one-time use):</span>
+          <code className="text-xs text-ink flex-1 min-w-0 truncate">{inviteLink}</code>
+          <button className="dash-btn dash-btn--ghost text-xs py-1.5 px-3" onClick={copyInviteLink}>
+            {inviteCopied ? 'Copied ✓' : 'Copy Link'}
+          </button>
+          <a href={whatsappShareUrl()} target="_blank" rel="noreferrer" className="dash-btn dash-btn--gold text-xs py-1.5 px-3">
+            Share via WhatsApp
+          </a>
+        </div>
+      )}
+
+      {showAddForm && (
+        <AddArtistForm
+          onCancel={() => setShowAddForm(false)}
+          onCreated={(artist) => {
+            setArtists((prev) => [...prev, artist]);
+            setShowAddForm(false);
+          }}
+        />
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -65,10 +137,17 @@ export default function AdminArtistsPage() {
               <div className="text-sm font-medium text-ink truncate">{artist.name}</div>
               <div className="text-xs text-muted truncate">{artist.email}</div>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                {artist.status === 'pending' && <span className="dash-badge dash-badge--pending">Pending Approval</span>}
                 <span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span>
                 <span className="dash-badge dash-badge--plan">{artist.subscription.plan}</span>
                 <span className="text-[11px] text-muted">{artist.genre}</span>
               </div>
+              {artist.status === 'pending' && (
+                <div className="flex gap-2 mt-2">
+                  <button className="dash-action-btn dash-action-btn--approve flex-1" onClick={() => handleApprove(artist.id)}>Approve</button>
+                  <button className="dash-action-btn dash-action-btn--reject flex-1" onClick={() => handleReject(artist.id)}>Reject</button>
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-end gap-2 shrink-0">
               <button
@@ -114,7 +193,13 @@ export default function AdminArtistsPage() {
                   </td>
                   <td className="text-muted">{artist.genre}</td>
                   <td><span className="dash-badge dash-badge--plan">{artist.subscription.plan}</span></td>
-                  <td><span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span></td>
+                  <td>
+                    {artist.status === 'pending' ? (
+                      <span className="dash-badge dash-badge--pending">Pending Approval</span>
+                    ) : (
+                      <span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span>
+                    )}
+                  </td>
                   <td>
                     <button
                       className={`dash-toggle ${artist.uploadAccess === 'granted' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
@@ -124,7 +209,16 @@ export default function AdminArtistsPage() {
                     </button>
                   </td>
                   <td className="text-muted text-sm">{new Date(artist.joinedDate).toLocaleDateString()}</td>
-                  <td><Link to={`/admin/artists/${artist.id}`} className="dash-action-link">View →</Link></td>
+                  <td>
+                    {artist.status === 'pending' ? (
+                      <div className="dash-row-actions">
+                        <button className="dash-action-btn dash-action-btn--approve" onClick={() => handleApprove(artist.id)}>Approve</button>
+                        <button className="dash-action-btn dash-action-btn--reject" onClick={() => handleReject(artist.id)}>Reject</button>
+                      </div>
+                    ) : (
+                      <Link to={`/admin/artists/${artist.id}`} className="dash-action-link">View →</Link>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

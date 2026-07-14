@@ -1,39 +1,86 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getArtistById, updateArtist, setUploadAccess } from '../../services/artists.service';
+import { getArtistById, updateArtist, setUploadAccess, approveArtist, deleteArtist } from '../../services/artists.service';
 import { getTracksByArtist, updateTrackStatus } from '../../services/tracks.service';
 import { sendNotification } from '../../services/notifications.service';
 import { PLAN_DEFINITIONS, updateSubscription } from '../../services/subscriptions.service';
-import type { ArtistProfile, TrackUpload, SubscriptionPlan, SubscriptionStatus } from '../../types/dashboard';
+import { getArtistAnalytics } from '../../services/analytics.service';
+import { recordPayout, getPayoutHistory } from '../../services/payouts.service';
+import { API_BASE_URL, getStoredToken } from '../../services/httpClient';
+import type { ArtistProfile, TrackUpload, SubscriptionPlan, SubscriptionStatus, ArtistAnalytics, Payout } from '../../types/dashboard';
+
+const PAYOUT_METHOD_LABEL: Record<string, string> = {
+  bank_transfer: 'Bank Transfer',
+  paypal: 'PayPal',
+  mobile_money: 'Mobile Money',
+};
 
 export default function AdminArtistDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [artist, setArtist] = useState<ArtistProfile | undefined>(() => id ? getArtistById(id) : undefined);
-  const tracks = useMemo(() => (id ? getTracksByArtist(id) : []), [id]);
+  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
+  const [loaded, setLoaded] = useState(false);
+  const [tracks, setTracks] = useState<TrackUpload[]>([]);
+  const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [payoutAmount, setPayoutAmount] = useState('');
+  const [payoutNote, setPayoutNote] = useState('');
+  const [payoutPeriod, setPayoutPeriod] = useState<string | undefined>(undefined);
+  const [payoutSaved, setPayoutSaved] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    void getArtistById(id).then((a) => {
+      setArtist(a);
+      setLoaded(true);
+    });
+    void getTracksByArtist(id).then(setTracks);
+    void getArtistAnalytics(id).then(setAnalytics);
+    void getPayoutHistory(id).then(setPayouts);
+  }, [id]);
+
+  async function refreshPayoutData() {
+    if (!id) return;
+    setAnalytics(await getArtistAnalytics(id));
+    setPayouts(await getPayoutHistory(id));
+  }
+
+  async function handleRecordPayout() {
+    if (!id) return;
+    const amount = parseFloat(payoutAmount);
+    if (isNaN(amount) || amount <= 0) return;
+    await recordPayout(id, amount, payoutNote.trim() || undefined, payoutPeriod);
+    setPayoutAmount('');
+    setPayoutNote('');
+    setPayoutPeriod(undefined);
+    await refreshPayoutData();
+    setPayoutSaved(true);
+    setTimeout(() => setPayoutSaved(false), 3000);
+  }
+
+  function startPayMonth(month: ArtistAnalytics['monthly'][number]) {
+    setPayoutAmount(month.pendingUsd.toFixed(2));
+    setPayoutNote(`Payout for ${month.month}`);
+    setPayoutPeriod(month.period);
+  }
 
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState(() => ({
-    name: artist?.name ?? '',
-    email: artist?.email ?? '',
-    phone: artist?.phone ?? '',
-    genre: artist?.genre ?? '',
-    bio: artist?.bio ?? '',
-  }));
+  const [form, setForm] = useState({ name: '', email: '', phone: '', genre: '', bio: '', password: '' });
 
   const [editSub, setEditSub] = useState(false);
-  const [subForm, setSubForm] = useState(() => ({
-    plan: artist?.subscription.plan ?? 'plan-a' as SubscriptionPlan,
-    status: artist?.subscription.status ?? 'active' as SubscriptionStatus,
-    price: String(artist?.subscription.price ?? ''),
-    expiryDate: artist?.subscription.expiryDate ?? '',
-    autoRenew: artist?.subscription.autoRenew ?? false,
-  }));
+  const [subForm, setSubForm] = useState({
+    plan: 'plan-a' as SubscriptionPlan,
+    status: 'active' as SubscriptionStatus,
+    price: '',
+    expiryDate: '',
+    autoRenew: false,
+  });
 
   const [saved, setSaved] = useState(false);
 
   if (!artist) {
+    if (!loaded) return null;
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted">Artist not found.</p>
@@ -42,56 +89,92 @@ export default function AdminArtistDetailPage() {
     );
   }
 
-  function handleSave() {
+  function startEdit() {
+    if (!artist) return;
+    setForm({ name: artist.name, email: artist.email, phone: artist.phone, genre: artist.genre, bio: artist.bio, password: '' });
+    setEditMode(true);
+  }
+
+  function startEditSub() {
+    if (!artist) return;
+    setSubForm({
+      plan: artist.subscription.plan,
+      status: artist.subscription.status,
+      price: String(artist.subscription.price),
+      expiryDate: artist.subscription.expiryDate,
+      autoRenew: artist.subscription.autoRenew,
+    });
+    setEditSub(true);
+  }
+
+  async function handleSave() {
     if (!id) return;
-    updateArtist(id, form);
-    setArtist(getArtistById(id));
+    const { password, ...profile } = form;
+    await updateArtist(id, password.trim() ? { ...profile, password: password.trim() } : profile);
+    setArtist(await getArtistById(id));
     setEditMode(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   }
 
-  function handleSaveSub() {
+  async function handleSaveSub() {
     if (!id) return;
-    updateSubscription(id, {
+    await updateSubscription(id, {
       plan: subForm.plan,
       status: subForm.status,
       price: parseFloat(subForm.price) || 0,
       expiryDate: subForm.expiryDate,
       autoRenew: subForm.autoRenew,
     });
-    setArtist(getArtistById(id));
+    setArtist(await getArtistById(id));
     setEditSub(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   }
 
-  function toggleAccess() {
+  async function toggleAccess() {
     if (!id || !artist) return;
     const next = artist.uploadAccess === 'granted' ? 'locked' : 'granted';
-    setUploadAccess(id, next);
-    setArtist(getArtistById(id));
-    sendNotification(id, 'general', 'Upload Access Updated',
+    await setUploadAccess(id, next);
+    setArtist(await getArtistById(id));
+    void sendNotification(id, 'general', 'Upload Access Updated',
       next === 'granted'
         ? 'Your upload access has been restored.'
         : 'Your upload access has been suspended. Please contact support.');
   }
 
-  function handleApprove(track: TrackUpload) {
-    updateTrackStatus(track.id, 'approved');
-    sendNotification(artist!.id, 'upload_approved', 'Upload Approved',
-      `Your track "${track.title}" has been approved.`,
-      { trackId: track.id, trackTitle: track.title });
-    setArtist(getArtistById(id!));
+  async function handleApproveArtist() {
+    if (!id) return;
+    await approveArtist(id);
+    setArtist(await getArtistById(id));
   }
 
-  function handleReject(track: TrackUpload) {
+  async function handleRejectArtist() {
+    if (!id) return;
+    if (!window.confirm('Reject and delete this pending account?')) return;
+    await deleteArtist(id);
+    navigate('/admin/artists');
+  }
+
+  async function handleApprove(track: TrackUpload) {
+    await updateTrackStatus(track.id, 'approved');
+    void sendNotification(artist!.id, 'upload_approved', 'Upload Approved',
+      `Your track "${track.title}" has been approved.`,
+      { trackId: track.id, trackTitle: track.title });
+    setTracks(await getTracksByArtist(id!));
+  }
+
+  async function handleReject(track: TrackUpload) {
     const note = window.prompt('Rejection reason (optional):') ?? '';
-    updateTrackStatus(track.id, 'rejected', note || undefined);
-    sendNotification(artist!.id, 'upload_rejected', 'Upload Rejected',
+    await updateTrackStatus(track.id, 'rejected', note || undefined);
+    void sendNotification(artist!.id, 'upload_rejected', 'Upload Rejected',
       `Your track "${track.title}" was not approved.${note ? ` Reason: ${note}` : ''}`,
       { trackId: track.id, trackTitle: track.title });
-    setArtist(getArtistById(id!));
+    setTracks(await getTracksByArtist(id!));
+  }
+
+  function audioDownloadUrl(trackId: string): string {
+    return `${API_BASE_URL}/tracks/${trackId}/audio?token=${getStoredToken() ?? ''}`;
   }
 
   return (
@@ -103,7 +186,7 @@ export default function AdminArtistDetailPage() {
         <div className="flex items-center gap-2 flex-wrap">
           {saved && <span className="dash-saved">Saved ✓</span>}
           {!editMode
-            ? <button className="dash-btn" onClick={() => setEditMode(true)}>Edit Profile</button>
+            ? <button className="dash-btn" onClick={startEdit}>Edit Profile</button>
             : <>
                 <button className="dash-btn dash-btn--ghost" onClick={() => setEditMode(false)}>Cancel</button>
                 <button className="dash-btn dash-btn--gold" onClick={handleSave}>Save Changes</button>
@@ -111,6 +194,17 @@ export default function AdminArtistDetailPage() {
           }
         </div>
       </div>
+
+      {/* Pending approval banner */}
+      {artist.status === 'pending' && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border border-amber-400/30 bg-amber-400/5 rounded-lg text-sm flex-wrap">
+          <span className="text-ink">⚠ This account is awaiting approval and cannot log in yet.</span>
+          <div className="flex gap-2">
+            <button className="dash-action-btn dash-action-btn--approve" onClick={handleApproveArtist}>Approve</button>
+            <button className="dash-action-btn dash-action-btn--reject" onClick={handleRejectArtist}>Reject</button>
+          </div>
+        </div>
+      )}
 
       {/* Profile + Subscription */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -150,6 +244,17 @@ export default function AdminArtistDetailPage() {
                 <label className="text-xs font-medium text-ink-2">Bio</label>
                 <textarea className="dash-input dash-textarea" value={form.bio} onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))} rows={3} />
               </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-ink-2">New Password</label>
+                <input
+                  type="password"
+                  className="dash-input"
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  placeholder="Leave blank to keep current password"
+                  autoComplete="new-password"
+                />
+              </div>
             </div>
           ) : (
             <div className="divide-y divide-line">
@@ -159,12 +264,19 @@ export default function AdminArtistDetailPage() {
                 { label: 'Genre',   value: artist.genre },
                 { label: 'Country', value: artist.country },
                 { label: 'Joined',  value: new Date(artist.joinedDate).toLocaleDateString() },
+                { label: 'Payout Method', value: artist.payoutMethod ? PAYOUT_METHOD_LABEL[artist.payoutMethod] : 'Not set' },
               ].map((row) => (
                 <div key={row.label} className="flex justify-between items-center py-2.5 text-sm">
                   <span className="text-muted">{row.label}</span>
                   <span className="text-ink text-right">{row.value}</span>
                 </div>
               ))}
+              {artist.payoutDetails && (
+                <div className="pt-2.5">
+                  <span className="text-muted text-sm">Payout Details</span>
+                  <p className="text-sm text-ink mt-1 whitespace-pre-wrap">{artist.payoutDetails}</p>
+                </div>
+              )}
               {artist.bio && <p className="pt-3 text-sm text-muted italic">{artist.bio}</p>}
             </div>
           )}
@@ -175,7 +287,7 @@ export default function AdminArtistDetailPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-ink">Subscription</h2>
             {!editSub
-              ? <button className="dash-btn text-xs py-1.5 px-3" onClick={() => setEditSub(true)}>Edit</button>
+              ? <button className="dash-btn text-xs py-1.5 px-3" onClick={startEditSub}>Edit</button>
               : <div className="flex gap-2">
                   <button className="dash-btn dash-btn--ghost text-xs py-1.5 px-3" onClick={() => setEditSub(false)}>Cancel</button>
                   <button className="dash-btn dash-btn--gold text-xs py-1.5 px-3" onClick={handleSaveSub}>Save</button>
@@ -258,6 +370,119 @@ export default function AdminArtistDetailPage() {
 
       </div>
 
+      {/* Payouts */}
+      <div className="dash-panel">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-ink">Payouts</h2>
+          {payoutSaved && <span className="dash-saved">Recorded ✓</span>}
+        </div>
+
+        {analytics && (
+          <div className="stat-grid stat-grid--3 mb-5">
+            <div className="stat-card">
+              <div className="stat-card__label">Total Revenue</div>
+              <div className="stat-card__value">${analytics.totalRevenue.toFixed(2)}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-card__label">Paid Out</div>
+              <div className="stat-card__value">${(analytics.totalRevenue - analytics.pendingPayout).toFixed(2)}</div>
+            </div>
+            <div className="stat-card stat-card--gold">
+              <div className="stat-card__label">Pending Payout</div>
+              <div className="stat-card__value">${analytics.pendingPayout.toFixed(2)}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Monthly breakdown — pay per month */}
+        {analytics && analytics.monthly.length > 0 && (
+          <div className="overflow-x-auto mb-5">
+            <table className="dash-table">
+              <thead>
+                <tr><th>Month</th><th>Streams</th><th>Revenue</th><th>Paid</th><th>Pending</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                {[...analytics.monthly].reverse().map((m) => (
+                  <tr key={m.period}>
+                    <td className="font-medium">{m.month}</td>
+                    <td>{m.streams.toLocaleString()}</td>
+                    <td>${m.revenue.toFixed(2)}</td>
+                    <td className="text-muted">${m.paidUsd.toFixed(2)}</td>
+                    <td>${m.pendingUsd.toFixed(2)}</td>
+                    <td>
+                      {m.pendingUsd > 0 ? (
+                        <button className="dash-action-btn dash-action-btn--approve" onClick={() => startPayMonth(m)}>Pay</button>
+                      ) : m.revenue > 0 ? (
+                        <span className="dash-badge dash-badge--live">Paid ✓</span>
+                      ) : (
+                        <span className="text-muted text-sm">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Confirm / general payout form */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end mb-5">
+          <div className="flex flex-col gap-1.5 flex-1">
+            <label className="text-xs font-medium text-ink-2">
+              Amount (USD){payoutPeriod && <span className="text-gold"> — for {payoutPeriod}</span>}
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              className="dash-input"
+              value={payoutAmount}
+              onChange={(e) => setPayoutAmount(e.target.value)}
+              placeholder="0.00"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5 flex-1">
+            <label className="text-xs font-medium text-ink-2">Note (optional)</label>
+            <input
+              className="dash-input"
+              value={payoutNote}
+              onChange={(e) => setPayoutNote(e.target.value)}
+              placeholder="e.g. November payout"
+            />
+          </div>
+          <div className="flex gap-2">
+            {payoutPeriod && (
+              <button
+                className="dash-btn dash-btn--ghost"
+                onClick={() => { setPayoutAmount(''); setPayoutNote(''); setPayoutPeriod(undefined); }}
+              >
+                Clear
+              </button>
+            )}
+            <button className="dash-btn dash-btn--gold" onClick={handleRecordPayout}>Record Payout</button>
+          </div>
+        </div>
+
+        {payouts.length === 0 ? (
+          <p className="text-sm text-muted">No payouts recorded yet.</p>
+        ) : (
+          <div className="divide-y divide-line">
+            {payouts.map((p) => (
+              <div key={p.id} className="flex justify-between items-center py-2.5 text-sm">
+                <div>
+                  <div className="text-ink">
+                    {new Date(p.paidAt).toLocaleDateString()}
+                    {p.period && <span className="text-muted"> · for {p.period}</span>}
+                  </div>
+                  {p.note && <div className="text-xs text-muted">{p.note}</div>}
+                </div>
+                <span className="text-ink font-medium">${p.amountUsd.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Tracks */}
       <div className="dash-panel p-0!">
         <h2 className="text-sm font-semibold text-ink px-5 pt-5 pb-3">
@@ -289,6 +514,16 @@ export default function AdminArtistDetailPage() {
                       <button className="dash-action-btn dash-action-btn--reject flex-1" onClick={() => handleReject(t)}>Reject</button>
                     </div>
                   )}
+                  {(t.coverArtUrl || t.audioFileUrl) && (
+                    <div className="flex gap-2 mt-2.5">
+                      {t.coverArtUrl && (
+                        <a href={`${API_BASE_URL}/storage/${t.coverArtUrl}`} target="_blank" rel="noreferrer" className="dash-action-btn flex-1 text-center">🖼 Cover</a>
+                      )}
+                      {t.audioFileUrl && (
+                        <a href={audioDownloadUrl(t.id)} className="dash-action-btn flex-1 text-center">♪ Audio</a>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -311,12 +546,23 @@ export default function AdminArtistDetailPage() {
                       <td className="text-muted text-sm">{new Date(t.releaseDate).toLocaleDateString()}</td>
                       <td className="text-mono text-sm">{t.upcCode ?? '—'}</td>
                       <td>
-                        {t.status === 'pending' ? (
-                          <div className="dash-row-actions">
-                            <button className="dash-action-btn dash-action-btn--approve" onClick={() => handleApprove(t)}>Approve</button>
-                            <button className="dash-action-btn dash-action-btn--reject" onClick={() => handleReject(t)}>Reject</button>
-                          </div>
-                        ) : <span className="text-muted text-sm">—</span>}
+                        <div className="dash-row-actions">
+                          {t.status === 'pending' && (
+                            <>
+                              <button className="dash-action-btn dash-action-btn--approve" onClick={() => handleApprove(t)}>Approve</button>
+                              <button className="dash-action-btn dash-action-btn--reject" onClick={() => handleReject(t)}>Reject</button>
+                            </>
+                          )}
+                          {t.coverArtUrl && (
+                            <a href={`${API_BASE_URL}/storage/${t.coverArtUrl}`} target="_blank" rel="noreferrer" className="dash-action-btn" title="View cover art">🖼</a>
+                          )}
+                          {t.audioFileUrl && (
+                            <a href={audioDownloadUrl(t.id)} className="dash-action-btn" title="Download audio">♪</a>
+                          )}
+                          {t.status !== 'pending' && !t.coverArtUrl && !t.audioFileUrl && (
+                            <span className="text-muted text-sm">—</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

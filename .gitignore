@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+api/config/config.php
+
+api/storage/covers/*
+api/storage/audio/*
+!api/storage/covers/.gitkeep
+!api/storage/audio/.gitkeep
+!api/storage/audio/.htaccess
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

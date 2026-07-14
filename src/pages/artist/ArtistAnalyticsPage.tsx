@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { getAnalyticsByArtist } from '../../services/tracks.service';
-import type { MonthlyStats, TrackStats } from '../../types/dashboard';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { getArtistAnalytics } from '../../services/analytics.service';
+import type { MonthlyStats, TrackStats, ArtistAnalytics } from '../../types/dashboard';
 
 const GOLD = '#c9a667';
 const PLATFORM_COLORS = ['#c9a667', '#e6c98a', '#8a6e3d', '#a08040', '#5d564c'];
@@ -78,10 +78,16 @@ function AreaSparkline({ data }: { data: MonthlyStats[] }) {
 }
 
 function PlatformBreakdown({ tracks }: { tracks: TrackStats[] }) {
-  const track = tracks[0];
-  if (!track || track.platforms.length === 0) return null;
-  const total = track.platforms.reduce((s, p) => s + p.streams, 0) || 1;
-  const sorted = [...track.platforms].sort((a, b) => b.streams - a.streams);
+  const platformTotals = new Map<string, number>();
+  for (const track of tracks) {
+    for (const p of track.platforms) {
+      platformTotals.set(p.name, (platformTotals.get(p.name) ?? 0) + p.streams);
+    }
+  }
+  const platforms = Array.from(platformTotals, ([name, streams]) => ({ name, streams }));
+  if (platforms.length === 0) return null;
+  const total = platforms.reduce((s, p) => s + p.streams, 0) || 1;
+  const sorted = [...platforms].sort((a, b) => b.streams - a.streams);
 
   return (
     <div className="dash-two-col">
@@ -146,10 +152,12 @@ function PlatformBreakdown({ tracks }: { tracks: TrackStats[] }) {
 
 export default function ArtistAnalyticsPage() {
   const { user } = useAuth();
-  const analytics = useMemo(
-    () => (user?.artistId ? getAnalyticsByArtist(user.artistId) : undefined),
-    [user],
-  );
+  const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
+
+  useEffect(() => {
+    if (!user?.artistId) return;
+    void getArtistAnalytics(user.artistId).then(setAnalytics);
+  }, [user]);
 
   if (!analytics) {
     return (

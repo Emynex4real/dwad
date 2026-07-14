@@ -1,7 +1,7 @@
-import { useState, useMemo, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { getAllArtists } from '../../services/artists.service';
 import { sendNotification, broadcastNotification, getAllNotifications } from '../../services/notifications.service';
-import type { NotificationType, Notification } from '../../types/dashboard';
+import type { ArtistProfile, NotificationType, Notification } from '../../types/dashboard';
 
 const NOTIFICATION_TYPES: { value: NotificationType; label: string }[] = [
   { value: 'general',              label: 'General' },
@@ -14,25 +14,33 @@ const NOTIFICATION_TYPES: { value: NotificationType; label: string }[] = [
 ];
 
 export default function AdminNotificationsPage() {
-  const artists = useMemo(() => getAllArtists(), []);
-  const [notifications, setNotifications] = useState<Notification[]>(() => getAllNotifications());
+  const [artists, setArtists] = useState<ArtistProfile[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const [target,   setTarget]   = useState<'individual' | 'all'>('individual');
-  const [artistId, setArtistId] = useState(artists[0]?.id ?? '');
+  const [artistId, setArtistId] = useState('');
   const [type,     setType]     = useState<NotificationType>('general');
   const [title,    setTitle]    = useState('');
   const [message,  setMessage]  = useState('');
   const [sent,     setSent]     = useState(false);
 
-  function handleSend(e: FormEvent) {
+  useEffect(() => {
+    void getAllArtists().then((list) => {
+      setArtists(list);
+      setArtistId((current) => current || (list[0]?.id ?? ''));
+    });
+    void getAllNotifications().then(setNotifications);
+  }, []);
+
+  async function handleSend(e: FormEvent) {
     e.preventDefault();
     if (!title.trim() || !message.trim()) return;
     if (target === 'all') {
-      broadcastNotification(artists.map((a) => a.id), type, title, message);
+      await broadcastNotification(artists.map((a) => a.id), type, title, message);
     } else {
-      sendNotification(artistId, type, title, message);
+      await sendNotification(artistId, type, title, message);
     }
-    setNotifications(getAllNotifications());
+    setNotifications(await getAllNotifications());
     setTitle('');
     setMessage('');
     setSent(true);

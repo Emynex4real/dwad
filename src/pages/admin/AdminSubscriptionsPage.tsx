@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getAllArtists } from '../../services/artists.service';
 import {
   renewSubscription,
@@ -7,11 +7,16 @@ import {
   PLAN_DEFINITIONS,
 } from '../../services/subscriptions.service';
 import { sendNotification } from '../../services/notifications.service';
-import type { ArtistProfile, SubscriptionPlan } from '../../types/dashboard';
+import type { ArtistProfile, Subscription, SubscriptionPlan } from '../../types/dashboard';
 
 export default function AdminSubscriptionsPage() {
-  const [artists, setArtists] = useState<ArtistProfile[]>(() => getAllArtists());
-  const expiring = useMemo(() => getExpiringSubscriptions(30), []);
+  const [artists, setArtists]   = useState<ArtistProfile[]>([]);
+  const [expiring, setExpiring] = useState<Subscription[]>([]);
+
+  useEffect(() => {
+    void getAllArtists().then(setArtists);
+    void getExpiringSubscriptions(30).then(setExpiring);
+  }, []);
 
   const stats = useMemo(() => ({
     active:    artists.filter((a) => a.subscription.status === 'active').length,
@@ -20,21 +25,21 @@ export default function AdminSubscriptionsPage() {
     mrr:       artists.filter((a) => a.subscription.status === 'active').reduce((s, a) => s + a.subscription.price, 0),
   }), [artists]);
 
-  function handleRenew(artistId: string, plan: SubscriptionPlan) {
-    renewSubscription(artistId, plan);
-    sendNotification(artistId, 'subscription_renewed', 'Subscription Renewed',
+  async function handleRenew(artistId: string, plan: SubscriptionPlan) {
+    await renewSubscription(artistId, plan);
+    void sendNotification(artistId, 'subscription_renewed', 'Subscription Renewed',
       `Your ${plan} plan has been renewed successfully.`);
-    setArtists(getAllArtists());
+    setArtists(await getAllArtists());
   }
 
-  function handleSuspend(artistId: string) {
-    setSubscriptionStatus(artistId, 'suspended');
-    setArtists(getAllArtists());
+  async function handleSuspend(artistId: string) {
+    await setSubscriptionStatus(artistId, 'suspended');
+    setArtists(await getAllArtists());
   }
 
-  function handleReactivate(artistId: string) {
-    setSubscriptionStatus(artistId, 'active');
-    setArtists(getAllArtists());
+  async function handleReactivate(artistId: string) {
+    await setSubscriptionStatus(artistId, 'active');
+    setArtists(await getAllArtists());
   }
 
   return (

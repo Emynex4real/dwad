@@ -807,7 +807,7 @@ img { display: block; max-width: 100%; }
   .login-form { display: flex; flex-direction: column; gap: 16px; }
   .login-field { display: flex; flex-direction: column; gap: 6px; }
   .login-field label { font-size: 13px; font-weight: 500; color: var(--color-ink-2); }
-  .login-field input {
+  .login-field input, .login-field select, .login-field textarea {
     padding: 10px 14px;
     border-radius: 8px;
     border: 1px solid var(--color-line-strong);
@@ -818,7 +818,8 @@ img { display: block; max-width: 100%; }
     outline: none;
     transition: border-color 0.2s;
   }
-  .login-field input:focus { border-color: var(--color-gold); }
+  .login-field textarea { resize: vertical; }
+  .login-field input:focus, .login-field select:focus, .login-field textarea:focus { border-color: var(--color-gold); }
   .login-error { font-size: 13px; color: #f07070; padding: 10px 14px; background: rgba(200,80,80,0.08); border-radius: 6px; border: 1px solid rgba(200,80,80,0.2); }
   .login-btn {
     width: 100%;
@@ -845,6 +846,65 @@ img { display: block; max-width: 100%; }
     transform: translateX(-50%);
     width: 600px; height: 600px;
     background: radial-gradient(circle, rgba(201,166,103,0.08) 0%, transparent 60%);
+  }
+
+  /* Artist signup page — wider variant of the login card, for longer forms */
+  .signup-card { max-width: 720px; }
+  .signup-steps { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .signup-step { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted); }
+  .signup-step__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-muted-2); flex-shrink: 0; }
+  .signup-step--done .signup-step__dot { background: var(--color-gold); }
+  .signup-step__line { width: 24px; height: 1px; background: var(--color-line-strong); }
+  .signup-section { display: flex; flex-direction: column; gap: 16px; }
+  .signup-section__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .signup-row { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 560px) { .signup-row { grid-template-columns: 1fr 1fr; } }
+  .signup-hint { font-size: 12px; color: var(--color-muted); margin-top: -8px; }
+
+  .plan-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 560px) { .plan-grid { grid-template-columns: 1fr 1fr; } }
+  .plan-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    padding: 16px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-bg-3);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .plan-card:hover { border-color: var(--color-gold-deep); }
+  .plan-card--selected { border-color: var(--color-gold); background: rgba(201,166,103,0.08); }
+  .plan-card__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .plan-card__name { font-size: 14px; font-weight: 600; color: var(--color-ink); }
+  .plan-card__price { font-family: var(--font-mono); font-size: 13px; color: var(--color-gold-2); }
+  .plan-card__check {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    border: 1px solid var(--color-line-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: transparent;
+  }
+  .plan-card--selected .plan-card__check { border-color: var(--color-gold); background: var(--color-gold); color: var(--color-bg); }
+  .plan-card__features { display: flex; flex-direction: column; gap: 4px; }
+  .plan-card__features li { font-size: 12px; color: var(--color-muted); display: flex; gap: 6px; }
+  .plan-card__features li::before { content: '✦'; color: var(--color-gold); flex-shrink: 0; }
+
+  .signup-success { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 12px 0; }
+  .signup-success__icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(201,166,103,0.12); color: var(--color-gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 8px;
   }
 
   /* ── Mobile bottom nav ───────────────────────────────────────────────────── */

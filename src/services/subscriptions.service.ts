@@ -1,5 +1,4 @@
 import type { Subscription, SubscriptionStatus, SubscriptionPlan, PlanDefinition } from '../types/dashboard';
-import { MOCK_ARTISTS } from '../data/mock/artists';
 import { getAllArtists, updateArtist } from './artists.service';
 
 export const PLAN_DEFINITIONS: PlanDefinition[] = [
@@ -95,30 +94,33 @@ export const PLAN_DEFINITIONS: PlanDefinition[] = [
   },
 ];
 
-export function getAllSubscriptions(): Subscription[] {
-  return getAllArtists().map((a) => a.subscription);
+export async function getAllSubscriptions(): Promise<Subscription[]> {
+  const artists = await getAllArtists();
+  return artists.map((a) => a.subscription);
 }
 
-export function getSubscriptionByArtist(artistId: string): Subscription | undefined {
-  return getAllArtists().find((a) => a.id === artistId)?.subscription;
+export async function getSubscriptionByArtist(artistId: string): Promise<Subscription | undefined> {
+  const artists = await getAllArtists();
+  return artists.find((a) => a.id === artistId)?.subscription;
 }
 
-export function updateSubscription(
+export async function updateSubscription(
   artistId: string,
   patch: Partial<Subscription>,
-): Subscription | null {
-  const artist = getAllArtists().find((a) => a.id === artistId);
+): Promise<Subscription | null> {
+  const artists = await getAllArtists();
+  const artist = artists.find((a) => a.id === artistId);
   if (!artist) return null;
   const updated = { ...artist.subscription, ...patch };
-  updateArtist(artistId, { subscription: updated });
+  await updateArtist(artistId, { subscription: updated });
   return updated;
 }
 
-export function renewSubscription(
+export async function renewSubscription(
   artistId: string,
   plan: SubscriptionPlan,
   months: number = 12,
-): Subscription | null {
+): Promise<Subscription | null> {
   const planDef = PLAN_DEFINITIONS.find((p) => p.id === plan);
   if (!planDef) return null;
 
@@ -135,17 +137,18 @@ export function renewSubscription(
   });
 }
 
-export function setSubscriptionStatus(
+export async function setSubscriptionStatus(
   artistId: string,
   status: SubscriptionStatus,
-): Subscription | null {
+): Promise<Subscription | null> {
   return updateSubscription(artistId, { status });
 }
 
-export function getExpiringSubscriptions(withinDays: number = 30): Subscription[] {
+export async function getExpiringSubscriptions(withinDays: number = 30): Promise<Subscription[]> {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() + withinDays);
-  return getAllSubscriptions().filter((s) => {
+  const subs = await getAllSubscriptions();
+  return subs.filter((s) => {
     const expiry = new Date(s.expiryDate);
     return s.status === 'active' && expiry <= cutoff;
   });
@@ -154,6 +157,3 @@ export function getExpiringSubscriptions(withinDays: number = 30): Subscription[
 export function getPlanDefinition(plan: SubscriptionPlan): PlanDefinition | undefined {
   return PLAN_DEFINITIONS.find((p) => p.id === plan);
 }
-
-// Initialise store reference (avoids circular init issues)
-void MOCK_ARTISTS;

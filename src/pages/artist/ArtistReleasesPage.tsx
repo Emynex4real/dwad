@@ -1,15 +1,21 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { getTracksByArtist } from '../../services/tracks.service';
 import { getArtistById } from '../../services/artists.service';
-import type { TrackStatus } from '../../types/dashboard';
+import type { ArtistProfile, TrackStatus, TrackUpload } from '../../types/dashboard';
 
 export default function ArtistReleasesPage() {
   const { user } = useAuth();
-  const artist = useMemo(() => (user?.artistId ? getArtistById(user.artistId) : undefined), [user]);
-  const tracks = useMemo(() => (user?.artistId ? getTracksByArtist(user.artistId) : []), [user]);
+  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
+  const [tracks, setTracks] = useState<TrackUpload[]>([]);
   const [statusFilter, setStatusFilter] = useState<TrackStatus | 'all'>('all');
+
+  useEffect(() => {
+    if (!user?.artistId) return;
+    void getArtistById(user.artistId).then(setArtist);
+    void getTracksByArtist(user.artistId).then(setTracks);
+  }, [user]);
 
   const filtered = useMemo(() => {
     const list = statusFilter === 'all' ? tracks : tracks.filter((t) => t.status === statusFilter);

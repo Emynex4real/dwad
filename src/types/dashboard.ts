@@ -27,6 +27,12 @@ export interface Subscription {
 // ── Artist ────────────────────────────────────────────────────────────────────
 export type UploadAccess = 'granted' | 'locked';
 
+const PayoutMethod = { BankTransfer: 'bank_transfer', PayPal: 'paypal', MobileMoney: 'mobile_money' } as const;
+export type PayoutMethod = typeof PayoutMethod[keyof typeof PayoutMethod];
+
+const AccountStatus = { Pending: 'pending', Active: 'active' } as const;
+export type AccountStatus = typeof AccountStatus[keyof typeof AccountStatus];
+
 export interface ArtistProfile {
   id: string;
   name: string;
@@ -37,6 +43,9 @@ export interface ArtistProfile {
   avatarUrl?: string;
   bio: string;
   uploadAccess: UploadAccess;
+  status: AccountStatus;
+  payoutMethod?: PayoutMethod;
+  payoutDetails?: string;
   subscription: Subscription;
   joinedDate: string; // ISO date string
   socialLinks: {
@@ -71,8 +80,11 @@ export interface TrackUpload {
 // ── Analytics ─────────────────────────────────────────────────────────────────
 export interface MonthlyStats {
   month: string; // e.g. "Jan 25"
+  period: string; // 'YYYY-MM'
   streams: number;
   revenue: number; // in USD
+  paidUsd: number;
+  pendingUsd: number;
 }
 
 export interface TrackStats {
@@ -93,6 +105,17 @@ export interface ArtistAnalytics {
   topTracks: TrackStats[];
 }
 
+// ── Payout ────────────────────────────────────────────────────────────────────
+export interface Payout {
+  id: string;
+  artistId: string;
+  amountUsd: number;
+  period?: string; // 'YYYY-MM'
+  note?: string;
+  recordedBy: string; // admin id
+  paidAt: string; // ISO date string
+}
+
 // ── Notification ──────────────────────────────────────────────────────────────
 export type NotificationType = 'upload_submitted' | 'upload_approved' | 'upload_rejected' | 'release_alert' | 'subscription_expired' | 'subscription_renewed' | 'general';
 
@@ -107,15 +130,36 @@ export interface Notification {
   metadata?: Record<string, string>; // e.g. { trackId, trackTitle }
 }
 
-// ── Reports (CSV / HTML upload) ───────────────────────────────────────────────
-export interface ReportUpload {
+// ── Reports (CSV upload) ───────────────────────────────────────────────────────
+export interface ReportUploadSummary {
   id: string;
   filename: string;
-  type: 'csv' | 'html';
-  uploadedAt: string;
-  status: 'processing' | 'applied' | 'failed';
-  affectedArtists: number;
+  period: string; // 'YYYY-MM'
+  totalRows: number;
+  matchedGroups: number;
+  pendingGroups: number;
   uploadedBy: string; // admin id
+  uploadedAt: string;
+}
+
+export type PendingReportReason = 'unmatched' | 'multi_artist';
+export type PendingReportStatus = 'pending' | 'resolved' | 'skipped';
+
+export interface PendingReportRow {
+  id: string;
+  reportUploadId: string;
+  filename: string;
+  creditText: string;
+  reason: PendingReportReason;
+  streams: number;
+  revenueUsd: number;
+  status: PendingReportStatus;
+  createdAt: string;
+}
+
+export interface ExchangeRate {
+  gbpToUsdRate: number;
+  updatedAt: string;
 }
 
 // ── Upload Form (artist upload submission) ────────────────────────────────────

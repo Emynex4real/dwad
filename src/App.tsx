@@ -25,6 +25,7 @@ const LegalPage        = lazy(() => import('./pages/LegalPage'));
 const BeatsPage        = lazy(() => import('./pages/BeatsPage'));
 const RadioPage        = lazy(() => import('./pages/RadioPage'));
 const LoginPage        = lazy(() => import('./pages/LoginPage'));
+const ArtistSignupPage = lazy(() => import('./pages/ArtistSignupPage'));
 const NotFoundPage     = lazy(() => import('./pages/NotFoundPage'));
 
 // ── Dashboard layouts ──────────────────────────────────────────────────────────
@@ -71,12 +72,17 @@ function ScrollToTop() {
 function AnimatedPage({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
+  const [renderedPathname, setRenderedPathname] = useState(pathname);
+
+  if (pathname !== renderedPathname) {
+    setRenderedPathname(pathname);
+    setVisible(false);
+  }
 
   useEffect(() => {
-    setVisible(false);
     const t = setTimeout(() => setVisible(true), 20);
     return () => clearTimeout(t);
-  }, [pathname]);
+  }, [renderedPathname]);
 
   return (
     <main
@@ -117,6 +123,7 @@ function PublicLayout() {
             <Route path="/radio"     element={<RadioPage />} />
             <Route path="/contact"   element={<ContactPage />} />
             <Route path="/login"     element={<LoginPage />} />
+            <Route path="/join/:token" element={<ArtistSignupPage />} />
             <Route path="*"          element={<NotFoundPage />} />
           </Routes>
         </Suspense>

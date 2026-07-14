@@ -1,63 +1,47 @@
 import type { Notification, NotificationType } from '../types/dashboard';
-import { MOCK_NOTIFICATIONS } from '../data/mock/notifications';
+import { apiFetch } from './httpClient';
 
-let store: Notification[] = structuredClone(MOCK_NOTIFICATIONS);
-
-export function getNotificationsForArtist(artistId: string): Notification[] {
-  return store
-    .filter((n) => n.artistId === artistId)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+export async function getNotificationsForArtist(artistId: string): Promise<Notification[]> {
+  return apiFetch<Notification[]>(`/notifications/artist/${artistId}`);
 }
 
-export function getAllNotifications(): Notification[] {
-  return [...store].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+export async function getAllNotifications(): Promise<Notification[]> {
+  return apiFetch<Notification[]>('/notifications');
 }
 
-export function getUnreadCount(artistId: string): number {
-  return store.filter((n) => n.artistId === artistId && !n.isRead).length;
+export async function markAsRead(notificationId: string): Promise<void> {
+  await apiFetch(`/notifications/${notificationId}/read`, { method: 'PATCH' });
 }
 
-export function markAsRead(notificationId: string): void {
-  const idx = store.findIndex((n) => n.id === notificationId);
-  if (idx !== -1) store[idx] = { ...store[idx], isRead: true };
+export async function markAllAsRead(artistId: string): Promise<void> {
+  await apiFetch(`/notifications/artist/${artistId}/read-all`, { method: 'PATCH' });
 }
 
-export function markAllAsRead(artistId: string): void {
-  store = store.map((n) => (n.artistId === artistId ? { ...n, isRead: true } : n));
-}
-
-export function sendNotification(
+export async function sendNotification(
   artistId: string,
   type: NotificationType,
   title: string,
   message: string,
   metadata?: Record<string, string>,
-): Notification {
-  const notification: Notification = {
-    id: `notif-${Date.now()}`,
-    artistId,
-    type,
-    title,
-    message,
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    ...(metadata ? { metadata } : {}),
-  };
-  store.unshift(notification);
-  return notification;
+): Promise<Notification> {
+  return apiFetch<Notification>('/notifications', {
+    method: 'POST',
+    body: { artistId, type, title, message, ...(metadata ? { metadata } : {}) },
+  });
 }
 
-export function broadcastNotification(
+export async function broadcastNotification(
   artistIds: string[],
   type: NotificationType,
   title: string,
   message: string,
-): Notification[] {
-  return artistIds.map((id) => sendNotification(id, type, title, message));
+): Promise<Notification[]> {
+  return apiFetch<Notification[]>('/notifications/broadcast', {
+    method: 'POST',
+    body: { artistIds, type, title, message },
+  });
 }
 
-export function deleteNotification(id: string): boolean {
-  const before = store.length;
-  store = store.filter((n) => n.id !== id);
-  return store.length < before;
+export async function deleteNotification(id: string): Promise<void> {
+  await apiFetch(`/notifications/${id}`, { method: 'DELETE' });
 }

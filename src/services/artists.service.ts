@@ -1,44 +1,78 @@
-import type { ArtistProfile, UploadAccess } from '../types/dashboard';
-import { MOCK_ARTISTS } from '../data/mock/artists';
+import type { ArtistProfile, UploadAccess, PayoutMethod } from '../types/dashboard';
+import { apiFetch, ApiError } from './httpClient';
 
-// In-memory store — swap this for fetch() calls to your backend
-let store: ArtistProfile[] = structuredClone(MOCK_ARTISTS);
-
-export function getAllArtists(): ArtistProfile[] {
-  return store;
+export async function getAllArtists(): Promise<ArtistProfile[]> {
+  return apiFetch<ArtistProfile[]>('/artists');
 }
 
-export function getArtistById(id: string): ArtistProfile | undefined {
-  return store.find((a) => a.id === id);
+export async function getArtistById(id: string): Promise<ArtistProfile | undefined> {
+  try {
+    return await apiFetch<ArtistProfile>(`/artists/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
 }
 
-export function getArtistByEmail(email: string): ArtistProfile | undefined {
-  return store.find((a) => a.email.toLowerCase() === email.toLowerCase());
+export async function updateArtist(
+  id: string,
+  patch: Partial<ArtistProfile> & { password?: string },
+): Promise<ArtistProfile | null> {
+  try {
+    return await apiFetch<ArtistProfile>(`/artists/${id}`, { method: 'PATCH', body: patch });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
 }
 
-export function updateArtist(id: string, patch: Partial<ArtistProfile>): ArtistProfile | null {
-  const idx = store.findIndex((a) => a.id === id);
-  if (idx === -1) return null;
-  store[idx] = { ...store[idx], ...patch };
-  return store[idx];
+export async function setUploadAccess(artistId: string, access: UploadAccess): Promise<ArtistProfile | null> {
+  try {
+    return await apiFetch<ArtistProfile>(`/artists/${artistId}/upload-access`, {
+      method: 'PATCH',
+      body: { uploadAccess: access },
+    });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
 }
 
-export function setUploadAccess(artistId: string, access: UploadAccess): ArtistProfile | null {
-  return updateArtist(artistId, { uploadAccess: access });
+export async function updatePayout(
+  artistId: string,
+  payoutMethod: PayoutMethod | null,
+  payoutDetails: string,
+): Promise<ArtistProfile> {
+  return apiFetch<ArtistProfile>(`/artists/${artistId}/payout`, {
+    method: 'PATCH',
+    body: { payoutMethod, payoutDetails },
+  });
 }
 
-export function deleteArtist(id: string): boolean {
-  const before = store.length;
-  store = store.filter((a) => a.id !== id);
-  return store.length < before;
+export async function deleteArtist(id: string): Promise<boolean> {
+  try {
+    await apiFetch(`/artists/${id}`, { method: 'DELETE' });
+    return true;
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return false;
+    throw err;
+  }
 }
 
-export function createArtist(artist: Omit<ArtistProfile, 'id' | 'joinedDate'>): ArtistProfile {
-  const newArtist: ArtistProfile = {
-    ...artist,
-    id: `artist-${Date.now()}`,
-    joinedDate: new Date().toISOString().split('T')[0],
-  };
-  store.push(newArtist);
-  return newArtist;
+export type NewArtist = Omit<ArtistProfile, 'id' | 'joinedDate' | 'subscription' | 'status'> & {
+  password: string;
+  subscription: Omit<ArtistProfile['subscription'], 'id' | 'artistId'>;
+};
+
+export async function createArtist(artist: NewArtist): Promise<ArtistProfile> {
+  return apiFetch<ArtistProfile>('/artists', { method: 'POST', body: artist });
+}
+
+export async function approveArtist(id: string): Promise<ArtistProfile | null> {
+  try {
+    return await apiFetch<ArtistProfile>(`/artists/${id}/approve`, { method: 'PATCH' });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
 }

@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getAllTracks, updateTrackStatus } from '../../services/tracks.service';
 import { getAllArtists } from '../../services/artists.service';
 import { sendNotification } from '../../services/notifications.service';
-import type { TrackUpload, TrackStatus } from '../../types/dashboard';
+import { API_BASE_URL, getStoredToken } from '../../services/httpClient';
+import type { ArtistProfile, TrackUpload, TrackStatus } from '../../types/dashboard';
 
 const STATUS_ACCENT: Record<string, string> = {
   pending:  'border-t-amber-400/60',
@@ -14,11 +15,16 @@ const STATUS_ACCENT: Record<string, string> = {
 const STATUS_TABS = ['all', 'pending', 'approved', 'live', 'rejected'] as const;
 
 export default function AdminUploadsPage() {
-  const artists = useMemo(() => getAllArtists(), []);
-  const [tracks, setTracks]             = useState<TrackUpload[]>(() => getAllTracks());
+  const [artists, setArtists]           = useState<ArtistProfile[]>([]);
+  const [tracks, setTracks]             = useState<TrackUpload[]>([]);
   const [statusFilter, setStatusFilter] = useState<TrackStatus | 'all'>('all');
   const [search, setSearch]             = useState('');
   const [selected, setSelected]         = useState<string[]>([]);
+
+  useEffect(() => {
+    void getAllArtists().then(setArtists);
+    void getAllTracks().then(setTracks);
+  }, []);
 
   const filtered = useMemo(() => {
     let list = tracks;
@@ -33,25 +39,25 @@ export default function AdminUploadsPage() {
     return [...list].sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
   }, [tracks, statusFilter, search, artists]);
 
-  function refresh() { setTracks(getAllTracks()); setSelected([]); }
+  async function refresh() { setTracks(await getAllTracks()); setSelected([]); }
 
-  function handleApprove(t: TrackUpload) {
-    updateTrackStatus(t.id, 'approved');
-    sendNotification(t.artistId, 'upload_approved', 'Upload Approved',
+  async function handleApprove(t: TrackUpload) {
+    await updateTrackStatus(t.id, 'approved');
+    void sendNotification(t.artistId, 'upload_approved', 'Upload Approved',
       `Your track "${t.title}" has been approved.`, { trackId: t.id, trackTitle: t.title });
-    refresh();
+    await refresh();
   }
 
-  function handleReject(t: TrackUpload) {
+  async function handleReject(t: TrackUpload) {
     const note = window.prompt('Rejection reason (shown to artist):') ?? '';
-    updateTrackStatus(t.id, 'rejected', note || undefined);
-    sendNotification(t.artistId, 'upload_rejected', 'Upload Rejected',
+    await updateTrackStatus(t.id, 'rejected', note || undefined);
+    void sendNotification(t.artistId, 'upload_rejected', 'Upload Rejected',
       `Your track "${t.title}" was not approved.${note ? ` Reason: ${note}` : ''}`,
       { trackId: t.id, trackTitle: t.title });
-    refresh();
+    await refresh();
   }
 
-  function handleMarkLive(id: string) { updateTrackStatus(id, 'live'); refresh(); }
+  async function handleMarkLive(id: string) { await updateTrackStatus(id, 'live'); await refresh(); }
 
   function downloadSubmission(t: TrackUpload) {
     const artist = artists.find((a) => a.id === t.artistId);
@@ -87,11 +93,15 @@ export default function AdminUploadsPage() {
     setSelected((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
   }
 
-  function bulkApprove() {
-    selected.forEach((id) => {
+  function audioDownloadUrl(trackId: string): string {
+    return `${API_BASE_URL}/tracks/${trackId}/audio?token=${getStoredToken() ?? ''}`;
+  }
+
+  async function bulkApprove() {
+    for (const id of selected) {
       const t = tracks.find((t) => t.id === id);
-      if (t?.status === 'pending') handleApprove(t);
-    });
+      if (t?.status === 'pending') await handleApprove(t);
+    }
   }
 
   const counts = useMemo(() => ({
@@ -228,13 +238,31 @@ export default function AdminUploadsPage() {
                     </button>
                   </div>
                 )}
-                <div className="pt-2 w-full">
+                <div className="pt-2 w-full grid grid-cols-1 gap-2">
                   <button
                     className="w-full py-2 text-xs font-semibold rounded-lg bg-white/5 text-muted border border-line active:bg-white/10"
                     onClick={() => downloadSubmission(t)}
                   >
                     ↓ Download Details
                   </button>
+                  {t.coverArtUrl && (
+                    <a
+                      href={`${API_BASE_URL}/storage/${t.coverArtUrl}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full py-2 text-xs font-semibold rounded-lg bg-white/5 text-muted border border-line active:bg-white/10 text-center"
+                    >
+                      🖼 View Cover Art
+                    </a>
+                  )}
+                  {t.audioFileUrl && (
+                    <a
+                      href={audioDownloadUrl(t.id)}
+                      className="w-full py-2 text-xs font-semibold rounded-lg bg-white/5 text-muted border border-line active:bg-white/10 text-center"
+                    >
+                      ♪ Download Audio
+                    </a>
+                  )}
                 </div>
 
               </div>
@@ -296,6 +324,12 @@ export default function AdminUploadsPage() {
                           <span className="text-muted text-sm">—</span>
                         )}
                         <button className="dash-action-btn" onClick={() => downloadSubmission(t)} title="Download submission details">↓</button>
+                        {t.coverArtUrl && (
+                          <a href={`${API_BASE_URL}/storage/${t.coverArtUrl}`} target="_blank" rel="noreferrer" className="dash-action-btn" title="View cover art">🖼</a>
+                        )}
+                        {t.audioFileUrl && (
+                          <a href={audioDownloadUrl(t.id)} className="dash-action-btn" title="Download audio">♪</a>
+                        )}
                       </div>
                     </td>
                   </tr>

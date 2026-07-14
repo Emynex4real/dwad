@@ -3,9 +3,9 @@
 ## 1. Project Context
 
 - **App Name:** dwad
-- **Domain:** Frontend-only React SPA.
-- **Scope:** This repository is **frontend only**. There is no `server/` directory. All backend communication is done via external APIs consumed from the frontend.
-- **Goal:** Clean, type-safe, performant React UI with strict TypeScript discipline.
+- **Domain:** React SPA with a plain-PHP JSON API backend.
+- **Scope:** This repository contains the React frontend (`src/`) and a plain-PHP API (`api/`) backed by MySQL/MariaDB. The frontend talks to `api/` over HTTP via `src/services/httpClient.ts` — components never call `fetch` directly.
+- **Goal:** Clean, type-safe, performant React UI with strict TypeScript discipline, backed by a small, dependency-free PHP API.
 
 ---
 
@@ -43,6 +43,19 @@ npm run lint       # ESLint (typescript-eslint + react-hooks + react-refresh)
 npm run preview    # Serve the production build locally
 ```
 
+### Backend (PHP API)
+
+| Concern | Choice |
+|---|---|
+| Language | PHP 8.3, plain — no framework |
+| Data access | PDO (MySQL/MariaDB), prepared statements only — never interpolate user input into SQL |
+| Auth | Bearer tokens (`auth_tokens` table), passwords via `password_hash`/`password_verify` |
+| Entry point | `api/index.php` — single front controller, `Router` dispatches to `Controllers/` |
+| Config | `api/config/config.php` (gitignored; real DB creds + CORS origins) — copy from `api/config/config.example.php` |
+| DB schema | `api/database/schema.sql` — run once to create tables + seed demo data |
+
+> **Rule:** Every protected route must resolve the caller through `Auth::requireUser()`/`Auth::requireAdmin()` — never trust a client-supplied user id or role.
+
 ---
 
 ## 3. Architecture & Directory Structure
@@ -63,6 +76,12 @@ src/
 ├── App.tsx         # Root component, router, global providers
 ├── main.tsx        # Entry point — ReactDOM.createRoot only
 └── index.css       # Global styles / CSS reset
+
+api/                # PHP JSON API (served by Apache/XAMPP), separate from the Vite build
+├── config/         # config.php (gitignored) + config.example.php template
+├── src/
+│   └── Controllers/  # One controller per resource (AuthController, ArtistController, ...)
+└── database/       # schema.sql — table definitions + seed data
 ```
 
 > **Rule:** When adding a new directory not listed here, document it in this file before committing.
@@ -166,3 +185,4 @@ src/
 _Agent Instructions: Append a new bullet point here immediately after making a mistake and receiving a correction from the user. Format: **[YYYY-MM-DD] — [Topic]:** Rule._
 
 - **[2026-05-11] — Baseline:** Initialized standards and self-learning protocol for this project. Frontend-only scope confirmed.
+- **[2026-07-03] — Backend pivot:** Project is no longer frontend-only. Added a plain-PHP + MySQL API under `api/`, consumed by the SPA via `src/services/httpClient.ts`. Mock services (`src/data/mock/`, in-memory stores in `src/services/*.service.ts`) are being migrated to real API calls one domain at a time — auth + artists first.
