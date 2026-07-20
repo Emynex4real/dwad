@@ -124,6 +124,17 @@ class ReportController
             throw new HttpException('Pending row not found', 404);
         }
 
+        $this->resolveRow($row, $artistId);
+
+        Response::json(['success' => true]);
+    }
+
+    /**
+     * Applies a pending row's streams/revenue to the given artist and marks it resolved.
+     * Shared by the manual resolve endpoint and auto-resolution on artist creation/approval.
+     */
+    private function resolveRow(array $row, string $artistId): void
+    {
         $upload = $this->findUploadRow($row['report_upload_id']);
         $this->upsertMonthly($artistId, $upload['period'], (int) $row['streams'], (float) $row['revenue_gbp']);
 
@@ -132,10 +143,34 @@ class ReportController
             $this->upsertTrackPlatform($artistId, $upload['period'], $tuple['track'], $tuple['platform'], $tuple['streams'], $tuple['revenue']);
         }
 
-        $pdo->prepare("UPDATE report_pending_rows SET status = 'resolved', resolved_artist_id = ? WHERE id = ?")
-            ->execute([$artistId, $args['id']]);
+        Database::pdo()->prepare("UPDATE report_pending_rows SET status = 'resolved', resolved_artist_id = ? WHERE id = ?")
+            ->execute([$artistId, $row['id']]);
+    }
 
-        Response::json(['success' => true]);
+    /**
+     * Auto-resolves any still-pending, single-artist ('unmatched') report rows whose
+     * credit text exactly matches this artist's name (case-insensitive, trimmed) —
+     * mirroring upload()'s own matching rule. Called after a new artist is created
+     * (or approved, for invite self-registrations) so reports uploaded before the
+     * artist existed get attributed automatically. Deliberately excludes
+     * reason = 'multi_artist' rows: those always require a human to pick which
+     * collaborator gets credit. Returns the number of rows resolved.
+     */
+    public static function autoResolveForArtist(string $artistId, string $artistName): int
+    {
+        $stmt = Database::pdo()->prepare(
+            "SELECT * FROM report_pending_rows
+             WHERE status = 'pending' AND reason = 'unmatched' AND LOWER(TRIM(credit_text)) = LOWER(TRIM(?))"
+        );
+        $stmt->execute([$artistName]);
+        $rows = $stmt->fetchAll();
+
+        $self = new self();
+        foreach ($rows as $row) {
+            $self->resolveRow($row, $artistId);
+        }
+
+        return count($rows);
     }
 
     public function skip(array $args): void

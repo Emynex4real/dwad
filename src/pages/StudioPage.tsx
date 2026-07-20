@@ -1,13 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Arrow from '../components/ui/Arrow';
 import PageHero from '../components/ui/PageHero';
 import SEO from '../components/ui/SEO';
 import { studioMain, HOF_ARTISTS } from '../data';
-import hallelujahCover from '../assets/hallelujah.jpeg';
-import gbeseCover      from '../assets/gbese.jpeg';
-import badessKidCover  from '../assets/badess kid .jpeg';
-import gallivantCover  from '../assets/gallivant.jpeg';
+import { getAllProductions } from '../services/productions.service';
+import { API_BASE_URL } from '../services/httpClient';
+import type { Production } from '../types/content';
 
 const studioJsonLd = {
   '@context': 'https://schema.org',
@@ -120,33 +119,6 @@ const packages = [
   },
 ];
 
-const tracklist = [
-  { num: '01', title: 'All for the Money', artist: 'Youngzy', src: '' },
-  { num: '02', title: 'Maro', artist: 'Badess Kid', src: '' },
-  { num: '03', title: 'Gallivant', artist: 'Youngzy', src: '' },
-  { num: '04', title: 'Addicted', artist: 'Akiib', src: '' },
-  { num: '05', title: 'Questions', artist: 'Skiitz x Miraji', src: '' },
-  { num: '06', title: 'Ayo', artist: 'Yemi Ekun', src: '' },
-  { num: '07', title: 'Green Light', artist: 'Zephyr', src: '' },
-  { num: '08', title: 'On Guard', artist: 'Nonny Gee', src: '' },
-  { num: '09', title: 'Omo Oloja', artist: 'Akiib', src: '' },
-  { num: '10', title: 'Gbese', artist: 'Blazebankz', src: '' },
-  { num: '11', title: 'Who is Akiib (Intro)', artist: 'Akiib', src: '' },
-  { num: '12', title: 'Uselu Roundabout', artist: 'Youngzy', src: '' },
-  { num: '13', title: 'Fame', artist: 'Badboi Yemi', src: '' },
-  { num: '14', title: 'Hallelujah', artist: 'Junbho', src: '' },
-  { num: '15', title: 'My Life (Master)', artist: 'J Smalling', src: '' },
-  { num: '16', title: 'Why', artist: 'Kenk C', src: '' },
-  { num: '17', title: 'Disrespect', artist: 'Spice', src: '' },
-];
-
-const recentProjects = [
-  { title: 'Hallelujah', artist: 'Junbho',     photo: hallelujahCover, spotify: 'https://open.spotify.com/artist/0bDsfHoVhvC2RZ5SYv9w3S' },
-  { title: 'Gbese',      artist: 'Blazebankz', photo: gbeseCover,      spotify: 'https://open.spotify.com/artist/0a6Lm1GzTLEBsFUB61gQY9' },
-  { title: 'Maro',       artist: 'Badess Kid', photo: badessKidCover,  spotify: 'https://open.spotify.com/artist/2CPYKOVDrb7jnJzi8lo3fD' },
-  { title: 'Gallivant',  artist: 'Youngzy',    photo: gallivantCover,  spotify: 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa' },
-];
-
 const terms = [
   {
     num: '01',
@@ -163,21 +135,29 @@ const terms = [
 export default function StudioPage() {
   const navigate = useNavigate();
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [productions, setProductions] = useState<Production[]>([]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    void getAllProductions().then(setProductions);
+  }, []);
+
+  const recentProjects = productions.filter((p) => p.coverArtUrl).slice(-4).reverse();
 
   const handleTrackClick = (idx: number) => {
     const audio = audioRef.current;
     if (!audio) return;
     if (activeIdx === idx) {
       if (isPlaying) { audio.pause(); setIsPlaying(false); }
-      else { void audio.play(); setIsPlaying(true); }
+      else { audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false)); }
     } else {
-      audio.src = tracklist[idx].src;
+      const audioFileUrl = productions[idx].audioFileUrl;
+      if (!audioFileUrl) return;
+      audio.src = `${API_BASE_URL}/storage/${audioFileUrl}`;
       setActiveIdx(idx);
-      if (tracklist[idx].src) { void audio.play(); setIsPlaying(true); }
-      else { setIsPlaying(false); }
+      audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
     }
   };
 
@@ -468,9 +448,9 @@ export default function StudioPage() {
               </a>
             </div>
             <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
-              {tracklist.map((t, i) => (
+              {productions.map((p, i) => (
                 <div
-                  key={t.num}
+                  key={p.id}
                   onClick={() => handleTrackClick(i)}
                   className="flex items-center gap-4 sm:gap-6 cursor-pointer transition-all duration-150 active:scale-[1.02]"
                   style={{
@@ -479,16 +459,19 @@ export default function StudioPage() {
                     borderLeft: `2px solid ${activeIdx === i ? 'var(--color-gold)' : 'transparent'}`,
                   }}
                 >
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: activeIdx === i ? 'var(--color-gold)' : 'var(--color-muted)', minWidth: '28px' }}>{t.num}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: activeIdx === i ? 'var(--color-gold)' : 'var(--color-muted)', minWidth: '28px' }}>{String(i + 1).padStart(2, '0')}</span>
                   <div className="flex-1 min-w-0">
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.2 }}>{t.title}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--color-muted)', textTransform: 'uppercase', marginTop: '2px' }}>{t.artist}</div>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.2 }}>{p.title}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--color-muted)', textTransform: 'uppercase', marginTop: '2px' }}>{p.artistName}</div>
                   </div>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: activeIdx === i && isPlaying ? 'var(--color-gold)' : 'var(--color-muted)', flexShrink: 0 }}>
                     {activeIdx === i && isPlaying ? '⏸' : '▶'}
                   </span>
                 </div>
               ))}
+              {productions.length === 0 && (
+                <p style={{ padding: '16px', fontSize: '13px', color: 'var(--color-muted)' }}>No songs added yet.</p>
+              )}
             </div>
             <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
           </div>
@@ -503,24 +486,31 @@ export default function StudioPage() {
             <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
           </div>
           <div className="grid gap-6 grid-cols-2 min-[700px]:grid-cols-4">
-            {recentProjects.map((p, i) => (
-              <a key={i} href={p.spotify} target="_blank" rel="noreferrer" className="group block">
-                <div
-                  className="relative overflow-hidden border"
-                  style={{ aspectRatio: '1/1', borderColor: 'var(--color-line)', background: 'var(--color-bg-2)' }}
-                >
-                  <img
-                    src={p.photo}
-                    alt={p.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="pt-4">
-                  <h4 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: '20px' }}>{p.title}</h4>
-                  <div className="mt-1" style={{ fontSize: '13px', color: 'var(--color-muted)' }}>{p.artist}</div>
-                </div>
-              </a>
-            ))}
+            {recentProjects.map((p) => {
+              const content = (
+                <>
+                  <div
+                    className="relative overflow-hidden border"
+                    style={{ aspectRatio: '1/1', borderColor: 'var(--color-line)', background: 'var(--color-bg-2)' }}
+                  >
+                    <img
+                      src={`${API_BASE_URL}/storage/${p.coverArtUrl}`}
+                      alt={p.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="pt-4">
+                    <h4 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: '20px' }}>{p.title}</h4>
+                    <div className="mt-1" style={{ fontSize: '13px', color: 'var(--color-muted)' }}>{p.artistName}</div>
+                  </div>
+                </>
+              );
+              return p.spotifyUrl ? (
+                <a key={p.id} href={p.spotifyUrl} target="_blank" rel="noreferrer" className="group block">{content}</a>
+              ) : (
+                <div key={p.id} className="group block">{content}</div>
+              );
+            })}
           </div>
         </div>
       </section>

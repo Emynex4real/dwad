@@ -22,6 +22,9 @@ require __DIR__ . '/src/Controllers/SettingsController.php';
 require __DIR__ . '/src/Controllers/AnalyticsController.php';
 require __DIR__ . '/src/Controllers/PayoutController.php';
 require __DIR__ . '/src/Controllers/InviteController.php';
+require __DIR__ . '/src/Controllers/ProductionController.php';
+require __DIR__ . '/src/Controllers/BeatController.php';
+require __DIR__ . '/src/Controllers/PricingController.php';
 
 $config = Config::get();
 
@@ -57,6 +60,9 @@ $settingsController = new SettingsController();
 $analyticsController = new AnalyticsController();
 $payoutController = new PayoutController();
 $inviteController = new InviteController();
+$productionController = new ProductionController();
+$beatController = new BeatController();
+$pricingController = new PricingController();
 
 $router->add('POST', '/auth/login', [$authController, 'login']);
 $router->add('POST', '/auth/logout', [$authController, 'logout']);
@@ -105,6 +111,20 @@ $router->add('GET', '/payouts/artist/{id}', [$payoutController, 'forArtist']);
 $router->add('POST', '/invites', [$inviteController, 'store']);
 $router->add('GET', '/invites/{token}', [$inviteController, 'show']);
 $router->add('POST', '/invites/{token}/register', [$inviteController, 'register']);
+
+$router->add('GET', '/productions', [$productionController, 'index']);
+$router->add('POST', '/productions', [$productionController, 'store']);
+$router->add('PATCH', '/productions/{id}', [$productionController, 'update']);
+$router->add('POST', '/productions/{id}', [$productionController, 'update']);
+$router->add('DELETE', '/productions/{id}', [$productionController, 'destroy']);
+
+$router->add('GET', '/beats', [$beatController, 'index']);
+$router->add('POST', '/beats', [$beatController, 'store']);
+$router->add('PATCH', '/beats/{id}', [$beatController, 'update']);
+$router->add('POST', '/beats/{id}', [$beatController, 'update']);
+$router->add('DELETE', '/beats/{id}', [$beatController, 'destroy']);
+
+$router->add('GET', '/pricing/localized', [$pricingController, 'localized']);
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'], $path);

@@ -157,6 +157,32 @@ CREATE TABLE IF NOT EXISTS settings (
 
 INSERT INTO settings (id, gbp_to_usd_rate) VALUES (1, 1.2700);
 
+CREATE TABLE IF NOT EXISTS currency_rates_cache (
+    id TINYINT PRIMARY KEY DEFAULT 1,
+    rates_json JSON NOT NULL,
+    fetched_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS productions (
+    id VARCHAR(40) PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    artist_name VARCHAR(150) NOT NULL,
+    cover_art_url VARCHAR(255) NULL,
+    audio_file_url VARCHAR(255) NULL,
+    spotify_url VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS beats (
+    id VARCHAR(40) PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    bpm VARCHAR(20) NULL,
+    type ENUM('lease', 'purchase') NOT NULL DEFAULT 'lease',
+    price DECIMAL(10, 2) NULL,
+    audio_file_url VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- password_hash for 'password123'
 INSERT INTO artists (id, name, email, password_hash, role, phone, genre, country, bio, upload_access, joined_date, social_spotify, social_instagram, social_youtube, social_apple) VALUES
 ('admin-001', 'Dwad Admin', 'admin@dwadmusic.com', '$2y$10$l41pPmblZJuw0B/YVQNGzOF301cBz22dvHeGEYykm8G.pNvVlM6u6', 'admin', NULL, NULL, NULL, NULL, 'granted', NULL, NULL, NULL, NULL, NULL),

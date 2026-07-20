@@ -1,94 +1,33 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Arrow from '../components/ui/Arrow';
 import SEO from '../components/ui/SEO';
 import studioPhoto from '../assets/studio/console-main.jpg';
-
-interface Beat {
-  num: string;
-  title: string;
-  bpm?: string;
-  type: 'lease' | 'purchase';
-  src: string;
-}
-
-const beats: Beat[] = [
-  { num: '01', title: 'Pammy',            bpm: '110bpm',     type: 'lease',    src: '' },
-  { num: '02', title: 'Viby piano',       bpm: '107bpm',     type: 'lease',    src: '' },
-  { num: '03', title: 'Monica – Afropiano', bpm: '115bpm',   type: 'lease',    src: '' },
-  { num: '04', title: 'Mash up',          bpm: '105bpm',     type: 'lease',    src: '' },
-  { num: '05', title: 'Iye o',            bpm: '112bpm',     type: 'lease',    src: '' },
-  { num: '06', title: 'Pepper',           bpm: '118bpm',     type: 'lease',    src: '' },
-  { num: '07', title: 'Slow & Steady',    bpm: '84bpm',      type: 'lease',    src: '' },
-  { num: '08', title: 'Surfers',          bpm: '113bpm',     type: 'lease',    src: '' },
-  { num: '09', title: 'In my head',       bpm: '96bpm',      type: 'purchase', src: '' },
-  { num: '10', title: 'Bum bum bigger',   bpm: '100bpm',     type: 'purchase', src: '' },
-  { num: '11', title: 'Holy',             bpm: '102bpm',     type: 'purchase', src: '' },
-  { num: '12', title: 'Happy',            bpm: '112bpm',     type: 'purchase', src: '' },
-  { num: '13', title: 'Fire Dance',       bpm: '112.060bpm', type: 'purchase', src: '' },
-  { num: '14', title: 'Energy',           bpm: '132bpm',     type: 'purchase', src: '' },
-  { num: '15', title: 'Fire Fire',        bpm: '98bpm',      type: 'purchase', src: '' },
-  { num: '16', title: 'Work of Art',      bpm: '112bpm',     type: 'purchase', src: '' },
-  { num: '17', title: 'Pour me Water',    bpm: '93.060bpm',  type: 'purchase', src: '' },
-  { num: '18', title: 'Piece of me',      bpm: '99bpm',      type: 'purchase', src: '' },
-  { num: '19', title: 'Peace of mind',    bpm: '93bpm',      type: 'purchase', src: '' },
-  { num: '20', title: 'Afro',             bpm: '90bpm',      type: 'purchase', src: '' },
-  { num: '21', title: 'X-O',                                  type: 'purchase', src: '' },
-  { num: '22', title: 'Stay',                                  type: 'purchase', src: '' },
-  { num: '23', title: 'Kalakuta',                              type: 'purchase', src: '' },
-  { num: '24', title: 'My Babe',                               type: 'purchase', src: '' },
-  { num: '25', title: 'Vibez',                                 type: 'purchase', src: '' },
-  { num: '26', title: 'Trappy',                                type: 'purchase', src: '' },
-  { num: '27', title: 'Things we do for Love',                 type: 'purchase', src: '' },
-  { num: '28', title: 'Sarafina',                              type: 'purchase', src: '' },
-  { num: '29', title: 'Santana',                               type: 'purchase', src: '' },
-  { num: '30', title: 'Rora',                                  type: 'purchase', src: '' },
-  { num: '31', title: 'Perfect',                               type: 'purchase', src: '' },
-  { num: '32', title: 'Obimo',                                 type: 'purchase', src: '' },
-  { num: '33', title: 'Nile',                                  type: 'purchase', src: '' },
-  { num: '34', title: 'Mood',                                  type: 'purchase', src: '' },
-  { num: '35', title: 'Nana',                                  type: 'purchase', src: '' },
-  { num: '36', title: 'Lov',                                   type: 'purchase', src: '' },
-  { num: '37', title: 'Lamba',                                 type: 'purchase', src: '' },
-  { num: '38', title: 'Lala',                                  type: 'purchase', src: '' },
-  { num: '39', title: 'KAfA',                                  type: 'purchase', src: '' },
-  { num: '40', title: 'Jule',                                  type: 'purchase', src: '' },
-  { num: '41', title: 'Groovy',                                type: 'purchase', src: '' },
-  { num: '42', title: 'Give Dem',                              type: 'purchase', src: '' },
-  { num: '43', title: 'Forever',                               type: 'purchase', src: '' },
-  { num: '44', title: 'Good Bye',                              type: 'purchase', src: '' },
-  { num: '45', title: 'Flower',                                type: 'purchase', src: '' },
-  { num: '46', title: 'Fever',                                 type: 'purchase', src: '' },
-  { num: '47', title: 'Carolina',                              type: 'purchase', src: '' },
-  { num: '48', title: 'Blessings',                             type: 'purchase', src: '' },
-  { num: '49', title: 'Body & Soul',                           type: 'purchase', src: '' },
-  { num: '50', title: 'Mapiano',                               type: 'purchase', src: '' },
-  { num: '51', title: 'Pakam',                                 type: 'purchase', src: '' },
-  { num: '52', title: 'Balerina',                              type: 'purchase', src: '' },
-  { num: '53', title: 'Dizzy',                                 type: 'purchase', src: '' },
-  { num: '54', title: 'Abena',                                 type: 'purchase', src: '' },
-  { num: '55', title: '1',                                     type: 'purchase', src: '' },
-  { num: '56', title: '2',                                     type: 'purchase', src: '' },
-  { num: '57', title: '3',                                     type: 'purchase', src: '' },
-  { num: '58', title: '6',                                     type: 'purchase', src: '' },
-  { num: '59', title: '10',                                    type: 'purchase', src: '' },
-];
+import { getAllBeats } from '../services/beats.service';
+import { API_BASE_URL } from '../services/httpClient';
+import type { Beat } from '../types/content';
 
 export default function BeatsPage() {
+  const [beats, setBeats] = useState<Beat[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    void getAllBeats().then(setBeats);
+  }, []);
 
   const handleBeatClick = (idx: number) => {
     const audio = audioRef.current;
     if (!audio) return;
     if (activeIdx === idx) {
       if (isPlaying) { audio.pause(); setIsPlaying(false); }
-      else { void audio.play(); setIsPlaying(true); }
+      else { audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false)); }
     } else {
-      audio.src = beats[idx].src;
+      const audioFileUrl = beats[idx].audioFileUrl;
+      if (!audioFileUrl) return;
+      audio.src = `${API_BASE_URL}/storage/${audioFileUrl}`;
       setActiveIdx(idx);
-      if (beats[idx].src) { void audio.play(); setIsPlaying(true); }
-      else { setIsPlaying(false); }
+      audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
     }
   };
 
@@ -191,7 +130,7 @@ export default function BeatsPage() {
           <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
             {beats.map((b, i) => (
               <div
-                key={b.num}
+                key={b.id}
                 onClick={() => handleBeatClick(i)}
                 className="flex items-center gap-4 sm:gap-6 cursor-pointer transition-all duration-150 active:scale-[1.01]"
                 style={{
@@ -202,7 +141,7 @@ export default function BeatsPage() {
               >
                 {/* Number */}
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: activeIdx === i ? 'var(--color-gold)' : 'var(--color-muted)', minWidth: '28px' }}>
-                  {b.num}
+                  {String(i + 1).padStart(2, '0')}
                 </span>
 
                 {/* Type dot */}
@@ -239,6 +178,9 @@ export default function BeatsPage() {
                 </span>
               </div>
             ))}
+            {beats.length === 0 && (
+              <p style={{ padding: '16px', fontSize: '13px', color: 'var(--color-muted)' }}>No beats added yet.</p>
+            )}
           </div>
 
           <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />

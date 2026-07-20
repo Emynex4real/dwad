@@ -1,8 +1,10 @@
+import { useState, useRef, useEffect } from 'react';
 import Arrow from '../components/ui/Arrow';
 import SEO from '../components/ui/SEO';
 import { studioMain } from '../data';
-import akiibPhoto from '../assets/artists/akiib.jpg';
-import youngzyPhoto from '../assets/artists/youngzy.jpg';
+import { getAllProductions } from '../services/productions.service';
+import { API_BASE_URL } from '../services/httpClient';
+import type { Production } from '../types/content';
 
 const packages = [
   {
@@ -87,33 +89,6 @@ const packages = [
   },
 ];
 
-const tracklist = [
-  { num: '01', title: 'All for the Money', artist: 'Youngzy' },
-  { num: '02', title: 'Maro', artist: 'Badess Kid' },
-  { num: '03', title: 'Gallivant', artist: 'Youngzy' },
-  { num: '04', title: 'Addicted', artist: 'Akiib' },
-  { num: '05', title: 'Questions', artist: 'Skiitz x Miraji' },
-  { num: '06', title: 'Ayo', artist: 'Yemi Ekun' },
-  { num: '07', title: 'Green Light', artist: 'Zephyr' },
-  { num: '08', title: 'On Guard', artist: 'Nonny Gee' },
-  { num: '09', title: 'Omo Oloja', artist: 'Akiib' },
-  { num: '10', title: 'Gbese', artist: 'Blazebankz' },
-  { num: '11', title: 'Who is Akiib (Intro)', artist: 'Akiib' },
-  { num: '12', title: 'Uselu Roundabout', artist: 'Youngzy' },
-  { num: '13', title: 'Fame', artist: 'Badboi Yemi' },
-  { num: '14', title: 'Hallelujah', artist: 'Junbho' },
-  { num: '15', title: 'My Life (Master)', artist: 'J Smalling' },
-  { num: '16', title: 'Why', artist: 'Kenk C' },
-  { num: '17', title: 'Disrespect', artist: 'Spice' },
-];
-
-const recentProjects = [
-  { title: 'Formula', artist: 'Tuneboi Col ft. Favour Tkb', photo: null },
-  { title: 'Hallelujah', artist: 'Junbho', photo: null },
-  { title: 'Baby', artist: 'Youngzy', photo: youngzyPhoto },
-  { title: 'Addicted', artist: 'Akiib', photo: akiibPhoto },
-];
-
 const terms = [
   {
     num: '01',
@@ -128,6 +103,32 @@ const terms = [
 ];
 
 export default function AkiibStudioPage() {
+  const [productions, setProductions] = useState<Production[]>([]);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    void getAllProductions().then(setProductions);
+  }, []);
+
+  const recentProjects = productions.slice(-4).reverse();
+
+  function handleTrackClick(idx: number) {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (activeIdx === idx) {
+      if (isPlaying) { audio.pause(); setIsPlaying(false); }
+      else { audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false)); }
+    } else {
+      const audioFileUrl = productions[idx].audioFileUrl;
+      if (!audioFileUrl) return;
+      audio.src = `${API_BASE_URL}/storage/${audioFileUrl}`;
+      setActiveIdx(idx);
+      audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    }
+  }
+
   return (
     <div className="page-enter">
       <SEO
@@ -366,20 +367,32 @@ export default function AkiibStudioPage() {
               </a>
             </div>
             <div className="flex flex-col gap-px" style={{ background: 'var(--color-line)' }}>
-              {tracklist.map(t => (
+              {productions.map((p, i) => (
                 <div
-                  key={t.num}
-                  className="flex items-center gap-4 sm:gap-6"
-                  style={{ background: 'var(--color-bg)', padding: '16px' }}
+                  key={p.id}
+                  onClick={() => handleTrackClick(i)}
+                  className="flex items-center gap-4 sm:gap-6 cursor-pointer transition-all duration-150 active:scale-[1.02]"
+                  style={{
+                    background: activeIdx === i ? 'var(--color-bg-2)' : 'var(--color-bg)',
+                    padding: '16px',
+                    borderLeft: `2px solid ${activeIdx === i ? 'var(--color-gold)' : 'transparent'}`,
+                  }}
                 >
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--color-muted)', minWidth: '28px' }}>{t.num}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.2em', color: activeIdx === i ? 'var(--color-gold)' : 'var(--color-muted)', minWidth: '28px' }}>{String(i + 1).padStart(2, '0')}</span>
                   <div className="flex-1 min-w-0">
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.2 }}>{t.title}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--color-muted)', textTransform: 'uppercase', marginTop: '2px' }}>{t.artist}</div>
+                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(15px, 2vw, 20px)', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1.2 }}>{p.title}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--color-muted)', textTransform: 'uppercase', marginTop: '2px' }}>{p.artistName}</div>
                   </div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: activeIdx === i && isPlaying ? 'var(--color-gold)' : 'var(--color-muted)', flexShrink: 0 }}>
+                    {activeIdx === i && isPlaying ? '⏸' : '▶'}
+                  </span>
                 </div>
               ))}
+              {productions.length === 0 && (
+                <p style={{ padding: '16px', fontSize: '13px', color: 'var(--color-muted)' }}>No songs added yet.</p>
+              )}
             </div>
+            <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
           </div>
         </div>
       </section>
@@ -392,14 +405,14 @@ export default function AkiibStudioPage() {
             <div className="flex-1 h-px" style={{ background: 'var(--color-line)' }} />
           </div>
           <div className="grid gap-6 grid-cols-2 min-[700px]:grid-cols-4">
-            {recentProjects.map((p, i) => (
-              <div key={i} className="group">
+            {recentProjects.map((p) => (
+              <div key={p.id} className="group">
                 <div
                   className="relative overflow-hidden border"
                   style={{ aspectRatio: '1/1', borderColor: 'var(--color-line)', background: 'var(--color-bg-2)' }}
                 >
-                  {p.photo ? (
-                    <img src={p.photo} alt={p.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  {p.coverArtUrl ? (
+                    <img src={`${API_BASE_URL}/storage/${p.coverArtUrl}`} alt={p.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(40px, 6vw, 72px)', color: 'var(--color-gold)', fontWeight: 300, fontStyle: 'italic' }}>
@@ -410,7 +423,7 @@ export default function AkiibStudioPage() {
                 </div>
                 <div className="pt-4">
                   <h4 style={{ fontFamily: 'var(--font-serif)', fontWeight: 400, fontSize: '20px' }}>{p.title}</h4>
-                  <div className="mt-1" style={{ fontSize: '13px', color: 'var(--color-muted)' }}>{p.artist}</div>
+                  <div className="mt-1" style={{ fontSize: '13px', color: 'var(--color-muted)' }}>{p.artistName}</div>
                 </div>
               </div>
             ))}

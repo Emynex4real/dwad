@@ -20,6 +20,13 @@ api/storage/audio/*
 !api/storage/audio/.gitkeep
 !api/storage/audio/.htaccess
 
+api/storage/productions/covers/*
+api/storage/productions/audio/*
+api/storage/beats/audio/*
+!api/storage/productions/covers/.gitkeep
+!api/storage/productions/audio/.gitkeep
+!api/storage/beats/audio/.gitkeep
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

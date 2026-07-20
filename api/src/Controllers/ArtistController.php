@@ -92,6 +92,8 @@ class ArtistController
             $sub['price'] ?? 0,
         ]);
 
+        ReportController::autoResolveForArtist($id, $body['name']);
+
         Response::json($this->mapArtist($this->findArtistRow($id)), 201);
     }
 
@@ -174,11 +176,14 @@ class ArtistController
         Auth::requireAdmin($pdo);
         $id = $args['id'];
 
-        if ($this->findArtistRow($id) === null) {
+        $artist = $this->findArtistRow($id);
+        if ($artist === null) {
             throw new HttpException('Artist not found', 404);
         }
 
         $pdo->prepare("UPDATE artists SET status = 'active' WHERE id = ?")->execute([$id]);
+
+        ReportController::autoResolveForArtist($id, $artist['name']);
 
         Response::json($this->mapArtist($this->findArtistRow($id)));
     }

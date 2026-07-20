@@ -18,6 +18,8 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/uploads',       label: 'Uploads',         shortLabel: 'Uploads', icon: '↑' },
   { to: '/admin/reports',       label: 'Reports',         shortLabel: 'Reports', icon: '◫' },
   { to: '/admin/notifications', label: 'Notifications',   shortLabel: 'Alerts',  icon: '◎' },
+  { to: '/admin/productions',   label: 'Productions',     shortLabel: 'Songs',   icon: '♫' },
+  { to: '/admin/beats',         label: 'Beats',           shortLabel: 'Beats',   icon: '●' },
 ];
 
 export default function AdminLayout() {
