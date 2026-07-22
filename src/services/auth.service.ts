@@ -23,6 +23,26 @@ export async function login(
   }
 }
 
+export async function forgotPassword(email: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await apiFetch('/auth/forgot-password', { method: 'POST', body: { email } });
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof ApiError ? err.message : 'Something went wrong. Please try again.';
+    return { success: false, error: message };
+  }
+}
+
+export async function resetPassword(token: string, password: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await apiFetch('/auth/reset-password', { method: 'POST', body: { token, password } });
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof ApiError ? err.message : 'Something went wrong. Please try again.';
+    return { success: false, error: message };
+  }
+}
+
 export async function logout(): Promise<void> {
   try {
     await apiFetch('/auth/logout', { method: 'POST' });

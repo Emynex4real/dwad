@@ -24,9 +24,11 @@ const AkiibMusicPage   = lazy(() => import('./pages/AkiibMusicPage'));
 const LegalPage        = lazy(() => import('./pages/LegalPage'));
 const BeatsPage        = lazy(() => import('./pages/BeatsPage'));
 const RadioPage        = lazy(() => import('./pages/RadioPage'));
-const LoginPage        = lazy(() => import('./pages/LoginPage'));
-const ArtistSignupPage = lazy(() => import('./pages/ArtistSignupPage'));
-const NotFoundPage     = lazy(() => import('./pages/NotFoundPage'));
+const LoginPage          = lazy(() => import('./pages/LoginPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage  = lazy(() => import('./pages/ResetPasswordPage'));
+const ArtistSignupPage   = lazy(() => import('./pages/ArtistSignupPage'));
+const NotFoundPage       = lazy(() => import('./pages/NotFoundPage'));
 
 // ── Dashboard layouts ──────────────────────────────────────────────────────────
 const AdminLayout  = lazy(() => import('./layouts/AdminLayout'));
@@ -43,6 +45,7 @@ const AdminReportsPage        = lazy(() => import('./pages/admin/AdminReportsPag
 const AdminNotificationsPage  = lazy(() => import('./pages/admin/AdminNotificationsPage'));
 const AdminProductionsPage    = lazy(() => import('./pages/admin/AdminProductionsPage'));
 const AdminBeatsPage          = lazy(() => import('./pages/admin/AdminBeatsPage'));
+const AdminCurrencyRatesPage  = lazy(() => import('./pages/admin/AdminCurrencyRatesPage'));
 
 // ── Artist pages ──────────────────────────────────────────────────────────────
 const ArtistHomePage      = lazy(() => import('./pages/artist/ArtistHomePage'));
@@ -125,6 +128,8 @@ function PublicLayout() {
             <Route path="/radio"     element={<RadioPage />} />
             <Route path="/contact"   element={<ContactPage />} />
             <Route path="/login"     element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/join/:token" element={<ArtistSignupPage />} />
             <Route path="*"          element={<NotFoundPage />} />
           </Routes>
@@ -156,6 +161,7 @@ function AppRouter() {
             <Route path="notifications" element={<AdminNotificationsPage />} />
             <Route path="productions" element={<AdminProductionsPage />} />
             <Route path="beats" element={<AdminBeatsPage />} />
+            <Route path="currency-rates" element={<AdminCurrencyRatesPage />} />
           </Route>
 
           {/* Artist routes */}

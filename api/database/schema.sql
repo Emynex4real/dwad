@@ -46,6 +46,15 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
     FOREIGN KEY (user_id) REFERENCES artists(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    token VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(40) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES artists(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS artist_invites (
     token VARCHAR(64) PRIMARY KEY,
     created_by VARCHAR(40) NOT NULL,
@@ -161,6 +170,18 @@ CREATE TABLE IF NOT EXISTS currency_rates_cache (
     id TINYINT PRIMARY KEY DEFAULT 1,
     rates_json JSON NOT NULL,
     fetched_at TIMESTAMP NOT NULL
+);
+
+-- Admin-managed rates for the marketing-page currency localization feature.
+-- Superseded currency_rates_cache (left in place, unused) as the live rate
+-- source — rates here are entered by an admin, not auto-fetched. Each row
+-- means "1 USD = rate units of this currency"; absence of a row means
+-- "not configured", and the localized-pricing endpoint falls back to
+-- showing the page's original base-currency price unchanged.
+CREATE TABLE IF NOT EXISTS currency_rates (
+    currency_code VARCHAR(3) PRIMARY KEY,
+    rate DECIMAL(18, 6) NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS productions (

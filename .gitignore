@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 api/config/config.php
+api/vendor
 
 api/storage/covers/*
 api/storage/audio/*

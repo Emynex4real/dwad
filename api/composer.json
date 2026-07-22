@@ -1,0 +1,11 @@
+{
+    "name": "dwad/api",
+    "description": "Plain-PHP JSON API for the Dwad Music SPA.",
+    "require": {
+        "php": ">=8.2",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

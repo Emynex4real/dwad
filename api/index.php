@@ -6,6 +6,7 @@
 // other projects share the same php.ini.
 ini_set('serialize_precision', -1);
 
+require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/src/HttpException.php';
 require __DIR__ . '/src/Response.php';
 require __DIR__ . '/src/Request.php';
@@ -13,6 +14,7 @@ require __DIR__ . '/src/Config.php';
 require __DIR__ . '/src/Database.php';
 require __DIR__ . '/src/Router.php';
 require __DIR__ . '/src/Auth.php';
+require __DIR__ . '/src/Mailer.php';
 require __DIR__ . '/src/Controllers/AuthController.php';
 require __DIR__ . '/src/Controllers/ArtistController.php';
 require __DIR__ . '/src/Controllers/NotificationController.php';
@@ -67,6 +69,8 @@ $pricingController = new PricingController();
 $router->add('POST', '/auth/login', [$authController, 'login']);
 $router->add('POST', '/auth/logout', [$authController, 'logout']);
 $router->add('GET', '/auth/me', [$authController, 'me']);
+$router->add('POST', '/auth/forgot-password', [$authController, 'forgotPassword']);
+$router->add('POST', '/auth/reset-password', [$authController, 'resetPassword']);
 
 $router->add('GET', '/artists', [$artistController, 'index']);
 $router->add('POST', '/artists', [$artistController, 'store']);
@@ -125,6 +129,9 @@ $router->add('POST', '/beats/{id}', [$beatController, 'update']);
 $router->add('DELETE', '/beats/{id}', [$beatController, 'destroy']);
 
 $router->add('GET', '/pricing/localized', [$pricingController, 'localized']);
+$router->add('GET', '/pricing/rates', [$pricingController, 'adminIndex']);
+$router->add('PATCH', '/pricing/rates/{code}', [$pricingController, 'adminUpdate']);
+$router->add('DELETE', '/pricing/rates/{code}', [$pricingController, 'adminDelete']);
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'], $path);

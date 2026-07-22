@@ -5,6 +5,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install pdo pdo_mysql zip
 
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 RUN a2enmod rewrite \
     && sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf
 
@@ -36,6 +38,8 @@ RUN { \
     && a2enconf deny-audio
 
 COPY api/ /var/www/html/
+
+RUN composer install --no-dev --no-interaction --optimize-autoloader --working-dir=/var/www/html
 
 RUN chown -R www-data:www-data /var/www/html/storage \
     && chmod -R 775 /var/www/html/storage

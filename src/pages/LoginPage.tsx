@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import SEO from '../components/ui/SEO';
 import { useAuth } from '../hooks/useAuth';
 import { logoWhite } from '../data';
@@ -10,6 +10,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -65,15 +66,35 @@ export default function LoginPage() {
 
           <div className="login-field">
             <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-            />
+            <div className="login-password-wrap">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="login-password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 3l18 18M10.58 10.58a2 2 0 002.83 2.83M9.88 5.09A10.7 10.7 0 0112 5c5 0 9 4 10 7-1 2.14-2.5 4.51-4.62 6.06M6.62 6.62C4.5 8.17 3 10.5 2 12c1 3 5 7 10 7a10.7 10.7 0 002.12-.21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            <Link to="/forgot-password" className="login-forgot">Forgot password?</Link>
           </div>
 
           {error && <div className="login-error">{error}</div>}
@@ -82,13 +103,6 @@ export default function LoginPage() {
             {submitting ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
-
-        <div className="login-hints">
-          <p className="login-hints__title">Demo credentials</p>
-          <p><strong>Admin:</strong> admin@dwadmusic.com</p>
-          <p><strong>Artist:</strong> akiib@dwadmusic.com</p>
-          <p><strong>Password:</strong> password123</p>
-        </div>
       </div>
 
       <div className="login-bg" aria-hidden>

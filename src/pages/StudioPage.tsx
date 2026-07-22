@@ -5,8 +5,9 @@ import PageHero from '../components/ui/PageHero';
 import SEO from '../components/ui/SEO';
 import { studioMain, HOF_ARTISTS } from '../data';
 import { getAllProductions } from '../services/productions.service';
+import { getLocalizedPricing } from '../services/pricing.service';
 import { API_BASE_URL } from '../services/httpClient';
-import type { Production } from '../types/content';
+import type { Production, LocalizedPricing } from '../types/content';
 
 const studioJsonLd = {
   '@context': 'https://schema.org',
@@ -50,7 +51,7 @@ const services = [
 const packages = [
   {
     tier: 'Package 1',
-    price: '$150',
+    price: 150,
     studio: null,
     items: [
       'Beat lease',
@@ -64,7 +65,7 @@ const packages = [
   },
   {
     tier: 'Package 2',
-    price: '$300',
+    price: 300,
     studio: null,
     items: [
       'Beat lease',
@@ -81,7 +82,7 @@ const packages = [
   },
   {
     tier: 'Package 3',
-    price: '$500',
+    price: 500,
     studio: null,
     items: [
       'Personal Beat',
@@ -100,7 +101,7 @@ const packages = [
   },
   {
     tier: 'Package 4',
-    price: '$1,000',
+    price: 1000,
     studio: null,
     items: [
       'Personal Beat',
@@ -136,13 +137,28 @@ export default function StudioPage() {
   const navigate = useNavigate();
   const [activeIdx, setActiveIdx] = useState(-1);
   const [productions, setProductions] = useState<Production[]>([]);
+  const [pricing, setPricing] = useState<LocalizedPricing>({ currencyCode: 'USD', rate: 1 });
 
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     void getAllProductions().then(setProductions);
+    void getLocalizedPricing().then(setPricing);
   }, []);
+
+  function formatPrice(usdAmount: number): string {
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: pricing.currencyCode,
+        currencyDisplay: 'narrowSymbol',
+        maximumFractionDigits: 0,
+      }).format(usdAmount * pricing.rate);
+    } catch {
+      return `$${usdAmount.toLocaleString()}`;
+    }
+  }
 
   const recentProjects = productions.filter((p) => p.coverArtUrl).slice(-4).reverse();
 
@@ -387,7 +403,7 @@ export default function StudioPage() {
                   </div>
                 )}
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>{pkg.tier}</div>
-                <div className="mt-3 mb-8" style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>{pkg.price}</div>
+                <div className="mt-3 mb-8" style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>{formatPrice(pkg.price)}</div>
                 {pkg.studio && (
                   <div className="mb-4" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{pkg.studio}</div>
                 )}

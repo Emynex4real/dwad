@@ -7,6 +7,14 @@ class InviteController
         $pdo = Database::pdo();
         $admin = Auth::requireAdmin($pdo);
 
+        // The invite link is permanent and shared by every artist — idempotent,
+        // so repeated clicks of "Generate Invite Link" always return the same one.
+        $existing = $pdo->query('SELECT token FROM artist_invites LIMIT 1')->fetchColumn();
+        if ($existing !== false) {
+            Response::json(['token' => $existing]);
+            return;
+        }
+
         $token = bin2hex(random_bytes(24));
         $pdo->prepare('INSERT INTO artist_invites (token, created_by) VALUES (?, ?)')
             ->execute([$token, $admin['id']]);
@@ -81,15 +89,13 @@ class InviteController
             $sub['price'] ?? 0,
         ]);
 
-        $pdo->prepare('UPDATE artist_invites SET used_at = NOW(), used_by_artist_id = ? WHERE token = ?')
-            ->execute([$id, $token]);
-
         Response::json(['success' => true], 201);
     }
 
     private function findValidInvite(string $token): ?array
     {
-        $stmt = Database::pdo()->prepare('SELECT * FROM artist_invites WHERE token = ? AND used_at IS NULL');
+        // No used_at check — the invite link is permanent and reusable by every artist.
+        $stmt = Database::pdo()->prepare('SELECT * FROM artist_invites WHERE token = ?');
         $stmt->execute([$token]);
         $row = $stmt->fetch();
         return $row === false ? null : $row;

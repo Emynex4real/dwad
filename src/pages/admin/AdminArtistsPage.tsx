@@ -85,7 +85,7 @@ export default function AdminArtistsPage() {
 
       {inviteLink && (
         <div className="dash-panel flex items-center gap-3 flex-wrap">
-          <span className="text-xs text-muted shrink-0">Invite link (one-time use):</span>
+          <span className="text-xs text-muted shrink-0">Invite link:</span>
           <code className="text-xs text-ink flex-1 min-w-0 truncate">{inviteLink}</code>
           <button className="dash-btn dash-btn--ghost text-xs py-1.5 px-3" onClick={copyInviteLink}>
             {inviteCopied ? 'Copied ✓' : 'Copy Link'}

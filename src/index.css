@@ -839,6 +839,28 @@ img { display: block; max-width: 100%; }
   .login-hints__title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-muted); margin-bottom: 6px; }
   .login-hints p { margin: 0; color: var(--color-muted); }
   .login-hints strong { color: var(--color-ink-2); }
+  .login-password-wrap { position: relative; display: flex; }
+  .login-password-wrap input { flex: 1; padding-right: 42px; }
+  .login-password-toggle {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--color-muted);
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .login-password-toggle:hover { color: var(--color-ink-2); }
+  .login-forgot { align-self: flex-end; font-size: 13px; color: var(--color-muted); text-decoration: none; }
+  .login-forgot:hover { color: var(--color-gold); }
+  .login-forgot--center { align-self: center; margin-top: 4px; }
   .login-bg { position: absolute; inset: 0; pointer-events: none; }
   .login-bg__glow {
     position: absolute;

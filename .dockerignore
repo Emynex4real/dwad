@@ -4,6 +4,7 @@ dist
 src
 public
 *.md
+api/vendor
 
 # Never bake real local secrets into the image, even though config.php is
 # already gitignored from the repo itself.

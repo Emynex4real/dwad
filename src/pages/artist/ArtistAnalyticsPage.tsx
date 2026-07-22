@@ -40,11 +40,15 @@ function BarChart({ data, dataKey, color, formatter }: {
 }
 
 function AreaSparkline({ data }: { data: MonthlyStats[] }) {
+  if (data.length === 0) {
+    return <p className="dash-empty">No monthly data yet.</p>;
+  }
+
   const max = Math.max(...data.map((d) => d.streams), 1);
   const W = 600;
   const H = 160;
   const pts = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * W;
+    const x = data.length > 1 ? (i / (data.length - 1)) * W : W / 2;
     const y = H - (d.streams / max) * (H - 20);
     return `${x},${y}`;
   });

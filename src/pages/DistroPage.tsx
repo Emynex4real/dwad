@@ -45,6 +45,7 @@ export default function DistroPage() {
       return new Intl.NumberFormat(undefined, {
         style: 'currency',
         currency: pricing.currencyCode,
+        currencyDisplay: 'narrowSymbol',
         maximumFractionDigits: 0,
       }).format(usdAmount * pricing.rate);
     } catch {

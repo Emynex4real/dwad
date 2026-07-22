@@ -29,3 +29,10 @@ export interface LocalizedPricing {
   currencyCode: string;
   rate: number;
 }
+
+export interface CurrencyRate {
+  currencyCode: string;
+  countries: string[];
+  rate: number | null;
+  updatedAt: string | null;
+}

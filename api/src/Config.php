@@ -32,6 +32,17 @@ class Config
             'auth' => [
                 'token_ttl_days' => (int) (getenv('AUTH_TOKEN_TTL_DAYS') ?: 30),
             ],
+            'smtp' => [
+                'host' => getenv('SMTP_HOST') ?: '',
+                'port' => (int) (getenv('SMTP_PORT') ?: 587),
+                'user' => getenv('SMTP_USER') ?: '',
+                'pass' => getenv('SMTP_PASS') ?: '',
+                'from_email' => getenv('SMTP_FROM_EMAIL') ?: '',
+                'from_name' => getenv('SMTP_FROM_NAME') ?: 'Dwad Music',
+            ],
+            'app' => [
+                'frontend_url' => getenv('FRONTEND_URL') ?: 'http://localhost:5173',
+            ],
         ];
     }
 }

@@ -3,13 +3,14 @@ import Arrow from '../components/ui/Arrow';
 import SEO from '../components/ui/SEO';
 import { studioMain } from '../data';
 import { getAllProductions } from '../services/productions.service';
+import { getLocalizedPricing } from '../services/pricing.service';
 import { API_BASE_URL } from '../services/httpClient';
-import type { Production } from '../types/content';
+import type { Production, LocalizedPricing } from '../types/content';
 
 const packages = [
   {
     tier: 'Promo',
-    price: '₦50,000',
+    price: 50000,
     studio: 'Ikorodu Studio',
     items: [
       'Beat lease',
@@ -20,7 +21,7 @@ const packages = [
   },
   {
     tier: 'Package 1',
-    price: '₦200,000',
+    price: 200000,
     studio: null,
     items: [
       'Beat lease',
@@ -34,7 +35,7 @@ const packages = [
   },
   {
     tier: 'Package 2',
-    price: '₦300,000',
+    price: 300000,
     studio: null,
     items: [
       'Beat lease',
@@ -51,7 +52,7 @@ const packages = [
   },
   {
     tier: 'Package 3',
-    price: '₦500,000',
+    price: 500000,
     studio: null,
     items: [
       'Personal Beat',
@@ -70,7 +71,7 @@ const packages = [
   },
   {
     tier: 'Package 4',
-    price: '₦1,000,000',
+    price: 1000000,
     studio: 'Ajah & Egbeda Studios',
     items: [
       'Personal Beat',
@@ -106,11 +107,26 @@ export default function AkiibStudioPage() {
   const [productions, setProductions] = useState<Production[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [pricing, setPricing] = useState<LocalizedPricing>({ currencyCode: 'NGN', rate: 1 });
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     void getAllProductions().then(setProductions);
+    void getLocalizedPricing('NGN').then(setPricing);
   }, []);
+
+  function formatPrice(ngnAmount: number): string {
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: pricing.currencyCode,
+        currencyDisplay: 'narrowSymbol',
+        maximumFractionDigits: 0,
+      }).format(ngnAmount * pricing.rate);
+    } catch {
+      return `₦${ngnAmount.toLocaleString()}`;
+    }
+  }
 
   const recentProjects = productions.slice(-4).reverse();
 
@@ -272,7 +288,7 @@ export default function AkiibStudioPage() {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>Ikorodu Studio · Terms &amp; conditions apply</div>
             </div>
             <div className="flex items-center gap-6 flex-wrap">
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>₦50,000</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>{formatPrice(50000)}</div>
               <div style={{ fontSize: '13px', color: 'var(--color-muted)', lineHeight: 1.5 }}>Beat lease · Recording · Mixing &amp; Mastering</div>
               <a
                 href="https://wa.me/message/5DCJVMDJRU2SE1"
@@ -306,7 +322,7 @@ export default function AkiibStudioPage() {
                   </div>
                 )}
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>{pkg.tier}</div>
-                <div className="mt-3 mb-8" style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>{pkg.price}</div>
+                <div className="mt-3 mb-8" style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 400, color: 'var(--color-ink)' }}>{formatPrice(pkg.price)}</div>
                 {pkg.studio && (
                   <div className="mb-4" style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{pkg.studio}</div>
                 )}
