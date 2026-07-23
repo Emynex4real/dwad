@@ -21,16 +21,21 @@ export default function AdminArtistsPage() {
     setArtists(await getAllArtists());
   }
 
-  async function handleGenerateInvite() {
-    const token = await createInvite();
-    setInviteLink(`${window.location.origin}/join/${token}`);
-    setInviteCopied(false);
-  }
-
   async function copyInviteLink() {
-    await navigator.clipboard.writeText(inviteLink);
-    setInviteCopied(true);
-    setTimeout(() => setInviteCopied(false), 2000);
+    let link = inviteLink;
+    if (!link) {
+      const token = await createInvite();
+      link = `${window.location.origin}/join/${token}`;
+      setInviteLink(link);
+    }
+    try {
+      await navigator.clipboard.writeText(link);
+      setInviteCopied(true);
+      setTimeout(() => setInviteCopied(false), 2000);
+    } catch {
+      // Clipboard access can be blocked by browser permissions/policy — the
+      // link is still fetched and shown below for the admin to copy manually.
+    }
   }
 
   function whatsappShareUrl(): string {
@@ -76,7 +81,9 @@ export default function AdminArtistsPage() {
           <p className="text-sm text-muted mt-1">{artists.length} registered artists</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <button className="dash-btn dash-btn--ghost" onClick={handleGenerateInvite}>Generate Invite Link</button>
+          <button className="dash-btn dash-btn--ghost" onClick={() => void copyInviteLink()}>
+            {inviteCopied ? 'Copied ✓' : 'Copy Invite Link'}
+          </button>
           {!showAddForm && (
             <button className="dash-btn dash-btn--gold" onClick={() => setShowAddForm(true)}>+ Add Artist</button>
           )}
