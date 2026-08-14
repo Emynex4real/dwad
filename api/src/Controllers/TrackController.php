@@ -13,6 +13,31 @@ class TrackController
         Response::json(array_map($this->mapTrack(...), $rows));
     }
 
+    public function live(): void
+    {
+        // cover_art_url IS NOT NULL: real submissions always have cover art
+        // (store() requires it), but a handful of older seed/demo rows were
+        // inserted directly without one — exclude those rather than show a
+        // broken image in this cover-art-driven grid.
+        $rows = Database::pdo()->query(
+            "SELECT t.id, t.title, t.release_date, t.cover_art_url, t.release_link, a.name AS artist_name
+             FROM tracks t
+             JOIN artists a ON a.id = t.artist_id
+             WHERE t.status = 'live' AND t.cover_art_url IS NOT NULL
+             ORDER BY t.submitted_at DESC
+             LIMIT 12"
+        )->fetchAll();
+
+        Response::json(array_map(fn (array $row) => [
+            'id' => $row['id'],
+            'title' => $row['title'],
+            'artistName' => $row['artist_name'],
+            'coverArtUrl' => $row['cover_art_url'],
+            'releaseLink' => $row['release_link'],
+            'releaseDate' => $row['release_date'],
+        ], $rows));
+    }
+
     public function forArtist(array $args): void
     {
         $pdo = Database::pdo();
@@ -142,6 +167,9 @@ class TrackController
             }
         }
         if (array_key_exists('platforms', $body)) {
+            if (!is_array($body['platforms'])) {
+                throw new HttpException('platforms must be an array.', 422);
+            }
             $sets[] = 'platforms = ?';
             $values[] = json_encode($body['platforms']);
         }
@@ -242,10 +270,16 @@ class TrackController
             throw new HttpException('Failed to create archive.', 500);
         }
         foreach ($valid as $i => $f) {
-            $zip->addFile($f['tmp_name'], sprintf('%02d-%s', $i + 1, $f['name']));
+            $zip->addFile($f['tmp_name'], sprintf('%02d-%s', $i + 1, $this->sanitizeZipEntryName($f['name'])));
         }
         $zip->close();
         return "audio/{$id}.zip";
+    }
+
+    private function sanitizeZipEntryName(string $name): string
+    {
+        $name = preg_replace('/[^A-Za-z0-9._-]/', '_', basename($name)) ?? '';
+        return $name !== '' ? $name : 'file';
     }
 
     private function findTrackRow(string $id): ?array

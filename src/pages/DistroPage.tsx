@@ -4,9 +4,11 @@ import Arrow from '../components/ui/Arrow';
 import ProjectCard from '../components/ui/ProjectCard';
 import Ticker from '../components/ui/Ticker';
 import SEO from '../components/ui/SEO';
-import { PROJECTS, HOF_ARTISTS, distroHero } from '../data';
-import { getLocalizedPricing } from '../services/pricing.service';
-import type { LocalizedPricing } from '../types/content';
+import { HOF_ARTISTS, distroHero } from '../data';
+import { getLocalizedPricing, getPricingPlans } from '../services/pricing.service';
+import { getLiveTracks } from '../services/tracks.service';
+import { API_BASE_URL } from '../services/httpClient';
+import type { LocalizedPricing, LiveTrack } from '../types/content';
 
 const distroJsonLd = {
   '@context': 'https://schema.org',
@@ -35,10 +37,25 @@ const features = [
 export default function DistroPage() {
   const navigate = useNavigate();
   const [pricing, setPricing] = useState<LocalizedPricing>({ currencyCode: 'USD', rate: 1 });
+  const [plans, setPlans] = useState<Map<string, number>>(new Map());
+  const [liveTracks, setLiveTracks] = useState<LiveTrack[]>([]);
 
   useEffect(() => {
     void getLocalizedPricing().then(setPricing);
+    void getPricingPlans().then((list) => setPlans(new Map(list.map((p) => [p.id, p.price]))));
+    void getLiveTracks().then(setLiveTracks);
   }, []);
+
+  const projects = liveTracks.map((t) => ({
+    title: t.title,
+    artist: t.artistName,
+    year: new Date(t.releaseDate).getFullYear().toString(),
+    cover: `${API_BASE_URL}/storage/${t.coverArtUrl}`,
+  }));
+
+  function planPrice(id: string): number {
+    return plans.get(id) ?? 0;
+  }
 
   function formatPrice(usdAmount: number): string {
     try {
@@ -250,7 +267,7 @@ export default function DistroPage() {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '16px' }}>
                 A · 1 Song Upload
               </div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(10)}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(planPrice('distro-a'))}</div>
               <div className="mt-6 flex flex-col gap-3 flex-1">
                 {['1 song upload', 'Spotify, Apple Music + all music apps', 'No TikTok or Instagram upload'].map((f, i) => (
                   <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: i === 2 ? 'var(--color-muted)' : 'var(--color-ink-2)', lineHeight: 1.5 }}>
@@ -269,7 +286,7 @@ export default function DistroPage() {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '16px' }}>
                 B · 1 Song Upload Pro
               </div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(15)}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(planPrice('distro-b'))}</div>
               <div className="mt-6 flex flex-col gap-3 flex-1">
                 {['1 song upload', 'Spotify, Apple Music + 200 more apps', 'TikTok, Instagram + all social media apps'].map(f => (
                   <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
@@ -288,7 +305,7 @@ export default function DistroPage() {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '16px' }}>
                 C · Unlimited
               </div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(30)}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(planPrice('distro-c'))}</div>
               <div className="mt-6 flex flex-col gap-3 flex-1">
                 {['Unlimited song uploads per year', 'Spotify, Apple Music + 200 more apps', 'TikTok, Instagram + all social media apps'].map(f => (
                   <div key={f} className="flex items-start gap-2" style={{ fontSize: '13px', color: 'var(--color-ink-2)', lineHeight: 1.5 }}>
@@ -313,7 +330,7 @@ export default function DistroPage() {
             {/* Gold $150 */}
             <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Gold</div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(150)}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(planPrice('distro-gold'))}</div>
               <div className="mt-6 flex flex-col gap-3 flex-1">
                 {[
                   'Unlimited upload a year',
@@ -337,7 +354,7 @@ export default function DistroPage() {
             {/* Diamond $500 */}
             <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Diamond</div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(500)}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(planPrice('distro-diamond'))}</div>
               <div className="mt-6 flex flex-col gap-3 flex-1">
                 {[
                   'Unlimited upload a year',
@@ -362,7 +379,7 @@ export default function DistroPage() {
             {/* Platinum $1,000 */}
             <div className="flex flex-col border" style={{ borderColor: 'var(--color-gold)', background: 'var(--color-bg-2)', padding: '32px 28px' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '16px' }}>Platinum</div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(1000)}</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 400, color: 'var(--color-ink)', lineHeight: 1 }}>{formatPrice(planPrice('distro-platinum'))}</div>
               <div className="mt-6 flex flex-col gap-3 flex-1">
                 {[
                   'Unlimited upload a year',
@@ -565,8 +582,11 @@ export default function DistroPage() {
             </p>
           </div>
           <div className="grid gap-6 grid-cols-2 min-[800px]:grid-cols-3 min-[1100px]:grid-cols-4">
-            {PROJECTS.map((p, i) => <ProjectCard key={i} project={p} idx={i} />)}
+            {projects.map((p, i) => <ProjectCard key={liveTracks[i].id} project={p} idx={i} />)}
           </div>
+          {projects.length === 0 && (
+            <p style={{ fontSize: '14px', color: 'var(--color-muted)' }}>No live releases yet.</p>
+          )}
         </div>
       </section>
 

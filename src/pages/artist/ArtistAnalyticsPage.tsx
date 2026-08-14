@@ -67,7 +67,7 @@ function AreaSparkline({ data }: { data: MonthlyStats[] }) {
         <polygon points={area} fill="url(#areaGrad)" />
         <polyline points={polyline} fill="none" stroke={GOLD} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
         {data.map((d, i) => {
-          const x = (i / (data.length - 1)) * W;
+          const x = data.length > 1 ? (i / (data.length - 1)) * W : W / 2;
           const y = H - (d.streams / max) * (H - 20);
           return <circle key={i} cx={x} cy={y} r="4" fill={GOLD} stroke="var(--color-bg)" strokeWidth="2" />;
         })}

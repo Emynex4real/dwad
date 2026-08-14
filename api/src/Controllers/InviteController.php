@@ -2,6 +2,20 @@
 
 class InviteController
 {
+    // Mirrors PLAN_DEFINITIONS in src/services/subscriptions.service.ts — the only other
+    // place these prices are defined. Self-registration must derive the price server-side
+    // from the chosen plan rather than trusting a client-supplied amount (unlike admin-created
+    // artists via ArtistController::store(), where a custom price is legitimate admin input).
+    private const PLAN_PRICES = [
+        'plan-a' => 10.00,
+        'plan-b' => 15.00,
+        'unlimited' => 30.00,
+        'gold' => 150.00,
+        'diamond' => 500.00,
+        'platinum' => 1000.00,
+        'platinum-pro' => 5000.00,
+    ];
+
     public function store(): void
     {
         $pdo = Database::pdo();
@@ -52,6 +66,7 @@ class InviteController
              VALUES (?, ?, ?, ?, \'artist\', ?, ?, ?, ?, \'granted\', \'pending\', CURDATE(), ?, ?, ?, ?)'
         );
         $social = $body['socialLinks'] ?? [];
+        $pdo->beginTransaction();
         try {
             $stmt->execute([
                 $id,
@@ -68,6 +83,7 @@ class InviteController
                 $social['apple'] ?? null,
             ]);
         } catch (PDOException $e) {
+            $pdo->rollBack();
             if ($e->getCode() === '23000') {
                 throw new HttpException('An artist with that email already exists.', 409);
             }
@@ -75,19 +91,31 @@ class InviteController
         }
 
         $sub = $body['subscription'] ?? [];
+        $plan = $sub['plan'] ?? 'plan-a';
+        if (!isset(self::PLAN_PRICES[$plan])) {
+            $pdo->rollBack();
+            throw new HttpException('Invalid subscription plan.', 422);
+        }
+
         $subStmt = $pdo->prepare(
             'INSERT INTO subscriptions (id, artist_id, plan, status, start_date, expiry_date, auto_renew, price)
              VALUES (?, ?, ?, \'active\', ?, ?, ?, ?)'
         );
-        $subStmt->execute([
-            'sub-' . bin2hex(random_bytes(6)),
-            $id,
-            $sub['plan'] ?? 'plan-a',
-            date('Y-m-d'),
-            date('Y-m-d', strtotime('+1 year')),
-            !empty($sub['autoRenew']) ? 1 : 0,
-            $sub['price'] ?? 0,
-        ]);
+        try {
+            $subStmt->execute([
+                'sub-' . bin2hex(random_bytes(6)),
+                $id,
+                $plan,
+                date('Y-m-d'),
+                date('Y-m-d', strtotime('+1 year')),
+                !empty($sub['autoRenew']) ? 1 : 0,
+                self::PLAN_PRICES[$plan],
+            ]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+        $pdo->commit();
 
         Response::json(['success' => true], 201);
     }

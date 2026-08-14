@@ -12,7 +12,15 @@ class ArtistController
         $pdo = Database::pdo();
         $artists = $pdo->query('SELECT ' . self::ARTIST_COLUMNS . " FROM artists WHERE role = 'artist' ORDER BY joined_date")->fetchAll();
 
-        $result = array_map(fn (array $row) => $this->mapArtist($row), $artists);
+        // One query for every artist's subscription instead of mapArtist()'s usual
+        // per-row query — with hundreds of artists that N+1 pattern becomes a real
+        // number of sequential round trips on every load of this list.
+        $subsByArtist = [];
+        foreach ($pdo->query('SELECT * FROM subscriptions') as $sub) {
+            $subsByArtist[$sub['artist_id']] = $sub;
+        }
+
+        $result = array_map(fn (array $row) => $this->mapArtist($row, $subsByArtist[$row['id']] ?? false), $artists);
         Response::json($result);
     }
 
@@ -52,6 +60,7 @@ class ArtistController
              VALUES (?, ?, ?, ?, \'artist\', ?, ?, ?, ?, ?, ?, CURDATE(), ?, ?, ?, ?)'
         );
         $social = $body['socialLinks'] ?? [];
+        $pdo->beginTransaction();
         try {
             $stmt->execute([
                 $id,
@@ -70,6 +79,7 @@ class ArtistController
                 $social['apple'] ?? null,
             ]);
         } catch (PDOException $e) {
+            $pdo->rollBack();
             if ($e->getCode() === '23000') {
                 throw new HttpException('An artist with that email already exists.', 409);
             }
@@ -81,16 +91,22 @@ class ArtistController
             'INSERT INTO subscriptions (id, artist_id, plan, status, start_date, expiry_date, auto_renew, price)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
         );
-        $subStmt->execute([
-            'sub-' . bin2hex(random_bytes(6)),
-            $id,
-            $sub['plan'] ?? 'plan-a',
-            $sub['status'] ?? 'active',
-            $sub['startDate'] ?? date('Y-m-d'),
-            $sub['expiryDate'] ?? date('Y-m-d', strtotime('+1 year')),
-            !empty($sub['autoRenew']) ? 1 : 0,
-            $sub['price'] ?? 0,
-        ]);
+        try {
+            $subStmt->execute([
+                'sub-' . bin2hex(random_bytes(6)),
+                $id,
+                $sub['plan'] ?? 'plan-a',
+                $sub['status'] ?? 'active',
+                $sub['startDate'] ?? date('Y-m-d'),
+                $sub['expiryDate'] ?? date('Y-m-d', strtotime('+1 year')),
+                !empty($sub['autoRenew']) ? 1 : 0,
+                $sub['price'] ?? 0,
+            ]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+        $pdo->commit();
 
         ReportController::autoResolveForArtist($id, $body['name']);
 
@@ -243,11 +259,18 @@ class ArtistController
         return $row === false ? null : $row;
     }
 
-    private function mapArtist(array $row): array
+    /**
+     * $subscription: pass the row explicitly (or `false` for "known to have none") when
+     * the caller already fetched it in bulk — omit it to look it up for this one artist.
+     */
+    private function mapArtist(array $row, array|false|null $subscription = null): array
     {
-        $subStmt = Database::pdo()->prepare('SELECT * FROM subscriptions WHERE artist_id = ?');
-        $subStmt->execute([$row['id']]);
-        $sub = $subStmt->fetch();
+        if ($subscription === null) {
+            $subStmt = Database::pdo()->prepare('SELECT * FROM subscriptions WHERE artist_id = ?');
+            $subStmt->execute([$row['id']]);
+            $subscription = $subStmt->fetch();
+        }
+        $sub = $subscription;
 
         return [
             'id' => $row['id'],

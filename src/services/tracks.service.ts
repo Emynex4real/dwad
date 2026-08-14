@@ -1,8 +1,13 @@
 import type { TrackUpload, TrackStatus } from '../types/dashboard';
+import type { LiveTrack } from '../types/content';
 import { apiFetch, ApiError } from './httpClient';
 
 export async function getAllTracks(): Promise<TrackUpload[]> {
   return apiFetch<TrackUpload[]>('/tracks');
+}
+
+export async function getLiveTracks(): Promise<LiveTrack[]> {
+  return apiFetch<LiveTrack[]>('/tracks/live');
 }
 
 export async function getTracksByArtist(artistId: string): Promise<TrackUpload[]> {

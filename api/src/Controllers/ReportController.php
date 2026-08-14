@@ -17,6 +17,13 @@ class ReportController
             throw new HttpException('Only CSV files are supported.', 422);
         }
 
+        $contentHash = hash_file('sha256', $_FILES['file']['tmp_name']);
+        $dup = $pdo->prepare('SELECT filename FROM report_uploads WHERE content_hash = ?');
+        $dup->execute([$contentHash]);
+        if (($dupFilename = $dup->fetchColumn()) !== false) {
+            throw new HttpException("This exact report file has already been uploaded (as \"$dupFilename\").", 409);
+        }
+
         $handle = fopen($_FILES['file']['tmp_name'], 'r');
         if ($handle === false) {
             throw new HttpException('Failed to read the uploaded file.', 500);
@@ -39,9 +46,9 @@ class ReportController
 
         $uploadId = 'report-' . bin2hex(random_bytes(6));
         $pdo->prepare(
-            'INSERT INTO report_uploads (id, filename, period, total_rows, matched_groups, pending_groups, uploaded_by)
-             VALUES (?, ?, ?, ?, 0, 0, ?)'
-        )->execute([$uploadId, $filename, $period, $totalRows, $user['id']]);
+            'INSERT INTO report_uploads (id, filename, period, total_rows, matched_groups, pending_groups, uploaded_by, content_hash)
+             VALUES (?, ?, ?, ?, 0, 0, ?, ?)'
+        )->execute([$uploadId, $filename, $period, $totalRows, $user['id'], $contentHash]);
 
         $rate = SettingsController::gbpToUsdRate();
         $matchedGroups = 0;
@@ -124,7 +131,9 @@ class ReportController
             throw new HttpException('Pending row not found', 404);
         }
 
-        $this->resolveRow($row, $artistId);
+        if (!$this->resolveRow($row, $artistId)) {
+            throw new HttpException('This row was already resolved.', 409);
+        }
 
         Response::json(['success' => true]);
     }
@@ -132,9 +141,21 @@ class ReportController
     /**
      * Applies a pending row's streams/revenue to the given artist and marks it resolved.
      * Shared by the manual resolve endpoint and auto-resolution on artist creation/approval.
+     *
+     * The status flip happens FIRST, scoped to `status = 'pending'`, so it doubles as a
+     * mutex: MySQL's row lock on this UPDATE means only one of two concurrent callers can
+     * affect the row. The loser gets rowCount() === 0 and returns before touching analytics,
+     * preventing the same row's streams/revenue from being added twice.
      */
-    private function resolveRow(array $row, string $artistId): void
+    private function resolveRow(array $row, string $artistId): bool
     {
+        $pdo = Database::pdo();
+        $stmt = $pdo->prepare("UPDATE report_pending_rows SET status = 'resolved', resolved_artist_id = ? WHERE id = ? AND status = 'pending'");
+        $stmt->execute([$artistId, $row['id']]);
+        if ($stmt->rowCount() === 0) {
+            return false;
+        }
+
         $upload = $this->findUploadRow($row['report_upload_id']);
         $this->upsertMonthly($artistId, $upload['period'], (int) $row['streams'], (float) $row['revenue_gbp']);
 
@@ -143,8 +164,7 @@ class ReportController
             $this->upsertTrackPlatform($artistId, $upload['period'], $tuple['track'], $tuple['platform'], $tuple['streams'], $tuple['revenue']);
         }
 
-        Database::pdo()->prepare("UPDATE report_pending_rows SET status = 'resolved', resolved_artist_id = ? WHERE id = ?")
-            ->execute([$artistId, $row['id']]);
+        return true;
     }
 
     /**
@@ -166,11 +186,14 @@ class ReportController
         $rows = $stmt->fetchAll();
 
         $self = new self();
+        $resolved = 0;
         foreach ($rows as $row) {
-            $self->resolveRow($row, $artistId);
+            if ($self->resolveRow($row, $artistId)) {
+                $resolved++;
+            }
         }
 
-        return count($rows);
+        return $resolved;
     }
 
     public function skip(array $args): void

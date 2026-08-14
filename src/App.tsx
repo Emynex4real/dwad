@@ -45,7 +45,7 @@ const AdminReportsPage        = lazy(() => import('./pages/admin/AdminReportsPag
 const AdminNotificationsPage  = lazy(() => import('./pages/admin/AdminNotificationsPage'));
 const AdminProductionsPage    = lazy(() => import('./pages/admin/AdminProductionsPage'));
 const AdminBeatsPage          = lazy(() => import('./pages/admin/AdminBeatsPage'));
-const AdminCurrencyRatesPage  = lazy(() => import('./pages/admin/AdminCurrencyRatesPage'));
+const AdminPriceListPage      = lazy(() => import('./pages/admin/AdminPriceListPage'));
 
 // ── Artist pages ──────────────────────────────────────────────────────────────
 const ArtistHomePage      = lazy(() => import('./pages/artist/ArtistHomePage'));
@@ -161,7 +161,7 @@ function AppRouter() {
             <Route path="notifications" element={<AdminNotificationsPage />} />
             <Route path="productions" element={<AdminProductionsPage />} />
             <Route path="beats" element={<AdminBeatsPage />} />
-            <Route path="currency-rates" element={<AdminCurrencyRatesPage />} />
+            <Route path="price-list" element={<AdminPriceListPage />} />
           </Route>
 
           {/* Artist routes */}

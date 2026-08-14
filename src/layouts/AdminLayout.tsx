@@ -20,7 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/notifications', label: 'Notifications',   shortLabel: 'Alerts',  icon: '◎' },
   { to: '/admin/productions',   label: 'Productions',     shortLabel: 'Songs',   icon: '♫' },
   { to: '/admin/beats',         label: 'Beats',           shortLabel: 'Beats',   icon: '●' },
-  { to: '/admin/currency-rates', label: 'Currency Rates', shortLabel: 'Rates',   icon: '$' },
+  { to: '/admin/price-list', label: 'Price List', shortLabel: 'Prices',   icon: '$' },
 ];
 
 export default function AdminLayout() {

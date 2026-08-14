@@ -42,8 +42,20 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
     token VARCHAR(64) PRIMARY KEY,
     user_id VARCHAR(40) NOT NULL,
     expires_at DATETIME NOT NULL,
+    -- Synchronizer-pattern CSRF token issued alongside the session, returned in the
+    -- login/me JSON body (never as a cookie) and required as X-CSRF-Token on writes —
+    -- see Auth::validateCsrf(). Nullable so existing rows survive the migration.
+    csrf_token VARCHAR(64) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES artists(id) ON DELETE CASCADE
+);
+
+-- Fixed-window rate limiting for brute-force-prone endpoints (login, forgot-password).
+-- id is a bucket key like "login:203.0.113.5"; see RateLimiter::tooManyAttempts().
+CREATE TABLE IF NOT EXISTS rate_limit_hits (
+    id VARCHAR(191) PRIMARY KEY,
+    attempts INT UNSIGNED NOT NULL DEFAULT 1,
+    window_started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -140,7 +152,11 @@ CREATE TABLE IF NOT EXISTS report_uploads (
     matched_groups INT UNSIGNED NOT NULL DEFAULT 0,
     pending_groups INT UNSIGNED NOT NULL DEFAULT 0,
     uploaded_by VARCHAR(40) NOT NULL,
-    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- sha256 of the uploaded file's contents; rejects re-processing an identical CSV
+    -- (upload() upserts with `+=` semantics, so a duplicate upload would double-add revenue).
+    content_hash CHAR(64) NULL,
+    UNIQUE KEY report_uploads_content_hash_unique (content_hash)
 );
 
 CREATE TABLE IF NOT EXISTS report_pending_rows (
@@ -172,17 +188,43 @@ CREATE TABLE IF NOT EXISTS currency_rates_cache (
     fetched_at TIMESTAMP NOT NULL
 );
 
--- Admin-managed rates for the marketing-page currency localization feature.
--- Superseded currency_rates_cache (left in place, unused) as the live rate
--- source — rates here are entered by an admin, not auto-fetched. Each row
--- means "1 USD = rate units of this currency"; absence of a row means
--- "not configured", and the localized-pricing endpoint falls back to
--- showing the page's original base-currency price unchanged.
+-- Unused — a short-lived attempt at admin-managed per-currency rates. Reverted
+-- back to auto-fetched rates (currency_rates_cache above) since maintaining
+-- ~50 currencies by hand was more upkeep than wanted. Left in place rather
+-- than dropped (no data of consequence, but avoids a destructive migration).
 CREATE TABLE IF NOT EXISTS currency_rates (
     currency_code VARCHAR(3) PRIMARY KEY,
     rate DECIMAL(18, 6) NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Admin-editable USD prices shown on the Distro/Studio/AkiibStudio marketing
+-- pages. Only the price itself is editable here — plan names, feature lists
+-- etc. stay hardcoded in each page's own JSX. Every visitor sees these
+-- converted to their local currency via /pricing/localized's live rate.
+CREATE TABLE IF NOT EXISTS pricing_plans (
+    id VARCHAR(60) PRIMARY KEY,
+    label VARCHAR(150) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+INSERT INTO pricing_plans (id, label, price) VALUES
+('distro-a', 'Distro — A (1 Song Upload)', 10.00),
+('distro-b', 'Distro — B (1 Song Upload Pro)', 15.00),
+('distro-c', 'Distro — C (Unlimited)', 30.00),
+('distro-gold', 'Distro — Gold', 150.00),
+('distro-diamond', 'Distro — Diamond', 500.00),
+('distro-platinum', 'Distro — Platinum', 1000.00),
+('studio-package-1', 'Studio — Package 1', 150.00),
+('studio-package-2', 'Studio — Package 2', 300.00),
+('studio-package-3', 'Studio — Package 3', 500.00),
+('studio-package-4', 'Studio — Package 4', 1000.00),
+('akiib-promo', 'Akiib Studio — Promo', 35.00),
+('akiib-package-1', 'Akiib Studio — Package 1', 135.00),
+('akiib-package-2', 'Akiib Studio — Package 2', 200.00),
+('akiib-package-3', 'Akiib Studio — Package 3', 335.00),
+('akiib-package-4', 'Akiib Studio — Package 4', 665.00);
 
 CREATE TABLE IF NOT EXISTS productions (
     id VARCHAR(40) PRIMARY KEY,

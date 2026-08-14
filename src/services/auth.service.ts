@@ -1,8 +1,8 @@
 import type { AuthUser } from '../types/dashboard';
-import { apiFetch, ApiError, setStoredToken, clearStoredToken } from './httpClient';
+import { apiFetch, ApiError, setCsrfToken } from './httpClient';
 
 interface LoginResponse {
-  token: string;
+  csrfToken: string;
   user: AuthUser;
 }
 
@@ -11,11 +11,11 @@ export async function login(
   password: string,
 ): Promise<{ success: boolean; error?: string; user?: AuthUser }> {
   try {
-    const { token, user } = await apiFetch<LoginResponse>('/auth/login', {
+    const { csrfToken, user } = await apiFetch<LoginResponse>('/auth/login', {
       method: 'POST',
       body: { email, password },
     });
-    setStoredToken(token);
+    setCsrfToken(csrfToken);
     return { success: true, user };
   } catch (err) {
     const message = err instanceof ApiError ? err.message : 'Login failed. Please try again.';
@@ -47,16 +47,17 @@ export async function logout(): Promise<void> {
   try {
     await apiFetch('/auth/logout', { method: 'POST' });
   } finally {
-    clearStoredToken();
+    setCsrfToken(null);
   }
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
   try {
-    const { user } = await apiFetch<{ user: AuthUser }>('/auth/me');
+    const { user, csrfToken } = await apiFetch<{ user: AuthUser; csrfToken: string | null }>('/auth/me');
+    setCsrfToken(csrfToken);
     return user;
   } catch {
-    clearStoredToken();
+    setCsrfToken(null);
     return null;
   }
 }

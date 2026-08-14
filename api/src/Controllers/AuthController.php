@@ -12,6 +12,10 @@ class AuthController
             throw new HttpException('Email and password are required.', 422);
         }
 
+        if (RateLimiter::tooManyAttempts('login:' . RateLimiter::clientIp(), 5, 900)) {
+            throw new HttpException('Too many login attempts. Please try again in a few minutes.', 429);
+        }
+
         $pdo = Database::pdo();
         $stmt = $pdo->prepare('SELECT id, email, name, role, status, password_hash FROM artists WHERE email = ?');
         $stmt->execute([$email]);
@@ -27,13 +31,16 @@ class AuthController
         $ttlDays = Config::get()['auth']['token_ttl_days'];
 
         $token = bin2hex(random_bytes(32));
+        $csrfToken = bin2hex(random_bytes(32));
         $insert = $pdo->prepare(
-            'INSERT INTO auth_tokens (token, user_id, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? DAY))'
+            'INSERT INTO auth_tokens (token, user_id, expires_at, csrf_token) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? DAY), ?)'
         );
-        $insert->execute([$token, $row['id'], $ttlDays]);
+        $insert->execute([$token, $row['id'], $ttlDays, $csrfToken]);
+
+        Auth::setSessionCookie($token, $ttlDays);
 
         Response::json([
-            'token' => $token,
+            'csrfToken' => $csrfToken,
             'user' => [
                 'id' => $row['id'],
                 'email' => $row['email'],
@@ -50,6 +57,10 @@ class AuthController
         $email = strtolower(trim($body['email'] ?? ''));
         if ($email === '') {
             throw new HttpException('Email is required.', 422);
+        }
+
+        if (RateLimiter::tooManyAttempts('forgot-password:' . RateLimiter::clientIp(), 3, 900)) {
+            throw new HttpException('Too many requests. Please try again in a few minutes.', 429);
         }
 
         $pdo = Database::pdo();
@@ -118,17 +129,19 @@ class AuthController
 
     public function logout(): void
     {
-        $token = Auth::bearerToken();
+        $token = Auth::sessionToken();
         if ($token !== null) {
             $stmt = Database::pdo()->prepare('DELETE FROM auth_tokens WHERE token = ?');
             $stmt->execute([$token]);
         }
+        Auth::clearSessionCookie();
         Response::json(['success' => true]);
     }
 
     public function me(): void
     {
-        $user = Auth::requireUser(Database::pdo());
-        Response::json(['user' => $user]);
+        $pdo = Database::pdo();
+        $user = Auth::requireUser($pdo);
+        Response::json(['user' => $user, 'csrfToken' => Auth::currentCsrfToken($pdo)]);
     }
 }

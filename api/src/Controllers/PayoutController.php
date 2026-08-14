@@ -20,11 +20,26 @@ class PayoutController
             throw new HttpException('Artist not found', 404);
         }
 
+        $period = $body['period'] ?? null;
+
+        // Debounce accidental double-clicks/retries: a truly separate payout for the same
+        // artist/amount/period will always be at least a few seconds apart in practice.
+        $dup = $pdo->prepare(
+            'SELECT id FROM payouts
+             WHERE artist_id = ? AND amount_usd = ? AND period <=> ? AND paid_at > (NOW() - INTERVAL 30 SECOND)'
+        );
+        $dup->execute([$artistId, (float) $amount, $period]);
+        $existingId = $dup->fetchColumn();
+        if ($existingId !== false) {
+            Response::json($this->findPayout($existingId));
+            return;
+        }
+
         $id = 'payout-' . bin2hex(random_bytes(6));
         $pdo->prepare(
             'INSERT INTO payouts (id, artist_id, amount_usd, period, note, recorded_by)
              VALUES (?, ?, ?, ?, ?, ?)'
-        )->execute([$id, $artistId, (float) $amount, $body['period'] ?? null, $body['note'] ?? null, $admin['id']]);
+        )->execute([$id, $artistId, (float) $amount, $period, $body['note'] ?? null, $admin['id']]);
 
         Response::json($this->findPayout($id), 201);
     }

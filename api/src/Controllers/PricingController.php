@@ -2,6 +2,7 @@
 
 class PricingController
 {
+    private const RATES_CACHE_TTL_SECONDS = 24 * 60 * 60;
     private const HTTP_TIMEOUT_SECONDS = 3;
 
     // ipwho.is's response has no currency field, only an ISO 3166-1 country_code —
@@ -35,33 +36,6 @@ class PricingController
         'TT' => 'TTD', 'BB' => 'BBD',
     ];
 
-    // Full English names for the admin currency-rates table, so it reads
-    // "Nigeria — NGN" rather than bare ISO codes. Same key set as COUNTRY_CURRENCY.
-    private const COUNTRY_NAMES = [
-        'US' => 'United States', 'GB' => 'United Kingdom', 'CA' => 'Canada', 'AU' => 'Australia', 'NZ' => 'New Zealand',
-        'IE' => 'Ireland', 'DE' => 'Germany', 'FR' => 'France', 'IT' => 'Italy', 'ES' => 'Spain',
-        'PT' => 'Portugal', 'NL' => 'Netherlands', 'BE' => 'Belgium', 'AT' => 'Austria', 'FI' => 'Finland',
-        'GR' => 'Greece', 'LU' => 'Luxembourg', 'MT' => 'Malta', 'CY' => 'Cyprus', 'SK' => 'Slovakia',
-        'SI' => 'Slovenia', 'EE' => 'Estonia', 'LV' => 'Latvia', 'LT' => 'Lithuania', 'HR' => 'Croatia',
-        'CH' => 'Switzerland', 'NO' => 'Norway', 'SE' => 'Sweden', 'DK' => 'Denmark', 'PL' => 'Poland',
-        'CZ' => 'Czech Republic', 'HU' => 'Hungary', 'RO' => 'Romania', 'BG' => 'Bulgaria', 'IS' => 'Iceland',
-        'UA' => 'Ukraine', 'RU' => 'Russia', 'TR' => 'Turkey',
-        'NG' => 'Nigeria', 'GH' => 'Ghana', 'KE' => 'Kenya', 'ZA' => 'South Africa', 'EG' => 'Egypt',
-        'TZ' => 'Tanzania', 'UG' => 'Uganda', 'RW' => 'Rwanda', 'ET' => 'Ethiopia', 'MA' => 'Morocco',
-        'DZ' => 'Algeria', 'TN' => 'Tunisia', 'SN' => 'Senegal', 'CI' => 'Ivory Coast', 'CM' => 'Cameroon',
-        'ZM' => 'Zambia', 'ZW' => 'Zimbabwe', 'BW' => 'Botswana', 'NA' => 'Namibia', 'MZ' => 'Mozambique',
-        'AO' => 'Angola', 'ML' => 'Mali', 'BF' => 'Burkina Faso', 'NE' => 'Niger', 'TG' => 'Togo',
-        'BJ' => 'Benin', 'GA' => 'Gabon', 'CD' => 'DR Congo', 'SL' => 'Sierra Leone', 'LR' => 'Liberia',
-        'IN' => 'India', 'PK' => 'Pakistan', 'BD' => 'Bangladesh', 'LK' => 'Sri Lanka', 'NP' => 'Nepal',
-        'CN' => 'China', 'JP' => 'Japan', 'KR' => 'South Korea', 'HK' => 'Hong Kong', 'TW' => 'Taiwan',
-        'SG' => 'Singapore', 'MY' => 'Malaysia', 'ID' => 'Indonesia', 'TH' => 'Thailand', 'VN' => 'Vietnam',
-        'PH' => 'Philippines', 'AE' => 'United Arab Emirates', 'SA' => 'Saudi Arabia', 'QA' => 'Qatar', 'KW' => 'Kuwait',
-        'BH' => 'Bahrain', 'OM' => 'Oman', 'JO' => 'Jordan', 'IL' => 'Israel', 'LB' => 'Lebanon',
-        'MX' => 'Mexico', 'BR' => 'Brazil', 'AR' => 'Argentina', 'CL' => 'Chile', 'CO' => 'Colombia',
-        'PE' => 'Peru', 'VE' => 'Venezuela', 'UY' => 'Uruguay', 'EC' => 'Ecuador', 'JM' => 'Jamaica',
-        'TT' => 'Trinidad and Tobago', 'BB' => 'Barbados',
-    ];
-
     public function localized(): void
     {
         $base = strtoupper(trim($_GET['base'] ?? 'USD'));
@@ -73,10 +47,9 @@ class PricingController
 
     /**
      * Resolves what 1 unit of $base is worth in the visitor's local currency.
-     * $base lets a page quote its prices in a currency other than USD (e.g.
-     * AkiibStudioPage quotes in NGN) and still get them converted correctly —
-     * admin-set rates are all USD-based, so any base-to-target rate is just
-     * adminRate(target) / adminRate(base).
+     * $base lets a page quote its prices in a currency other than USD and still
+     * get them converted correctly — the cached rates table is USD-based, so
+     * any base-to-target rate is just rates[target] / rates[base].
      */
     private function resolve(string $base): array
     {
@@ -98,89 +71,58 @@ class PricingController
             return $fallback;
         }
 
-        $targetRate = $this->adminRate($currencyCode);
-        $baseRate = $this->adminRate($base);
-        if ($targetRate === null || $baseRate === null) {
+        $rates = $this->cachedRates();
+        $targetRate = $rates[$currencyCode] ?? null;
+        $baseRate = $rates[$base] ?? null;
+        if (!is_numeric($targetRate) || !is_numeric($baseRate) || (float) $targetRate <= 0 || (float) $baseRate <= 0) {
             return $fallback;
         }
 
-        return ['currencyCode' => $currencyCode, 'rate' => $targetRate / $baseRate];
+        return ['currencyCode' => $currencyCode, 'rate' => (float) $targetRate / (float) $baseRate];
     }
 
-    // USD is the fixed pivot (1 USD = 1 USD) — never stored, never admin-editable.
-    // Every other currency's rate is admin-entered; no row means "not configured".
-    private function adminRate(string $currencyCode): ?float
+    public function plansIndex(): void
     {
-        if ($currencyCode === 'USD') {
-            return 1.0;
-        }
-        $stmt = Database::pdo()->prepare('SELECT rate FROM currency_rates WHERE currency_code = ?');
-        $stmt->execute([$currencyCode]);
-        $rate = $stmt->fetchColumn();
-        return $rate === false ? null : (float) $rate;
+        $rows = Database::pdo()->query('SELECT id, label, price, updated_at FROM pricing_plans')->fetchAll();
+        Response::json(array_map(fn (array $row) => [
+            'id' => $row['id'],
+            'label' => $row['label'],
+            'price' => (float) $row['price'],
+            'updatedAt' => $row['updated_at'],
+        ], $rows));
     }
 
-    public function adminIndex(): void
+    public function plansUpdate(array $args): void
     {
-        Auth::requireAdmin(Database::pdo());
-
-        $rows = Database::pdo()->query('SELECT currency_code, rate, updated_at FROM currency_rates')->fetchAll();
-        $ratesByCode = [];
-        foreach ($rows as $row) {
-            $ratesByCode[$row['currency_code']] = ['rate' => (float) $row['rate'], 'updatedAt' => $row['updated_at']];
-        }
-
-        $countriesByCurrency = [];
-        foreach (self::COUNTRY_CURRENCY as $countryCode => $currencyCode) {
-            if ($currencyCode === 'USD') {
-                continue;
-            }
-            $countriesByCurrency[$currencyCode][] = self::COUNTRY_NAMES[$countryCode] ?? $countryCode;
-        }
-
-        $result = [];
-        foreach ($countriesByCurrency as $currencyCode => $countries) {
-            sort($countries);
-            $result[] = [
-                'currencyCode' => $currencyCode,
-                'countries' => $countries,
-                'rate' => $ratesByCode[$currencyCode]['rate'] ?? null,
-                'updatedAt' => $ratesByCode[$currencyCode]['updatedAt'] ?? null,
-            ];
-        }
-        usort($result, fn (array $a, array $b) => $a['currencyCode'] <=> $b['currencyCode']);
-
-        Response::json($result);
-    }
-
-    public function adminUpdate(array $args): void
-    {
-        Auth::requireAdmin(Database::pdo());
-        $code = strtoupper($args['code']);
-        if (!preg_match('/^[A-Z]{3}$/', $code) || $code === 'USD') {
-            throw new HttpException('Invalid currency code.', 422);
-        }
+        $pdo = Database::pdo();
+        Auth::requireAdmin($pdo);
 
         $body = Request::body();
-        $rate = $body['rate'] ?? null;
-        if (!is_numeric($rate) || (float) $rate <= 0) {
-            throw new HttpException('rate must be a positive number.', 422);
+        $price = $body['price'] ?? null;
+        if (!is_numeric($price) || (float) $price <= 0) {
+            throw new HttpException('price must be a positive number.', 422);
         }
 
-        Database::pdo()->prepare(
-            'INSERT INTO currency_rates (currency_code, rate) VALUES (?, ?)
-             ON DUPLICATE KEY UPDATE rate = VALUES(rate)'
-        )->execute([$code, (float) $rate]);
+        $stmt = $pdo->prepare('UPDATE pricing_plans SET price = ? WHERE id = ?');
+        $stmt->execute([(float) $price, $args['id']]);
+        if ($stmt->rowCount() === 0) {
+            $exists = $pdo->prepare('SELECT 1 FROM pricing_plans WHERE id = ?');
+            $exists->execute([$args['id']]);
+            if ($exists->fetchColumn() === false) {
+                throw new HttpException('Pricing plan not found', 404);
+            }
+        }
 
-        Response::json(['success' => true]);
-    }
+        $row = $pdo->prepare('SELECT id, label, price, updated_at FROM pricing_plans WHERE id = ?');
+        $row->execute([$args['id']]);
+        $plan = $row->fetch();
 
-    public function adminDelete(array $args): void
-    {
-        Auth::requireAdmin(Database::pdo());
-        $code = strtoupper($args['code']);
-        Database::pdo()->prepare('DELETE FROM currency_rates WHERE currency_code = ?')->execute([$code]);
-        Response::json(['success' => true]);
+        Response::json([
+            'id' => $plan['id'],
+            'label' => $plan['label'],
+            'price' => (float) $plan['price'],
+            'updatedAt' => $plan['updated_at'],
+        ]);
     }
 
     private function clientIp(): ?string
@@ -205,6 +147,34 @@ class PricingController
         return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
     }
 
+    private function cachedRates(): array
+    {
+        $pdo = Database::pdo();
+        $row = $pdo->query('SELECT rates_json, fetched_at FROM currency_rates_cache WHERE id = 1')->fetch();
+
+        $isStale = $row === false || (time() - strtotime($row['fetched_at'])) > self::RATES_CACHE_TTL_SECONDS;
+        if (!$isStale) {
+            return json_decode($row['rates_json'], true);
+        }
+
+        $fresh = $this->fetchJson('https://open.er-api.com/v6/latest/USD');
+        $rates = ($fresh['result'] ?? null) === 'success' && is_array($fresh['rates'] ?? null)
+            ? $fresh['rates']
+            : null;
+
+        if ($rates === null) {
+            // Refetch failed — serve the stale cache rather than nothing, if we have one.
+            return $row === false ? [] : json_decode($row['rates_json'], true);
+        }
+
+        $pdo->prepare(
+            'INSERT INTO currency_rates_cache (id, rates_json, fetched_at) VALUES (1, ?, NOW())
+             ON DUPLICATE KEY UPDATE rates_json = VALUES(rates_json), fetched_at = VALUES(fetched_at)'
+        )->execute([json_encode($rates)]);
+
+        return $rates;
+    }
+
     private function fetchJson(string $url): ?array
     {
         $context = stream_context_create([
@@ -218,8 +188,7 @@ class PricingController
 
         // @ suppresses the E_WARNING file_get_contents() raises on a failed
         // connection/timeout — we branch on the false return instead, and every
-        // failure path here must degrade to the base-currency fallback, never
-        // surface as an error.
+        // failure path here must degrade to the USD fallback, never surface as an error.
         $body = @file_get_contents($url, false, $context);
         if ($body === false) {
             return null;

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { getAllTracks, updateTrackStatus } from '../../services/tracks.service';
 import { getAllArtists } from '../../services/artists.service';
 import { sendNotification } from '../../services/notifications.service';
-import { API_BASE_URL, getStoredToken } from '../../services/httpClient';
+import { API_BASE_URL } from '../../services/httpClient';
 import type { ArtistProfile, TrackUpload, TrackStatus } from '../../types/dashboard';
 
 const STATUS_ACCENT: Record<string, string> = {
@@ -94,7 +94,7 @@ export default function AdminUploadsPage() {
   }
 
   function audioDownloadUrl(trackId: string): string {
-    return `${API_BASE_URL}/tracks/${trackId}/audio?token=${getStoredToken() ?? ''}`;
+    return `${API_BASE_URL}/tracks/${trackId}/audio`;
   }
 
   async function bulkApprove() {

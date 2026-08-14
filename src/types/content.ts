@@ -30,9 +30,18 @@ export interface LocalizedPricing {
   rate: number;
 }
 
-export interface CurrencyRate {
-  currencyCode: string;
-  countries: string[];
-  rate: number | null;
-  updatedAt: string | null;
+export interface PricingPlan {
+  id: string;
+  label: string;
+  price: number;
+  updatedAt: string;
+}
+
+export interface LiveTrack {
+  id: string;
+  title: string;
+  artistName: string;
+  coverArtUrl: string;
+  releaseLink: string | null;
+  releaseDate: string;
 }

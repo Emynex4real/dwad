@@ -14,6 +14,7 @@ require __DIR__ . '/src/Config.php';
 require __DIR__ . '/src/Database.php';
 require __DIR__ . '/src/Router.php';
 require __DIR__ . '/src/Auth.php';
+require __DIR__ . '/src/RateLimiter.php';
 require __DIR__ . '/src/Mailer.php';
 require __DIR__ . '/src/Controllers/AuthController.php';
 require __DIR__ . '/src/Controllers/ArtistController.php';
@@ -35,8 +36,9 @@ $isAllowedOrigin = in_array($origin, $config['cors']['allowed_origins'], true)
     || (bool) preg_match('#^https?://localhost:\d+$#', $origin);
 if ($isAllowedOrigin) {
     header("Access-Control-Allow-Origin: $origin");
-    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token');
     header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
+    header('Access-Control-Allow-Credentials: true');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -91,6 +93,7 @@ $router->add('DELETE', '/notifications/{id}', [$notificationController, 'destroy
 
 $router->add('GET', '/tracks', [$trackController, 'index']);
 $router->add('POST', '/tracks', [$trackController, 'store']);
+$router->add('GET', '/tracks/live', [$trackController, 'live']);
 $router->add('GET', '/tracks/artist/{id}', [$trackController, 'forArtist']);
 $router->add('GET', '/tracks/{id}/audio', [$trackController, 'audio']);
 $router->add('GET', '/tracks/{id}', [$trackController, 'show']);
@@ -129,9 +132,8 @@ $router->add('POST', '/beats/{id}', [$beatController, 'update']);
 $router->add('DELETE', '/beats/{id}', [$beatController, 'destroy']);
 
 $router->add('GET', '/pricing/localized', [$pricingController, 'localized']);
-$router->add('GET', '/pricing/rates', [$pricingController, 'adminIndex']);
-$router->add('PATCH', '/pricing/rates/{code}', [$pricingController, 'adminUpdate']);
-$router->add('DELETE', '/pricing/rates/{code}', [$pricingController, 'adminDelete']);
+$router->add('GET', '/pricing/plans', [$pricingController, 'plansIndex']);
+$router->add('PATCH', '/pricing/plans/{id}', [$pricingController, 'plansUpdate']);
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'], $path);

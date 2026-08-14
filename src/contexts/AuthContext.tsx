@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthUser } from '../types/dashboard';
 import * as authService from '../services/auth.service';
-import { getStoredToken } from '../services/httpClient';
 import { AuthContext } from '../hooks/useAuth';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -11,9 +10,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function hydrate() {
-      if (getStoredToken()) {
-        setUser(await authService.getCurrentUser());
-      }
+      // The session lives in an httpOnly cookie this page can't read, so there's no
+      // client-side way to know "am I logged in" without asking the API.
+      setUser(await authService.getCurrentUser());
       setIsLoading(false);
     }
     void hydrate();

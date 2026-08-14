@@ -6,7 +6,7 @@ import { sendNotification } from '../../services/notifications.service';
 import { PLAN_DEFINITIONS, updateSubscription } from '../../services/subscriptions.service';
 import { getArtistAnalytics } from '../../services/analytics.service';
 import { recordPayout, getPayoutHistory } from '../../services/payouts.service';
-import { API_BASE_URL, getStoredToken } from '../../services/httpClient';
+import { API_BASE_URL } from '../../services/httpClient';
 import type { ArtistProfile, TrackUpload, SubscriptionPlan, SubscriptionStatus, ArtistAnalytics, Payout } from '../../types/dashboard';
 
 const PAYOUT_METHOD_LABEL: Record<string, string> = {
@@ -174,7 +174,7 @@ export default function AdminArtistDetailPage() {
   }
 
   function audioDownloadUrl(trackId: string): string {
-    return `${API_BASE_URL}/tracks/${trackId}/audio?token=${getStoredToken() ?? ''}`;
+    return `${API_BASE_URL}/tracks/${trackId}/audio`;
   }
 
   return (
