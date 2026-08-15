@@ -6,7 +6,13 @@ class Auth
 
     private static function cookieSecure(): bool
     {
-        return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            return true;
+        }
+        // Render (and most PaaS hosts) terminate TLS at a reverse proxy and forward plain
+        // HTTP to the app container, so $_SERVER['HTTPS'] is never set even in production —
+        // X-Forwarded-Proto is how the proxy communicates the original scheme.
+        return strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
     }
 
     /**
