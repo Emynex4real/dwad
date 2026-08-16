@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 import { uploadReport, getReportHistory, getPendingReviews, resolvePendingReview, skipPendingReview } from '../../services/reports.service';
 import { getAllArtists } from '../../services/artists.service';
-import { getExchangeRate, updateExchangeRate } from '../../services/settings.service';
+import { getExchangeRate } from '../../services/settings.service';
 import type { ReportUploadSummary, PendingReportRow, ArtistProfile } from '../../types/dashboard';
 
 const REASON_LABEL: Record<PendingReportRow['reason'], string> = {
@@ -15,7 +15,6 @@ export default function AdminReportsPage() {
   const [artists, setArtists]     = useState<ArtistProfile[]>([]);
   const [assignments, setAssignments] = useState<Record<string, string>>({});
   const [rate, setRate]           = useState<number | null>(null);
-  const [rateInput, setRateInput] = useState('');
   const [dragOver, setDragOver]   = useState(false);
   const [processing, setProcessing] = useState(false);
   const [log, setLog]             = useState<string[]>([]);
@@ -30,7 +29,7 @@ export default function AdminReportsPage() {
     void getReportHistory().then(setHistory);
     void getPendingReviews().then(setPending);
     void getAllArtists().then(setArtists);
-    void getExchangeRate().then((r) => { setRate(r.gbpToUsdRate); setRateInput(String(r.gbpToUsdRate)); });
+    void getExchangeRate().then((r) => setRate(r.gbpToUsdRate));
   }, []);
 
   function addLog(msg: string) {
@@ -88,16 +87,6 @@ export default function AdminReportsPage() {
     await refresh();
   }
 
-  async function handleSaveRate() {
-    const parsed = parseFloat(rateInput);
-    if (isNaN(parsed) || parsed <= 0) return;
-    const updated = await updateExchangeRate(parsed);
-    setRate(updated.gbpToUsdRate);
-    setRateInput(String(updated.gbpToUsdRate));
-    addLog(`Exchange rate updated to £1 = $${updated.gbpToUsdRate}.`);
-    await refresh();
-  }
-
   return (
     <div className="flex flex-col gap-5 max-w-300">
 
@@ -110,23 +99,9 @@ export default function AdminReportsPage() {
       {/* Exchange rate */}
       <div className="dash-panel flex items-center gap-3 flex-wrap">
         <h2 className="text-sm font-semibold text-ink">Exchange Rate</h2>
-        <span className="text-xs text-muted">£1 =</span>
-        <input
-          type="number"
-          step="0.0001"
-          min="0"
-          value={rateInput}
-          onChange={(e) => setRateInput(e.target.value)}
-          className="dash-input w-28"
-        />
-        <span className="text-xs text-muted">USD</span>
-        <button
-          className="dash-btn dash-btn--gold"
-          disabled={rate === null || parseFloat(rateInput) === rate || !rateInput}
-          onClick={handleSaveRate}
-        >
-          Save
-        </button>
+        <span className="text-xs text-muted">
+          {rate === null ? 'Loading…' : `£1 = $${rate.toFixed(4)} (live rate, updates automatically)`}
+        </span>
         <span className="text-xs text-muted">Reports are shown in USD, converted from the GBP figures distributors report.</span>
       </div>
 

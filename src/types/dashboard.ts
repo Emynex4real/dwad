@@ -159,7 +159,6 @@ export interface PendingReportRow {
 
 export interface ExchangeRate {
   gbpToUsdRate: number;
-  updatedAt: string;
 }
 
 // ── Upload Form (artist upload submission) ────────────────────────────────────

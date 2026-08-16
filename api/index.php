@@ -107,7 +107,6 @@ $router->add('PATCH', '/reports/pending/{id}/resolve', [$reportController, 'reso
 $router->add('PATCH', '/reports/pending/{id}/skip', [$reportController, 'skip']);
 
 $router->add('GET', '/settings/exchange-rate', [$settingsController, 'exchangeRate']);
-$router->add('PATCH', '/settings/exchange-rate', [$settingsController, 'updateExchangeRate']);
 
 $router->add('GET', '/analytics', [$analyticsController, 'index']);
 $router->add('GET', '/analytics/artist/{id}', [$analyticsController, 'forArtist']);

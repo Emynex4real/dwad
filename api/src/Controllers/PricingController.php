@@ -60,7 +60,7 @@ class PricingController
             return $fallback;
         }
 
-        $geo = $this->fetchJson('https://ipwho.is/' . $ip);
+        $geo = self::fetchJson('https://ipwho.is/' . $ip);
         if ($geo === null || ($geo['success'] ?? false) !== true) {
             return $fallback;
         }
@@ -71,7 +71,7 @@ class PricingController
             return $fallback;
         }
 
-        $rates = $this->cachedRates();
+        $rates = self::cachedRates();
         $targetRate = $rates[$currencyCode] ?? null;
         $baseRate = $rates[$base] ?? null;
         if (!is_numeric($targetRate) || !is_numeric($baseRate) || (float) $targetRate <= 0 || (float) $baseRate <= 0) {
@@ -147,7 +147,13 @@ class PricingController
         return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
     }
 
-    private function cachedRates(): array
+    /**
+     * USD-based rates (rates[X] = units of X per 1 USD), cached 24h. Public+static
+     * so other controllers needing a live exchange rate (e.g. SettingsController's
+     * GBP→USD figure for royalty reports) reuse the same fetch+cache instead of
+     * hitting the upstream API independently.
+     */
+    public static function cachedRates(): array
     {
         $pdo = Database::pdo();
         $row = $pdo->query('SELECT rates_json, fetched_at FROM currency_rates_cache WHERE id = 1')->fetch();
@@ -157,7 +163,7 @@ class PricingController
             return json_decode($row['rates_json'], true);
         }
 
-        $fresh = $this->fetchJson('https://open.er-api.com/v6/latest/USD');
+        $fresh = self::fetchJson('https://open.er-api.com/v6/latest/USD');
         $rates = ($fresh['result'] ?? null) === 'success' && is_array($fresh['rates'] ?? null)
             ? $fresh['rates']
             : null;
@@ -175,7 +181,7 @@ class PricingController
         return $rates;
     }
 
-    private function fetchJson(string $url): ?array
+    private static function fetchJson(string $url): ?array
     {
         $context = stream_context_create([
             'http' => [
