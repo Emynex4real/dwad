@@ -28,6 +28,7 @@ require __DIR__ . '/src/Controllers/InviteController.php';
 require __DIR__ . '/src/Controllers/ProductionController.php';
 require __DIR__ . '/src/Controllers/BeatController.php';
 require __DIR__ . '/src/Controllers/PricingController.php';
+require __DIR__ . '/src/Controllers/SpotlightController.php';
 
 $config = Config::get();
 
@@ -67,6 +68,7 @@ $inviteController = new InviteController();
 $productionController = new ProductionController();
 $beatController = new BeatController();
 $pricingController = new PricingController();
+$spotlightController = new SpotlightController();
 
 $router->add('POST', '/auth/login', [$authController, 'login']);
 $router->add('POST', '/auth/logout', [$authController, 'logout']);
@@ -133,6 +135,15 @@ $router->add('DELETE', '/beats/{id}', [$beatController, 'destroy']);
 $router->add('GET', '/pricing/localized', [$pricingController, 'localized']);
 $router->add('GET', '/pricing/plans', [$pricingController, 'plansIndex']);
 $router->add('PATCH', '/pricing/plans/{id}', [$pricingController, 'plansUpdate']);
+
+$router->add('GET', '/spotlight', [$spotlightController, 'index']);
+$router->add('POST', '/spotlight/items', [$spotlightController, 'storeItem']);
+$router->add('PATCH', '/spotlight/items/{id}', [$spotlightController, 'updateItem']);
+$router->add('POST', '/spotlight/items/{id}', [$spotlightController, 'updateItem']);
+$router->add('PATCH', '/spotlight/items/{id}/move', [$spotlightController, 'moveItem']);
+$router->add('DELETE', '/spotlight/items/{id}', [$spotlightController, 'destroyItem']);
+$router->add('PATCH', '/spotlight/settings', [$spotlightController, 'updateSettings']);
+$router->add('POST', '/spotlight/settings', [$spotlightController, 'updateSettings']);
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'], $path);

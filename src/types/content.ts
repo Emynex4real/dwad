@@ -45,3 +45,35 @@ export interface LiveTrack {
   releaseLink: string | null;
   releaseDate: string;
 }
+
+// ── Spotlight page content (admin-managed) ──────────────────────────────────
+// Hall of Fame and the artist-name marquee are NOT here — both are reused as-is
+// on Home/Studio/Distro/Graphics pages and were kept hardcoded on purpose.
+export type SpotlightSection = 'roster' | 'topTalents' | 'topHits' | 'videos' | 'topClassics' | 'coverWall';
+
+export interface SpotlightItem {
+  id: string;
+  section: SpotlightSection;
+  primaryText: string | null;
+  secondaryText: string | null;
+  imagePath: string | null;
+  videoId: string | null;
+  externalUrl: string | null;
+  sortOrder: number;
+}
+
+export interface SpotlightArtistOfMonth {
+  name: string;
+  genre: string | null;
+  country: string | null;
+  photoUrl: string | null;
+}
+
+export interface SpotlightSettings {
+  artistOfMonth: SpotlightArtistOfMonth;
+}
+
+export interface SpotlightContent {
+  settings: SpotlightSettings;
+  items: Record<SpotlightSection, SpotlightItem[]>;
+}

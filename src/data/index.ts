@@ -13,8 +13,6 @@ import bulletOlayemi from '../assets/covers/bullet-olayemi.jpg';
 import ayakata       from '../assets/covers/ayahata.jpg';
 
 // artist photos
-import mday          from '../assets/artists/mday.jpg';
-import akiib         from '../assets/artists/akiib.jpg';
 import bellaShmurda  from '../assets/artists/bella-shmurda.jpg';
 import dremo         from '../assets/artists/dremo.jpg';
 import zinoleesky    from '../assets/artists/zinoleesky.jpg';
@@ -73,11 +71,6 @@ export const PROJECTS: Project[] = [
   { title: 'Oya Egbu Onwu',   artist: 'Uche Onye Egwu',         year: '2024', cover: ucheOnyeEgwu },
   { title: 'Bullet',           artist: 'Olasphere',              year: '2024', cover: bulletOlayemi },
   { title: 'Ayakata',          artist: 'Lyriq Yeyé',             year: '2024', cover: ayakata },
-];
-
-export const ROSTER_ARTISTS = [
-  { name: 'M Day Yor', role: 'Afro Soul · NG', num: '01', photo: mday },
-  { name: 'Akiib',     role: 'Alt Pop · NG',   num: '02', photo: akiib },
 ];
 
 export const HOF_ARTISTS = [

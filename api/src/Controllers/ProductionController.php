@@ -19,7 +19,7 @@ class ProductionController
 
         $title = trim($_POST['title'] ?? '');
         $artistName = trim($_POST['artistName'] ?? '');
-        $spotifyUrl = trim($_POST['spotifyUrl'] ?? '');
+        $spotifyUrl = $this->validatedUrl(trim($_POST['spotifyUrl'] ?? ''));
 
         if ($title === '' || $artistName === '') {
             throw new HttpException('title and artistName are required.', 422);
@@ -50,7 +50,7 @@ class ProductionController
             'INSERT INTO productions (id, title, artist_name, cover_art_url, audio_file_url, spotify_url)
              VALUES (?, ?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$id, $title, $artistName, $coverUrl, $audioUrl, $spotifyUrl !== '' ? $spotifyUrl : null]);
+        $stmt->execute([$id, $title, $artistName, $coverUrl, $audioUrl, $spotifyUrl]);
 
         Response::json($this->findProduction($id), 201);
     }
@@ -72,7 +72,7 @@ class ProductionController
         $isMultipart = str_starts_with($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data');
         $body = $isMultipart ? $_POST : Request::body();
 
-        $fieldMap = ['title' => 'title', 'artistName' => 'artist_name', 'spotifyUrl' => 'spotify_url'];
+        $fieldMap = ['title' => 'title', 'artistName' => 'artist_name'];
         $sets = [];
         $values = [];
         foreach ($fieldMap as $jsonKey => $column) {
@@ -81,6 +81,10 @@ class ProductionController
                 $sets[] = "$column = ?";
                 $values[] = $isMultipart && $value === '' ? null : $value;
             }
+        }
+        if (array_key_exists('spotifyUrl', $body)) {
+            $sets[] = 'spotify_url = ?';
+            $values[] = $this->validatedUrl(trim((string) $body['spotifyUrl']));
         }
 
         if ($isMultipart) {
@@ -140,6 +144,21 @@ class ProductionController
 
         $pdo->prepare('DELETE FROM productions WHERE id = ?')->execute([$args['id']]);
         Response::json(['success' => true]);
+    }
+
+    // Rendered as a raw <a href> on the public Studio page — without a scheme
+    // allowlist here, an admin-set `javascript:` URL would execute in any visitor's
+    // browser when clicked (target="_blank"/rel="noreferrer" don't block that scheme).
+    private function validatedUrl(string $url): ?string
+    {
+        if ($url === '') {
+            return null;
+        }
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            throw new HttpException('URL must start with http:// or https://.', 422);
+        }
+        return $url;
     }
 
     private function validatedExtension(string $filename, array $allowed, string $errorMessage): string

@@ -246,6 +246,99 @@ CREATE TABLE IF NOT EXISTS beats (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Admin-editable Spotlight page content. Hall of Fame and the artist-name
+-- marquee are deliberately NOT here — both are reused as-is on Home/Studio/
+-- Distro/Graphics pages and were kept hardcoded on purpose. The hero heading/
+-- description are also deliberately NOT here — kept static in SpotlightPage.tsx.
+CREATE TABLE IF NOT EXISTS spotlight_settings (
+    id TINYINT PRIMARY KEY DEFAULT 1,
+    artist_of_month_name VARCHAR(150) NOT NULL DEFAULT '',
+    artist_of_month_genre VARCHAR(100) NULL,
+    artist_of_month_country VARCHAR(100) NULL,
+    artist_of_month_photo VARCHAR(255) NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+INSERT INTO spotlight_settings (id, artist_of_month_name, artist_of_month_genre, artist_of_month_country, artist_of_month_photo) VALUES
+(1, 'M Day Yor', 'Afro Soul', 'Nigeria', 'spotlight/artist-of-month.jpg');
+
+-- One polymorphic table for the six list-shaped sections (roster, top
+-- talents, top hits, videos, top classics, cover wall) rather than six
+-- near-duplicate tables — they're genuinely the same repeating shape.
+CREATE TABLE IF NOT EXISTS spotlight_items (
+    id VARCHAR(40) PRIMARY KEY,
+    section ENUM('roster', 'top_talents', 'top_hits', 'videos', 'top_classics', 'cover_wall') NOT NULL,
+    primary_text VARCHAR(150) NULL,
+    secondary_text VARCHAR(150) NULL,
+    image_path VARCHAR(255) NULL,
+    video_id VARCHAR(30) NULL,
+    external_url VARCHAR(255) NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX (section, sort_order)
+);
+
+INSERT INTO spotlight_items (id, section, primary_text, secondary_text, image_path, external_url, sort_order) VALUES
+('spotlight-seed-roster-01', 'roster', 'M Day Yor', 'Afro Soul · NG', 'spotlight/items/roster-mday.jpg', NULL, 1),
+('spotlight-seed-roster-02', 'roster', 'Akiib', 'Alt Pop · NG', 'spotlight/items/roster-akiib.jpg', NULL, 2),
+
+('spotlight-seed-talent-01', 'top_talents', 'Badess Kid', 'Artist', 'spotlight/items/talent-badess-kid.jpeg', 'https://open.spotify.com/artist/2CPYKOVDrb7jnJzi8lo3fD', 1),
+('spotlight-seed-talent-02', 'top_talents', 'Dmanteaser', 'Artist', NULL, 'https://open.spotify.com/search/dmanteaser/artists', 2),
+('spotlight-seed-talent-03', 'top_talents', 'Jazzydking', 'Artist', NULL, 'https://open.spotify.com/search/jazzydking/artists', 3),
+
+('spotlight-seed-hit-01', 'top_hits', 'Gallivant', 'Youngzy', 'spotlight/items/gallivant.jpeg', 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa', 1),
+('spotlight-seed-hit-02', 'top_hits', 'A Cry to God', 'King Yungzil', 'spotlight/items/cover-17.jpeg', 'https://open.spotify.com/artist/326UBkWhn2XgCcjIhjtmr7', 2),
+('spotlight-seed-hit-03', 'top_hits', 'Drip', 'African Boy', 'spotlight/items/cover-20.jpeg', 'https://open.spotify.com/artist/25bc1K8fnRXnOG0lyKOCEl', 3),
+('spotlight-seed-hit-04', 'top_hits', 'My Life', 'Normal Donzee ft. Bella Shmurda', 'spotlight/items/cover-16.jpeg', 'https://open.spotify.com/artist/7uOVdfoFMg0FbFmc1Xp7Ye', 4),
+('spotlight-seed-hit-05', 'top_hits', 'All for You', 'Karmarr', 'spotlight/items/cover-21.jpeg', 'https://open.spotify.com/artist/1eesfZPQ3CCwy2qKdifzY9', 5),
+('spotlight-seed-hit-06', 'top_hits', 'Where You Dey', 'Jah Lingo', 'spotlight/items/cover-15.jpeg', 'https://open.spotify.com/artist/4j7tdwUsMU9Y8PxeQrmCE1', 6),
+('spotlight-seed-hit-07', 'top_hits', 'Oja Men', 'Ysteve ft. Ojadilichukwu', 'spotlight/items/cover-19.jpeg', 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT', 7),
+('spotlight-seed-hit-08', 'top_hits', 'Who is Akiib? EP', 'Akiib', 'spotlight/items/who-is-akiib.jpeg', 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG', 8),
+('spotlight-seed-hit-09', 'top_hits', 'Love Letter', 'Valid Patema', 'spotlight/items/cover-18.jpeg', 'https://open.spotify.com/artist/2AwcOuICLKuwxBoftfCpMQ', 9),
+('spotlight-seed-hit-10', 'top_hits', 'Oya Egbu Onwu', 'Uche Onye Egwu', 'spotlight/items/uche-onye-egwu.jpg', 'https://open.spotify.com/artist/1GiPtQPB6UOfSHDiedkkl9', 10),
+('spotlight-seed-hit-11', 'top_hits', 'Naija', 'Solotone', NULL, 'https://open.spotify.com/artist/5TR5ha19awStaDcqWGnwHU', 11),
+('spotlight-seed-hit-12', 'top_hits', 'Ohema Remix', 'Nokyes ft Sugarboi', 'spotlight/items/cover-14.jpeg', 'https://open.spotify.com/artist/1nJ9LK9SJxdYAFUGy4FYuI', 12),
+
+('spotlight-seed-video-01', 'videos', 'Bryno T Ft. Sy Lynghuan', 'Unbeliever', NULL, NULL, 1),
+('spotlight-seed-video-02', 'videos', 'Youngzy', 'Gallivant', NULL, NULL, 2),
+('spotlight-seed-video-03', 'videos', 'Akiib', 'Asalamalekun', NULL, NULL, 3),
+('spotlight-seed-video-04', 'videos', 'Ryno ft Oberz', 'Lavida Loca', NULL, NULL, 4),
+
+('spotlight-seed-classic-01', 'top_classics', 'Gallivant', 'Youngzy', 'spotlight/items/gallivant.jpeg', 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa', 1),
+('spotlight-seed-classic-02', 'top_classics', 'Oja Men', 'Ysteve ft. Ojadilichukwu', 'spotlight/items/cover-19.jpeg', 'https://open.spotify.com/artist/4QEXoweI6YsbmAuwd0NeCT', 2),
+('spotlight-seed-classic-03', 'top_classics', 'Party Animal', 'Nature Republiq', 'spotlight/items/cover-11.jpeg', 'https://open.spotify.com/artist/0XMntmvSwcr9AjpRgZ9cQ4', 3),
+('spotlight-seed-classic-04', 'top_classics', 'Grace Time', 'Omo Oluwa Badboi Kp', 'spotlight/items/cover-03.jpeg', 'https://open.spotify.com/artist/2WgKuGjjR3RfKpzBxTyAX0', 4),
+('spotlight-seed-classic-05', 'top_classics', 'Watin Dey', 'Jazzydking', 'spotlight/items/cover-06.jpeg', 'https://open.spotify.com/artist/4Lde6MtzI4hIWwobB5Wc46', 5),
+('spotlight-seed-classic-06', 'top_classics', 'Yehowa Ye', 'Empaya Vybez', 'spotlight/items/cover-09.jpeg', 'https://open.spotify.com/album/2YWVKEc1cPnYdHFw0ox2rZ', 6),
+('spotlight-seed-classic-07', 'top_classics', 'Crazy', 'BThree', 'spotlight/items/cover-08.jpeg', 'https://open.spotify.com/album/1pW6nzt5pPCpAcQEYHQHau', 7),
+('spotlight-seed-classic-08', 'top_classics', 'Omo Oloja', 'Akiib', NULL, 'https://open.spotify.com/artist/1SfCh1tKzltIu87n2xqPNG', 8),
+('spotlight-seed-classic-09', 'top_classics', 'Mommy', 'Mhuftybwoy', 'spotlight/items/cover-10.jpeg', 'https://open.spotify.com/artist/48WsE4LHxumfAOmy7hI1Z8', 9),
+('spotlight-seed-classic-10', 'top_classics', 'Flenjo', 'Brown Spice', 'spotlight/items/cover-07.jpeg', 'https://open.spotify.com/artist/0d9ezg07OhJowFemqUo7ax', 10),
+('spotlight-seed-classic-11', 'top_classics', 'Gallivant', 'Youngzy', 'spotlight/items/gallivant.jpeg', 'https://open.spotify.com/artist/3ogv3yL56eGFd8jsNw5CXa', 11),
+('spotlight-seed-classic-12', 'top_classics', 'Bianca', 'Boldmanhs', 'spotlight/items/cover-04.jpeg', 'https://open.spotify.com/artist/24grl33UR73dBjbqGSRp8n', 12),
+
+('spotlight-seed-wall-01', 'cover_wall', NULL, NULL, 'spotlight/items/cover-01.jpeg', NULL, 1),
+('spotlight-seed-wall-02', 'cover_wall', NULL, NULL, 'spotlight/items/cover-02.jpeg', NULL, 2),
+('spotlight-seed-wall-03', 'cover_wall', NULL, NULL, 'spotlight/items/cover-03.jpeg', NULL, 3),
+('spotlight-seed-wall-04', 'cover_wall', NULL, NULL, 'spotlight/items/cover-04.jpeg', NULL, 4),
+('spotlight-seed-wall-05', 'cover_wall', NULL, NULL, 'spotlight/items/cover-05.jpeg', NULL, 5),
+('spotlight-seed-wall-06', 'cover_wall', NULL, NULL, 'spotlight/items/cover-06.jpeg', NULL, 6),
+('spotlight-seed-wall-07', 'cover_wall', NULL, NULL, 'spotlight/items/cover-07.jpeg', NULL, 7),
+('spotlight-seed-wall-08', 'cover_wall', NULL, NULL, 'spotlight/items/cover-08.jpeg', NULL, 8),
+('spotlight-seed-wall-09', 'cover_wall', NULL, NULL, 'spotlight/items/cover-09.jpeg', NULL, 9),
+('spotlight-seed-wall-10', 'cover_wall', NULL, NULL, 'spotlight/items/cover-10.jpeg', NULL, 10),
+('spotlight-seed-wall-11', 'cover_wall', NULL, NULL, 'spotlight/items/cover-11.jpeg', NULL, 11),
+('spotlight-seed-wall-12', 'cover_wall', NULL, NULL, 'spotlight/items/cover-12.jpeg', NULL, 12),
+('spotlight-seed-wall-13', 'cover_wall', NULL, NULL, 'spotlight/items/cover-13.jpeg', NULL, 13),
+('spotlight-seed-wall-14', 'cover_wall', NULL, NULL, 'spotlight/items/cover-14.jpeg', NULL, 14),
+('spotlight-seed-wall-15', 'cover_wall', NULL, NULL, 'spotlight/items/cover-15.jpeg', NULL, 15),
+('spotlight-seed-wall-16', 'cover_wall', NULL, NULL, 'spotlight/items/cover-16.jpeg', NULL, 16),
+('spotlight-seed-wall-17', 'cover_wall', NULL, NULL, 'spotlight/items/cover-17.jpeg', NULL, 17),
+('spotlight-seed-wall-18', 'cover_wall', NULL, NULL, 'spotlight/items/cover-18.jpeg', NULL, 18),
+('spotlight-seed-wall-19', 'cover_wall', NULL, NULL, 'spotlight/items/cover-19.jpeg', NULL, 19),
+('spotlight-seed-wall-20', 'cover_wall', NULL, NULL, 'spotlight/items/cover-20.jpeg', NULL, 20),
+('spotlight-seed-wall-21', 'cover_wall', NULL, NULL, 'spotlight/items/cover-21.jpeg', NULL, 21);
+
 -- password_hash for 'password123'
 INSERT INTO artists (id, name, email, password_hash, role, phone, genre, country, bio, upload_access, joined_date, social_spotify, social_instagram, social_youtube, social_apple) VALUES
 ('admin-001', 'Dwad Admin', 'admin@dwadmusic.com', '$2y$10$l41pPmblZJuw0B/YVQNGzOF301cBz22dvHeGEYykm8G.pNvVlM6u6', 'admin', NULL, NULL, NULL, NULL, 'granted', NULL, NULL, NULL, NULL, NULL),

@@ -46,6 +46,7 @@ const AdminNotificationsPage  = lazy(() => import('./pages/admin/AdminNotificati
 const AdminProductionsPage    = lazy(() => import('./pages/admin/AdminProductionsPage'));
 const AdminBeatsPage          = lazy(() => import('./pages/admin/AdminBeatsPage'));
 const AdminPriceListPage      = lazy(() => import('./pages/admin/AdminPriceListPage'));
+const AdminSpotlightPage      = lazy(() => import('./pages/admin/AdminSpotlightPage'));
 
 // ── Artist pages ──────────────────────────────────────────────────────────────
 const ArtistHomePage      = lazy(() => import('./pages/artist/ArtistHomePage'));
@@ -162,6 +163,7 @@ function AppRouter() {
             <Route path="productions" element={<AdminProductionsPage />} />
             <Route path="beats" element={<AdminBeatsPage />} />
             <Route path="price-list" element={<AdminPriceListPage />} />
+            <Route path="spotlight" element={<AdminSpotlightPage />} />
           </Route>
 
           {/* Artist routes */}

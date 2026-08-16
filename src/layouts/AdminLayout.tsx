@@ -21,6 +21,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/productions',   label: 'Productions',     shortLabel: 'Songs',   icon: '♫' },
   { to: '/admin/beats',         label: 'Beats',           shortLabel: 'Beats',   icon: '●' },
   { to: '/admin/price-list', label: 'Price List', shortLabel: 'Prices',   icon: '$' },
+  { to: '/admin/spotlight',     label: 'Spotlight',       shortLabel: 'Spotlight', icon: '✦' },
 ];
 
 export default function AdminLayout() {

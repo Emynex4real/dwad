@@ -15,6 +15,10 @@ dist-ssr
 api/config/config.php
 api/vendor
 
+# One-time bulk-import data (real artist names/emails) — not source code, never committed
+api/scripts/*.json
+api/scripts/EXCLUDED_shared_email.md
+
 api/storage/covers/*
 api/storage/audio/*
 !api/storage/covers/.gitkeep
@@ -27,6 +31,12 @@ api/storage/beats/audio/*
 !api/storage/productions/covers/.gitkeep
 !api/storage/productions/audio/.gitkeep
 !api/storage/beats/audio/.gitkeep
+
+# The initial seed images (migrated from the old hardcoded Spotlight page
+# content) are force-added and tracked despite this rule — this only keeps
+# *future* admin-uploaded spotlight images out of git, same as productions/beats.
+api/storage/spotlight/items/*
+api/storage/spotlight/artist-of-month.*
 
 # Editor directories and files
 .vscode/*
