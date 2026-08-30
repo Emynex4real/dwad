@@ -9,7 +9,8 @@
       "Bash(Sort-Object FullName)",
       "Bash(npm install *)",
       "Bash(npm run *)",
-      "Bash(git -C /opt/lampp/htdocs/dwad remote -v)"
+      "Bash(git -C /opt/lampp/htdocs/dwad remote -v)",
+      "Bash(php -r ' *)"
     ]
   }
 }

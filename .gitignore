@@ -13,6 +13,10 @@ dist-ssr
 *.local
 
 api/config/config.php
+api/config/config.truehost.php
+
+# One-off deployment packages, not source code
+truehost-deploy/
 api/vendor
 
 # One-time bulk-import data (real artist names/emails) — not source code, never committed
