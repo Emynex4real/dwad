@@ -10,7 +10,8 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(git -C /opt/lampp/htdocs/dwad remote -v)",
-      "Bash(php -r ' *)"
+      "Bash(php -r ' *)",
+      "Bash(/opt/lampp/bin/mysql -h127.0.0.1 -uroot dwad -e \"DESCRIBE pricing_plans; SELECT id, price FROM pricing_plans;\")"
     ]
   }
 }

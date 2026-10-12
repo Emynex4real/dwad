@@ -1,6 +1,6 @@
 import type { TrackUpload, TrackStatus } from '../types/dashboard';
 import type { LiveTrack } from '../types/content';
-import { apiFetch, ApiError } from './httpClient';
+import { apiFetch, uploadFormData, ApiError } from './httpClient';
 
 export async function getAllTracks(): Promise<TrackUpload[]> {
   return apiFetch<TrackUpload[]>('/tracks');
@@ -38,6 +38,10 @@ export async function updateTrack(id: string, patch: Partial<TrackUpload>): Prom
   return apiFetch<TrackUpload>(`/tracks/${id}`, { method: 'PATCH', body: patch });
 }
 
-export async function submitTrack(formData: FormData): Promise<TrackUpload> {
-  return apiFetch<TrackUpload>('/tracks', { method: 'POST', body: formData });
+export async function submitTrack(formData: FormData, onProgress?: (percent: number) => void): Promise<TrackUpload> {
+  return uploadFormData<TrackUpload>('/tracks', formData, onProgress);
+}
+
+export async function deleteTrack(id: string): Promise<void> {
+  await apiFetch<{ success: boolean }>(`/tracks/${id}`, { method: 'DELETE' });
 }

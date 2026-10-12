@@ -3,9 +3,7 @@ import { useParams } from 'react-router-dom';
 import SEO from '../components/ui/SEO';
 import { checkInvite, registerViaInvite } from '../services/invites.service';
 import { ApiError } from '../services/httpClient';
-import { PLAN_DEFINITIONS } from '../services/subscriptions.service';
 import { logoWhite } from '../data';
-import type { SubscriptionPlan } from '../types/dashboard';
 
 export default function ArtistSignupPage() {
   const { token } = useParams<{ token: string }>();
@@ -15,13 +13,10 @@ export default function ArtistSignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
   const [genre, setGenre] = useState('');
   const [country, setCountry] = useState('');
-  const [bio, setBio] = useState('');
-  const [spotify, setSpotify] = useState('');
-  const [instagram, setInstagram] = useState('');
-  const [plan, setPlan] = useState<SubscriptionPlan>('plan-a');
 
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -40,7 +35,6 @@ export default function ArtistSignupPage() {
       return;
     }
 
-    const planDef = PLAN_DEFINITIONS.find((p) => p.id === plan);
     setSubmitting(true);
     try {
       await registerViaInvite(token, {
@@ -50,12 +44,6 @@ export default function ArtistSignupPage() {
         phone: phone.trim(),
         genre: genre.trim(),
         country: country.trim(),
-        bio: bio.trim(),
-        socialLinks: {
-          ...(spotify.trim() ? { spotify: spotify.trim() } : {}),
-          ...(instagram.trim() ? { instagram: instagram.trim() } : {}),
-        },
-        subscription: { plan, price: planDef?.price ?? 0 },
       });
       setSubmitted(true);
     } catch (err) {
@@ -118,7 +106,38 @@ export default function ArtistSignupPage() {
                 </div>
                 <div className="login-field">
                   <label htmlFor="password">Password</label>
-                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" placeholder="At least 8 characters" />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      autoComplete="new-password"
+                      placeholder="At least 8 characters"
+                      style={{ paddingRight: '64px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '10px',
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        color: 'var(--color-muted)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -139,45 +158,7 @@ export default function ArtistSignupPage() {
                     <label htmlFor="country">Country</label>
                     <input id="country" value={country} onChange={(e) => setCountry(e.target.value)} />
                   </div>
-                  <div className="login-field">
-                    <label htmlFor="spotify">Spotify URL</label>
-                    <input id="spotify" value={spotify} onChange={(e) => setSpotify(e.target.value)} placeholder="Optional" />
-                  </div>
                 </div>
-                <div className="signup-row">
-                  <div className="login-field">
-                    <label htmlFor="instagram">Instagram URL</label>
-                    <input id="instagram" value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="Optional" />
-                  </div>
-                </div>
-                <div className="login-field">
-                  <label htmlFor="bio">Bio</label>
-                  <textarea id="bio" rows={3} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Optional — a short intro artists will see on your profile" />
-                </div>
-              </div>
-
-              <div className="signup-section">
-                <div className="signup-section__title">Choose Your Plan</div>
-                <div className="plan-grid">
-                  {PLAN_DEFINITIONS.map((p) => (
-                    <button
-                      type="button"
-                      key={p.id}
-                      className={`plan-card ${plan === p.id ? 'plan-card--selected' : ''}`}
-                      onClick={() => setPlan(p.id)}
-                    >
-                      <div className="plan-card__top">
-                        <span className="plan-card__name">{p.name}</span>
-                        <span className="plan-card__check">✓</span>
-                      </div>
-                      <div className="plan-card__price">${p.price}/yr</div>
-                      <ul className="plan-card__features">
-                        {p.features.slice(0, 2).map((f) => <li key={f}>{f}</li>)}
-                      </ul>
-                    </button>
-                  ))}
-                </div>
-                <p className="signup-hint">You can change your plan later once your account is approved.</p>
               </div>
 
               {error && <div className="login-error">{error}</div>}

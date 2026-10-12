@@ -1,33 +1,56 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useArtists } from '../../hooks/useArtists';
 import { getArtistAnalytics } from '../../services/analytics.service';
-import { getArtistById, updatePayout } from '../../services/artists.service';
+import { updatePayout } from '../../services/artists.service';
 import { getPayoutHistory } from '../../services/payouts.service';
-import type { ArtistProfile, ArtistAnalytics, PayoutMethod, Payout } from '../../types/dashboard';
+import type { ArtistAnalytics, PayoutMethod, Payout } from '../../types/dashboard';
+
+function parsePayoutDetails(raw: string): { accountNumber: string; accountName: string; bankName: string } {
+  const line = (label: string) => {
+    const match = raw.match(new RegExp(`^${label}:\\s*(.*)$`, 'im'));
+    return match ? match[1].trim() : '';
+  };
+  return {
+    accountNumber: line('Account number'),
+    accountName: line('Account name'),
+    bankName: line('Bank name'),
+  };
+}
 
 export default function ArtistIncomePage() {
   const { user } = useAuth();
+  const { getArtist, updateArtistInCache } = useArtists();
+  const artist = user?.artistId ? getArtist(user.artistId) : undefined;
   const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
-  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [payoutMethod, setPayoutMethod] = useState<PayoutMethod | ''>('');
-  const [payoutDetails, setPayoutDetails] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [accountName, setAccountName] = useState('');
+  const [bankName, setBankName] = useState('');
   const [payoutSaved, setPayoutSaved] = useState(false);
+  const [payoutFormInitFor, setPayoutFormInitFor] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!user?.artistId) return;
-    void getArtistById(user.artistId).then((a) => {
-      setArtist(a);
-      setPayoutMethod(a?.payoutMethod ?? '');
-      setPayoutDetails(a?.payoutDetails ?? '');
-    });
     void getArtistAnalytics(user.artistId).then(setAnalytics);
     void getPayoutHistory(user.artistId).then(setPayouts);
   }, [user]);
 
+  if (artist && artist.id !== payoutFormInitFor) {
+    setPayoutFormInitFor(artist.id);
+    setPayoutMethod(artist.payoutMethod ?? '');
+    const parsed = parsePayoutDetails(artist.payoutDetails ?? '');
+    setAccountNumber(parsed.accountNumber);
+    setAccountName(parsed.accountName);
+    setBankName(parsed.bankName);
+  }
+
   async function handleSavePayout() {
     if (!user?.artistId) return;
+    const payoutDetails = `Account number: ${accountNumber}\nAccount name: ${accountName}\nBank name: ${bankName}`;
     await updatePayout(user.artistId, payoutMethod || null, payoutDetails);
+    updateArtistInCache(user.artistId, { payoutMethod: payoutMethod || undefined, payoutDetails });
     setPayoutSaved(true);
     setTimeout(() => setPayoutSaved(false), 3000);
   }
@@ -161,30 +184,34 @@ export default function ArtistIncomePage() {
           </select>
         </div>
 
-        <div style={{ marginTop: 20 }}>
-          <label className="income-info__label" htmlFor="payout-details" style={{ display: 'block', marginBottom: 8 }}>
-            Payout Details
-          </label>
-          <textarea
-            id="payout-details"
-            value={payoutDetails}
-            onChange={(e) => setPayoutDetails(e.target.value)}
-            placeholder="Enter your bank name and account number, PayPal email, or mobile money number..."
-            rows={4}
-            style={{
-              width: '100%',
-              background: 'var(--color-bg)',
-              border: '1px solid var(--color-line)',
-              color: 'var(--color-ink)',
-              padding: '12px 14px',
-              fontSize: '14px',
-              lineHeight: 1.6,
-              resize: 'vertical',
-              outline: 'none',
-              fontFamily: 'var(--font-sans)',
-            }}
-          />
-          <div className="flex items-center gap-3" style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 20 }} className="flex flex-col gap-4">
+          {[
+            { id: 'payout-account-number', label: 'Account number', value: accountNumber, onChange: setAccountNumber },
+            { id: 'payout-account-name', label: 'Account name', value: accountName, onChange: setAccountName },
+            { id: 'payout-bank-name', label: 'Bank name', value: bankName, onChange: setBankName },
+          ].map((field) => (
+            <div key={field.id}>
+              <label className="income-info__label" htmlFor={field.id} style={{ display: 'block', marginBottom: 8 }}>
+                {field.label}
+              </label>
+              <input
+                id={field.id}
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'var(--color-bg)',
+                  border: '1px solid var(--color-line)',
+                  color: 'var(--color-ink)',
+                  padding: '12px 14px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  fontFamily: 'var(--font-sans)',
+                }}
+              />
+            </div>
+          ))}
+          <div className="flex items-center gap-3">
             <button className="dash-btn dash-btn--gold" onClick={handleSavePayout}>Save Payout Info</button>
             {payoutSaved && <span className="dash-saved">Saved ✓</span>}
           </div>

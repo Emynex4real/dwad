@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getArtistById, updateArtist, setUploadAccess, approveArtist, deleteArtist } from '../../services/artists.service';
-import { getTracksByArtist, updateTrackStatus } from '../../services/tracks.service';
+import { updateArtist, setUploadAccess, setCopyrightFlag, approveArtist, deleteArtist } from '../../services/artists.service';
+import { updateTrackStatus } from '../../services/tracks.service';
 import { sendNotification } from '../../services/notifications.service';
 import { PLAN_DEFINITIONS, updateSubscription } from '../../services/subscriptions.service';
 import { getArtistAnalytics } from '../../services/analytics.service';
 import { recordPayout, getPayoutHistory } from '../../services/payouts.service';
 import { API_BASE_URL } from '../../services/httpClient';
+import { useArtists } from '../../hooks/useArtists';
+import { useTracks } from '../../hooks/useTracks';
 import type { ArtistProfile, TrackUpload, SubscriptionPlan, SubscriptionStatus, ArtistAnalytics, Payout } from '../../types/dashboard';
 
 const PAYOUT_METHOD_LABEL: Record<string, string> = {
@@ -19,9 +21,14 @@ export default function AdminArtistDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
-  const [loaded, setLoaded] = useState(false);
-  const [tracks, setTracks] = useState<TrackUpload[]>([]);
+  const { getArtist, fetchArtist, isLoading: artistsLoading, updateArtistInCache, removeArtistFromCache } = useArtists();
+  const { getTracksForArtist, updateTrackInCache } = useTracks();
+  const cachedArtist = id ? getArtist(id) : undefined;
+  const [fetchedArtist, setFetchedArtist] = useState<ArtistProfile | undefined>(undefined);
+  const [fetchAttempted, setFetchAttempted] = useState(false);
+  const artist = cachedArtist ?? fetchedArtist;
+  const loaded = !!cachedArtist || fetchAttempted;
+  const tracks = id ? getTracksForArtist(id) : [];
   const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [payoutAmount, setPayoutAmount] = useState('');
@@ -30,12 +37,15 @@ export default function AdminArtistDetailPage() {
   const [payoutSaved, setPayoutSaved] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
-    void getArtistById(id).then((a) => {
-      setArtist(a);
-      setLoaded(true);
+    if (!id || cachedArtist) return;
+    void fetchArtist(id).then((a) => {
+      setFetchedArtist(a);
+      setFetchAttempted(true);
     });
-    void getTracksByArtist(id).then(setTracks);
+  }, [id, cachedArtist, fetchArtist]);
+
+  useEffect(() => {
+    if (!id) return;
     void getArtistAnalytics(id).then(setAnalytics);
     void getPayoutHistory(id).then(setPayouts);
   }, [id]);
@@ -80,7 +90,7 @@ export default function AdminArtistDetailPage() {
   const [saved, setSaved] = useState(false);
 
   if (!artist) {
-    if (!loaded) return null;
+    if (!loaded || artistsLoading) return null;
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted">Artist not found.</p>
@@ -110,8 +120,8 @@ export default function AdminArtistDetailPage() {
   async function handleSave() {
     if (!id) return;
     const { password, ...profile } = form;
-    await updateArtist(id, password.trim() ? { ...profile, password: password.trim() } : profile);
-    setArtist(await getArtistById(id));
+    const updated = await updateArtist(id, password.trim() ? { ...profile, password: password.trim() } : profile);
+    if (updated) updateArtistInCache(id, updated);
     setEditMode(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -119,14 +129,14 @@ export default function AdminArtistDetailPage() {
 
   async function handleSaveSub() {
     if (!id) return;
-    await updateSubscription(id, {
+    const updatedSub = await updateSubscription(id, {
       plan: subForm.plan,
       status: subForm.status,
       price: parseFloat(subForm.price) || 0,
       expiryDate: subForm.expiryDate,
       autoRenew: subForm.autoRenew,
     });
-    setArtist(await getArtistById(id));
+    if (updatedSub) updateArtistInCache(id, { subscription: updatedSub });
     setEditSub(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -135,42 +145,50 @@ export default function AdminArtistDetailPage() {
   async function toggleAccess() {
     if (!id || !artist) return;
     const next = artist.uploadAccess === 'granted' ? 'locked' : 'granted';
-    await setUploadAccess(id, next);
-    setArtist(await getArtistById(id));
+    const updated = await setUploadAccess(id, next);
+    if (updated) updateArtistInCache(id, updated);
     void sendNotification(id, 'general', 'Upload Access Updated',
       next === 'granted'
         ? 'Your upload access has been restored.'
         : 'Your upload access has been suspended. Please contact support.');
   }
 
+  async function toggleCopyright() {
+    if (!id || !artist) return;
+    const next = artist.copyrightStatus === 'flagged' ? 'clear' : 'flagged';
+    const updated = await setCopyrightFlag(id, next);
+    if (updated) updateArtistInCache(id, updated);
+  }
+
   async function handleApproveArtist() {
     if (!id) return;
-    await approveArtist(id);
-    setArtist(await getArtistById(id));
+    const updated = await approveArtist(id);
+    if (updated) updateArtistInCache(id, updated);
   }
 
   async function handleRejectArtist() {
     if (!id) return;
     if (!window.confirm('Reject and delete this pending account?')) return;
     await deleteArtist(id);
+    removeArtistFromCache(id);
     navigate('/admin/artists');
   }
 
   async function handleApprove(track: TrackUpload) {
-    await updateTrackStatus(track.id, 'approved');
+    const updated = await updateTrackStatus(track.id, 'approved');
+    updateTrackInCache(track.id, updated);
     void sendNotification(artist!.id, 'upload_approved', 'Upload Approved',
       `Your track "${track.title}" has been approved.`,
       { trackId: track.id, trackTitle: track.title });
-    setTracks(await getTracksByArtist(id!));
   }
 
   async function handleReject(track: TrackUpload) {
     const note = window.prompt('Rejection reason (optional):') ?? '';
-    await updateTrackStatus(track.id, 'rejected', note || undefined);
+    const updated = await updateTrackStatus(track.id, 'rejected', note || undefined);
+    updateTrackInCache(track.id, updated);
     void sendNotification(artist!.id, 'upload_rejected', 'Upload Rejected',
       `Your track "${track.title}" was not approved.${note ? ` Reason: ${note}` : ''}`,
       { trackId: track.id, trackTitle: track.title });
-    setTracks(await getTracksByArtist(id!));
   }
 
   function audioDownloadUrl(trackId: string): string {
@@ -206,6 +224,14 @@ export default function AdminArtistDetailPage() {
         </div>
       )}
 
+      {/* Copyright flag banner */}
+      {artist.copyrightStatus === 'flagged' && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border border-red-500/30 bg-red-500/5 rounded-lg text-sm flex-wrap">
+          <span className="text-ink">⚠ This account is flagged for a copyright issue and cannot log in.</span>
+          <button className="dash-action-btn dash-action-btn--approve" onClick={toggleCopyright}>Clear Flag</button>
+        </div>
+      )}
+
       {/* Profile + Subscription */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
@@ -213,14 +239,26 @@ export default function AdminArtistDetailPage() {
         <div className="dash-panel">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-ink">Profile</h2>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted">Upload</span>
-              <button
-                className={`dash-toggle ${artist.uploadAccess === 'granted' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
-                onClick={toggleAccess}
-              >
-                <span className="dash-toggle__knob" />
-              </button>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted">Upload</span>
+                <button
+                  className={`dash-toggle ${artist.uploadAccess === 'granted' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
+                  onClick={toggleAccess}
+                >
+                  <span className="dash-toggle__knob" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted">Copyright</span>
+                <button
+                  className={`dash-toggle ${artist.copyrightStatus === 'flagged' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
+                  onClick={toggleCopyright}
+                  title={artist.copyrightStatus === 'flagged' ? 'Clear flag' : 'Flag account'}
+                >
+                  <span className="dash-toggle__knob" />
+                </button>
+              </div>
             </div>
           </div>
 

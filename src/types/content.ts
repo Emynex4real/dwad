@@ -12,6 +12,15 @@ export interface Production {
   createdAt: string;
 }
 
+export interface DistroRelease {
+  id: string;
+  title: string;
+  artistName: string;
+  coverArtUrl: string | null;
+  releaseUrl: string | null;
+  createdAt: string;
+}
+
 const BeatType = { Lease: 'lease', Purchase: 'purchase' } as const;
 export type BeatType = typeof BeatType[keyof typeof BeatType];
 
@@ -30,10 +39,22 @@ export interface LocalizedPricing {
   rate: number;
 }
 
+export const PricingGroup = {
+  DistroBasic: 'distro-basic',
+  DistroBundle: 'distro-bundle',
+  Studio: 'studio',
+  Akiib: 'akiib',
+} as const;
+export type PricingGroup = typeof PricingGroup[keyof typeof PricingGroup];
+
 export interface PricingPlan {
   id: string;
   label: string;
   price: number;
+  features: string[];
+  groupKey: PricingGroup;
+  featured: boolean;
+  sortOrder: number;
   updatedAt: string;
 }
 

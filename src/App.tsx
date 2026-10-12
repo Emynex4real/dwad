@@ -4,6 +4,9 @@ import Topbar from './components/layout/Topbar';
 import Footer from './components/layout/Footer';
 import { logoWhite } from './data';
 import { AuthProvider } from './contexts/AuthContext';
+import { ArtistProvider } from './contexts/ArtistContext';
+import { TrackProvider } from './contexts/TrackContext';
+import { ReportProvider } from './contexts/ReportContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import AdminRoute from './routes/AdminRoute';
 import ArtistRoute from './routes/ArtistRoute';
@@ -44,6 +47,7 @@ const AdminStatsPage          = lazy(() => import('./pages/admin/AdminStatsPage'
 const AdminReportsPage        = lazy(() => import('./pages/admin/AdminReportsPage'));
 const AdminNotificationsPage  = lazy(() => import('./pages/admin/AdminNotificationsPage'));
 const AdminProductionsPage    = lazy(() => import('./pages/admin/AdminProductionsPage'));
+const AdminDistroReleasesPage = lazy(() => import('./pages/admin/AdminDistroReleasesPage'));
 const AdminBeatsPage          = lazy(() => import('./pages/admin/AdminBeatsPage'));
 const AdminPriceListPage      = lazy(() => import('./pages/admin/AdminPriceListPage'));
 const AdminSpotlightPage      = lazy(() => import('./pages/admin/AdminSpotlightPage'));
@@ -161,6 +165,7 @@ function AppRouter() {
             <Route path="reports" element={<AdminReportsPage />} />
             <Route path="notifications" element={<AdminNotificationsPage />} />
             <Route path="productions" element={<AdminProductionsPage />} />
+            <Route path="distro-releases" element={<AdminDistroReleasesPage />} />
             <Route path="beats" element={<AdminBeatsPage />} />
             <Route path="price-list" element={<AdminPriceListPage />} />
             <Route path="spotlight" element={<AdminSpotlightPage />} />
@@ -186,9 +191,15 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <NotificationProvider>
-          <AppRouter />
-        </NotificationProvider>
+        <ArtistProvider>
+          <TrackProvider>
+            <ReportProvider>
+              <NotificationProvider>
+                <AppRouter />
+              </NotificationProvider>
+            </ReportProvider>
+          </TrackProvider>
+        </ArtistProvider>
       </AuthProvider>
     </BrowserRouter>
   );

@@ -7,9 +7,6 @@ interface RegisterInvitePayload {
   phone?: string;
   genre?: string;
   country?: string;
-  bio?: string;
-  socialLinks?: { spotify?: string; instagram?: string };
-  subscription: { plan: string; price: number };
 }
 
 export async function createInvite(): Promise<string> {

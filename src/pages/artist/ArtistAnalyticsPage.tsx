@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getArtistAnalytics } from '../../services/analytics.service';
+import AreaSparkline from '../../components/ui/AreaSparkline';
 import type { MonthlyStats, TrackStats, ArtistAnalytics } from '../../types/dashboard';
 
 const GOLD = '#c9a667';
@@ -35,48 +36,6 @@ function BarChart({ data, dataKey, color, formatter }: {
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function AreaSparkline({ data }: { data: MonthlyStats[] }) {
-  if (data.length === 0) {
-    return <p className="dash-empty">No monthly data yet.</p>;
-  }
-
-  const max = Math.max(...data.map((d) => d.streams), 1);
-  const W = 600;
-  const H = 160;
-  const pts = data.map((d, i) => {
-    const x = data.length > 1 ? (i / (data.length - 1)) * W : W / 2;
-    const y = H - (d.streams / max) * (H - 20);
-    return `${x},${y}`;
-  });
-  const polyline = pts.join(' ');
-  const area = `${pts[0].split(',')[0]},${H} ` + polyline + ` ${pts[pts.length - 1].split(',')[0]},${H}`;
-
-  return (
-    <div style={{ width: '100%', overflow: 'hidden' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ width: '100%', height: '160px', display: 'block' }}>
-        <defs>
-          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={GOLD} stopOpacity={0.35} />
-            <stop offset="100%" stopColor={GOLD} stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <polygon points={area} fill="url(#areaGrad)" />
-        <polyline points={polyline} fill="none" stroke={GOLD} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-        {data.map((d, i) => {
-          const x = data.length > 1 ? (i / (data.length - 1)) * W : W / 2;
-          const y = H - (d.streams / max) * (H - 20);
-          return <circle key={i} cx={x} cy={y} r="4" fill={GOLD} stroke="var(--color-bg)" strokeWidth="2" />;
-        })}
-      </svg>
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0 0', borderTop: '1px solid var(--color-line)' }}>
-        {data.map((d) => (
-          <span key={d.month} style={{ fontSize: '10px', color: 'var(--color-muted)', flex: 1, textAlign: 'center' }}>{d.month}</span>
-        ))}
-      </div>
     </div>
   );
 }
@@ -154,9 +113,18 @@ function PlatformBreakdown({ tracks }: { tracks: TrackStats[] }) {
   );
 }
 
+const PERIOD_OPTIONS = [
+  { value: 'all', label: 'All Time' },
+  { value: '3',   label: 'Last 3 Months' },
+  { value: '6',   label: 'Last 6 Months' },
+  { value: '12',  label: 'Last 12 Months' },
+] as const;
+
 export default function ArtistAnalyticsPage() {
   const { user } = useAuth();
   const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
+  const [trackFilter, setTrackFilter] = useState('all');
+  const [periodFilter, setPeriodFilter] = useState<typeof PERIOD_OPTIONS[number]['value']>('all');
 
   useEffect(() => {
     if (!user?.artistId) return;
@@ -174,6 +142,14 @@ export default function ArtistAnalyticsPage() {
     );
   }
 
+  const selectedTrack = trackFilter === 'all' ? undefined : analytics.topTracks.find((t) => t.trackId === trackFilter);
+  const monthlySource = selectedTrack ? selectedTrack.monthly : analytics.monthly;
+  const filteredMonthly = periodFilter === 'all' ? monthlySource : monthlySource.slice(-Number(periodFilter));
+
+  const totalStreams = filteredMonthly.reduce((s, m) => s + m.streams, 0);
+  const totalRevenue = filteredMonthly.reduce((s, m) => s + m.revenue, 0);
+  const pendingPayout = filteredMonthly.reduce((s, m) => s + m.pendingUsd, 0);
+
   return (
     <div className="dash-page">
       <div className="dash-page__header">
@@ -181,26 +157,41 @@ export default function ArtistAnalyticsPage() {
         <p className="dash-page__sub">Streams and revenue across all your releases.</p>
       </div>
 
+      {/* Filters */}
+      <div className="dash-filters">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-ink-2">Track</label>
+          <select className="dash-input select-field" value={trackFilter} onChange={(e) => setTrackFilter(e.target.value)}>
+            <option value="all">All Tracks</option>
+            {analytics.topTracks.map((t) => <option key={t.trackId} value={t.trackId}>{t.title}</option>)}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-ink-2">Period</label>
+          <select className="dash-input select-field" value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value as typeof periodFilter)}>
+            {PERIOD_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+      </div>
+
       {/* Top stats */}
       <div className="stat-grid stat-grid--4">
         <div className="stat-card stat-card--gold">
           <div className="stat-card__label">Total Streams</div>
-          <div className="stat-card__value">{analytics.totalStreams.toLocaleString()}</div>
+          <div className="stat-card__value">{totalStreams.toLocaleString()}</div>
         </div>
         <div className="stat-card">
           <div className="stat-card__label">Total Revenue</div>
-          <div className="stat-card__value">${analytics.totalRevenue.toFixed(2)}</div>
+          <div className="stat-card__value">${totalRevenue.toFixed(2)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-card__label">Pending Payout</div>
-          <div className="stat-card__value">${analytics.pendingPayout.toFixed(2)}</div>
+          <div className="stat-card__value">${pendingPayout.toFixed(2)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-card__label">Avg per Stream</div>
           <div className="stat-card__value">
-            ${analytics.totalStreams > 0
-              ? (analytics.totalRevenue / analytics.totalStreams * 1000).toFixed(3)
-              : '0.000'}
+            ${totalStreams > 0 ? (totalRevenue / totalStreams * 1000).toFixed(3) : '0.000'}
             <span className="stat-card__unit">/1K</span>
           </div>
         </div>
@@ -209,14 +200,14 @@ export default function ArtistAnalyticsPage() {
       {/* Monthly Streams area chart */}
       <div className="dash-panel">
         <h2 className="dash-panel__title">Monthly Streams</h2>
-        <AreaSparkline data={analytics.monthly} />
+        <AreaSparkline data={filteredMonthly} />
       </div>
 
       {/* Monthly Revenue bar chart */}
       <div className="dash-panel">
         <h2 className="dash-panel__title">Monthly Revenue</h2>
         <BarChart
-          data={analytics.monthly}
+          data={filteredMonthly}
           dataKey="revenue"
           color={GOLD}
           formatter={(v) => `$${v.toFixed(0)}`}
@@ -224,7 +215,7 @@ export default function ArtistAnalyticsPage() {
       </div>
 
       {/* Platform breakdown */}
-      <PlatformBreakdown tracks={analytics.topTracks} />
+      <PlatformBreakdown tracks={selectedTrack ? [selectedTrack] : analytics.topTracks} />
     </div>
   );
 }

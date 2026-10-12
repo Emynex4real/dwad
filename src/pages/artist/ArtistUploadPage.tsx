@@ -1,10 +1,12 @@
-import { useState, useRef, useEffect, type FormEvent, type ChangeEvent } from 'react';
+import { useState, useRef, type FormEvent, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { getArtistById } from '../../services/artists.service';
-import { submitTrack } from '../../services/tracks.service';
+import { useArtists } from '../../hooks/useArtists';
+import { useTracks } from '../../hooks/useTracks';
+import { submitTrack, deleteTrack } from '../../services/tracks.service';
 import { sendNotification } from '../../services/notifications.service';
-import type { ArtistProfile } from '../../types/dashboard';
+import { ApiError } from '../../services/httpClient';
+import type { TrackSubmissionDetails } from '../../types/dashboard';
 
 const GENRES = [
   'Afrobeats', 'Afro Soul', 'Alt Pop', 'Hip Hop', 'R&B', 'Gospel',
@@ -12,14 +14,13 @@ const GENRES = [
 ];
 
 const TERMS = [
-  'Make sure your song has no copyright, samples, or is a cover song. No refunds will be issued for copyright issues.',
+  'Make sure your song has no copyright, uncleared samples…',
+  'Do not use a stolen beat or unlicensed instrumental. No refunds will be issued for beat issues.',
   'Choose a unique artist name before uploading to avoid name clashes with existing artists.',
   'If another artist shares your name, your song may be misattributed. Dwad assumes no responsibility for this.',
   'Verify your artist name does not already exist on Spotify and Apple Music before submitting.',
   'If you have uploaded on Spotify and Apple Music before, paste your profile or song links in the form accordingly.',
   'Do not buy streams. Your account will be permanently closed for fake, artificial, or purchased streams.',
-  'You cannot upload a song that is already on streaming platforms, except Audiomack.',
-  'Only songs uploaded after 3 months can be taken down.',
 ];
 
 interface SingleForm {
@@ -27,9 +28,10 @@ interface SingleForm {
   realName: string;
   country: string;
   whatsapp: string;
-  audiomackId: string;
   title: string;
   featuring: string;
+  featuringPreviouslyReleased: '' | 'yes' | 'no';
+  featuringProfileLink: string;
   producer: string;
   genre: string;
   releaseDate: string;
@@ -43,38 +45,52 @@ interface AlbumForm {
   realName: string;
   country: string;
   whatsapp: string;
-  audiomackId: string;
   albumTitle: string;
   albumType: '' | 'Album' | 'EP' | 'Mixtape';
   trackCount: string;
   producer: string;
   genre: string;
   releaseDate: string;
-  previouslyReleased: '' | 'yes' | 'no';
-  profileLink: string;
-  notes: string;
 }
 
+interface AlbumSong {
+  id: string;
+  title: string;
+  featuring: string;
+  featuringPreviouslyReleased: '' | 'yes' | 'no';
+  featuringProfileLink: string;
+  previouslyReleased: '' | 'yes' | 'no';
+  profileLink: string;
+  audioFile: File | null;
+  producer: string;
+}
+
+const MAX_ALBUM_TRACKS = 30;
+
 const SINGLE_INIT: SingleForm = {
-  artistName: '', realName: '', country: '', whatsapp: '', audiomackId: '', title: '', featuring: '',
+  artistName: '', realName: '', country: '', whatsapp: '', title: '', featuring: '',
+  featuringPreviouslyReleased: '', featuringProfileLink: '',
   producer: '', genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
 };
 
 const ALBUM_INIT: AlbumForm = {
-  artistName: '', realName: '', country: '', whatsapp: '', audiomackId: '', albumTitle: '', albumType: '',
-  trackCount: '', producer: '', genre: '', releaseDate: '', previouslyReleased: '', profileLink: '', notes: '',
+  artistName: '', realName: '', country: '', whatsapp: '', albumTitle: '', albumType: '',
+  trackCount: '', producer: '', genre: '', releaseDate: '',
 };
 
 export default function ArtistUploadPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
+  const { getArtist } = useArtists();
+  const { addTrackToCache } = useTracks();
+  const artist = user?.artistId ? getArtist(user.artistId) : undefined;
 
   const [agreed, setAgreed] = useState(false);
   const [uploadType, setUploadType] = useState<'single' | 'album' | null>(null);
 
   const [single, setSingle] = useState<SingleForm>(SINGLE_INIT);
   const [album, setAlbum] = useState<AlbumForm>(ALBUM_INIT);
+  const [albumSongs, setAlbumSongs] = useState<AlbumSong[]>([]);
 
   const [audioFiles, setAudioFiles] = useState<FileList | null>(null);
   const [coverArt, setCoverArt] = useState<File | null>(null);
@@ -82,22 +98,20 @@ export default function ArtistUploadPage() {
   const coverRef = useRef<HTMLInputElement>(null);
 
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStage, setUploadStage] = useState('');
   const [error, setError] = useState('');
   const [termsOpen, setTermsOpen] = useState(false);
   const [termsSigned, setTermsSigned] = useState([false, false, false, false]);
   const [pendingSubmit, setPendingSubmit] = useState<'single' | 'album' | null>(null);
   const [tomorrow] = useState(() => new Date(Date.now() + 86_400_000).toISOString().split('T')[0]);
+  const [nameDefaultedFor, setNameDefaultedFor] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    if (!user?.artistId) return;
-    void getArtistById(user.artistId).then((a) => {
-      setArtist(a);
-      if (a) {
-        setSingle((f) => ({ ...f, artistName: f.artistName || a.name }));
-        setAlbum((f) => ({ ...f, artistName: f.artistName || a.name }));
-      }
-    });
-  }, [user]);
+  if (artist && artist.id !== nameDefaultedFor) {
+    setNameDefaultedFor(artist.id);
+    setSingle((f) => ({ ...f, artistName: f.artistName || artist.name }));
+    setAlbum((f) => ({ ...f, artistName: f.artistName || artist.name }));
+  }
 
   if (!artist) return null;
 
@@ -138,6 +152,19 @@ export default function ArtistUploadPage() {
   function handleAlbum(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
     setAlbum((f) => ({ ...f, [name]: value }));
+
+    if (name === 'trackCount') {
+      const count = Math.max(0, Math.min(MAX_ALBUM_TRACKS, parseInt(value, 10) || 0));
+      setAlbumSongs((prev) => {
+        const next = prev.slice(0, count);
+        while (next.length < count) next.push({ id: crypto.randomUUID(), title: '', featuring: '', featuringPreviouslyReleased: '', featuringProfileLink: '', previouslyReleased: '', profileLink: '', audioFile: null, producer: '' });
+        return next;
+      });
+    }
+  }
+
+  function updateAlbumSong(id: string, patch: Partial<AlbumSong>) {
+    setAlbumSongs((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   }
 
   function handleSingleSubmit(e: FormEvent) {
@@ -152,6 +179,8 @@ export default function ArtistUploadPage() {
     if (!single.genre)             { setError('Genre is required.'); return; }
     if (!single.releaseDate)       { setError('Release date is required.'); return; }
     if (!single.previouslyReleased) { setError('Please indicate if this song was previously released.'); return; }
+    if (single.featuring.trim() && !single.featuringPreviouslyReleased) { setError('Please indicate if the featuring artist has released music on streaming platforms before.'); return; }
+    if (single.featuringPreviouslyReleased === 'yes' && !single.featuringProfileLink.trim()) { setError('Please paste the featuring artist\'s profile or song link.'); return; }
     if (!audioFiles?.length)       { setError('Please upload your audio file.'); return; }
     if (!coverArt)                 { setError('Please upload your cover art.'); return; }
 
@@ -163,10 +192,10 @@ export default function ArtistUploadPage() {
     setTermsOpen(true);
   }
 
-  function buildUploadFormData(fields: Record<string, string>): FormData {
+  function buildUploadFormData(fields: Record<string, string>, audioFileList: FileList | File[] | null): FormData {
     const formData = new FormData();
     Object.entries(fields).forEach(([key, value]) => formData.append(key, value));
-    Array.from(audioFiles ?? []).forEach((file) => formData.append('audio[]', file));
+    Array.from(audioFileList ?? []).forEach((file) => formData.append('audio[]', file));
     if (coverArt) formData.append('cover', coverArt);
     return formData;
   }
@@ -174,26 +203,54 @@ export default function ArtistUploadPage() {
   async function doSingleSubmit() {
     if (!artist) return;
     setSubmitting(true);
+    setUploadProgress(0);
+    setUploadStage('Uploading…');
 
-    const track = await submitTrack(buildUploadFormData({
-      artistId: artist.id,
-      title: single.title.trim(),
-      genre: single.genre,
-      releaseDate: single.releaseDate,
-      platforms: JSON.stringify(['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music']),
-      ...(single.featuring.trim() ? { featuring: single.featuring.trim() } : {}),
-    }));
+    const details: TrackSubmissionDetails = {
+      stageName: single.artistName.trim(),
+      realName: single.realName.trim(),
+      country: single.country.trim(),
+      whatsapp: single.whatsapp.trim(),
+      producer: single.producer.trim(),
+      ...(single.previouslyReleased ? { previouslyReleased: single.previouslyReleased } : {}),
+      ...(single.previouslyReleased === 'yes' ? { profileLink: single.profileLink.trim() } : {}),
+      ...(single.featuring.trim() && single.featuringPreviouslyReleased
+        ? { featuringPreviouslyReleased: single.featuringPreviouslyReleased }
+        : {}),
+      ...(single.featuring.trim() && single.featuringPreviouslyReleased === 'yes'
+        ? { featuringProfileLink: single.featuringProfileLink.trim() }
+        : {}),
+      notes: single.notes.trim(),
+    };
 
-    void sendNotification(
-      artist.id,
-      'upload_submitted',
-      'Upload Received',
-      `We've received your single "${track.title}". Our team will review it within 2–3 business days.`,
-      { trackId: track.id, trackTitle: track.title },
-    );
+    try {
+      const track = await submitTrack(buildUploadFormData({
+        artistId: artist.id,
+        title: single.title.trim(),
+        genre: single.genre,
+        releaseDate: single.releaseDate,
+        platforms: JSON.stringify(['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music']),
+        details: JSON.stringify(details),
+        ...(single.featuring.trim() ? { featuring: single.featuring.trim() } : {}),
+      }, audioFiles), (pct) => setUploadProgress(pct));
+      addTrackToCache(track);
 
-    setSubmitting(false);
-    navigate('/artist/releases');
+      void sendNotification(
+        artist.id,
+        'upload_submitted',
+        'Upload Received',
+        `We've received your single "${track.title}". Our team will review it within 2–3 business days.`,
+        { trackId: track.id, trackTitle: track.title },
+      );
+
+      navigate('/artist/releases');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Upload failed. Please check your connection and try again.');
+    } finally {
+      setSubmitting(false);
+      setUploadProgress(0);
+      setUploadStage('');
+    }
   }
 
   function handleAlbumSubmit(e: FormEvent) {
@@ -209,9 +266,13 @@ export default function ArtistUploadPage() {
     if (!album.producer.trim())    { setError('Producer name is required.'); return; }
     if (!album.genre)              { setError('Genre is required.'); return; }
     if (!album.releaseDate)        { setError('Release date is required.'); return; }
-    if (!album.previouslyReleased) { setError('Please indicate if this was previously released.'); return; }
-    if (!album.notes.trim())       { setError('Track list is required.'); return; }
-    if (!audioFiles?.length)       { setError('Please upload your audio files.'); return; }
+    if (albumSongs.length === 0)   { setError('Please enter the number of tracks.'); return; }
+    if (albumSongs.some((s) => !s.title.trim())) { setError('Please enter a title for every track.'); return; }
+    if (albumSongs.some((s) => !s.audioFile))    { setError('Please upload an audio file for every track.'); return; }
+    if (albumSongs.some((s) => !s.previouslyReleased)) { setError('Please indicate if each song was previously released, for every track.'); return; }
+    if (albumSongs.some((s) => s.previouslyReleased === 'yes' && !s.profileLink.trim())) { setError('Please paste the profile or song link for every track that was previously released.'); return; }
+    if (albumSongs.some((s) => s.featuring.trim() && !s.featuringPreviouslyReleased)) { setError('Please indicate if the featuring artist has released music on streaming platforms before, for every track with a featuring artist.'); return; }
+    if (albumSongs.some((s) => s.featuringPreviouslyReleased === 'yes' && !s.featuringProfileLink.trim())) { setError("Please paste the featuring artist's profile or song link for every track that needs it."); return; }
     if (!coverArt)                 { setError('Please upload your cover art.'); return; }
 
     const today = new Date().toISOString().split('T')[0];
@@ -225,25 +286,73 @@ export default function ArtistUploadPage() {
   async function doAlbumSubmit() {
     if (!artist) return;
     setSubmitting(true);
+    setUploadProgress(0);
+    setUploadStage('');
 
-    const track = await submitTrack(buildUploadFormData({
-      artistId: artist.id,
-      title: album.albumTitle.trim(),
-      genre: album.genre,
-      releaseDate: album.releaseDate,
-      platforms: JSON.stringify(['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music']),
-    }));
+    const albumId = crypto.randomUUID();
+    const platforms = JSON.stringify(['Spotify', 'Apple Music', 'Boomplay', 'TikTok', 'YouTube Music', 'Audiomack', 'Tidal', 'Deezer', 'Amazon Music']);
+    const total = albumSongs.length;
 
-    void sendNotification(
-      artist.id,
-      'upload_submitted',
-      'Album Upload Received',
-      `We've received your ${album.albumType} "${track.title}". Our team will review it within 2–3 business days.`,
-      { trackId: track.id, trackTitle: track.title },
-    );
+    const createdTrackIds: string[] = [];
+    try {
+      let firstTrackId = '';
+      for (let i = 0; i < total; i++) {
+        const song = albumSongs[i];
+        setUploadStage(`Uploading track ${i + 1} of ${total}: "${song.title}"`);
+        const details: TrackSubmissionDetails = {
+          stageName: album.artistName.trim(),
+          realName: album.realName.trim(),
+          country: album.country.trim(),
+          whatsapp: album.whatsapp.trim(),
+          producer: song.producer.trim() || album.producer.trim(),
+          ...(song.previouslyReleased ? { previouslyReleased: song.previouslyReleased } : {}),
+          ...(song.previouslyReleased === 'yes' ? { profileLink: song.profileLink.trim() } : {}),
+          ...(song.featuring.trim() && song.featuringPreviouslyReleased
+            ? { featuringPreviouslyReleased: song.featuringPreviouslyReleased }
+            : {}),
+          ...(song.featuring.trim() && song.featuringPreviouslyReleased === 'yes'
+            ? { featuringProfileLink: song.featuringProfileLink.trim() }
+            : {}),
+        };
+        const track = await submitTrack(buildUploadFormData({
+          artistId: artist.id,
+          title: song.title.trim(),
+          genre: album.genre,
+          releaseDate: album.releaseDate,
+          platforms,
+          details: JSON.stringify(details),
+          albumId,
+          albumTitle: album.albumTitle.trim(),
+          albumType: album.albumType,
+          ...(song.featuring.trim() ? { featuring: song.featuring.trim() } : {}),
+        }, song.audioFile ? [song.audioFile] : []), (pct) => {
+          setUploadProgress(Math.round(((i + pct / 100) / total) * 100));
+        });
+        addTrackToCache(track);
+        createdTrackIds.push(track.id);
+        if (!firstTrackId) firstTrackId = track.id;
+      }
 
-    setSubmitting(false);
-    navigate('/artist/releases');
+      void sendNotification(
+        artist.id,
+        'upload_submitted',
+        'Album Upload Received',
+        `We've received your ${album.albumType} "${album.albumTitle}" (${albumSongs.length} tracks). Our team will review it within 2–3 business days.`,
+        { trackId: firstTrackId, trackTitle: album.albumTitle },
+      );
+
+      navigate('/artist/releases');
+    } catch (err) {
+      if (createdTrackIds.length > 0) {
+        await Promise.allSettled(createdTrackIds.map((id) => deleteTrack(id)));
+      }
+      const baseMessage = err instanceof ApiError ? err.message : 'Upload failed. Please check your connection and try again.';
+      setError(`${baseMessage} Any songs already uploaded for this album have been removed — please try again.`);
+    } finally {
+      setSubmitting(false);
+      setUploadProgress(0);
+      setUploadStage('');
+    }
   }
 
   async function handleTermsConfirm() {
@@ -306,7 +415,7 @@ export default function ArtistUploadPage() {
           </button>
           <button
             type="button"
-            onClick={() => { setUploadType('album'); setError(''); setAudioFiles(null); setCoverArt(null); }}
+            onClick={() => { setUploadType('album'); setError(''); setAudioFiles(null); setCoverArt(null); setAlbumSongs([]); }}
             className={[
               'dash-panel flex flex-col items-center gap-3 py-8 cursor-pointer transition-colors border-2',
               uploadType === 'album' ? 'border-gold' : 'border-transparent',
@@ -343,9 +452,6 @@ export default function ArtistUploadPage() {
                 <Field label="Active WhatsApp Number" required>
                   <input name="whatsapp" className="dash-input" value={single.whatsapp} onChange={handleSingle} placeholder="e.g. +234 801 234 5678" maxLength={20} required />
                 </Field>
-                <Field label="Audiomack Artist ID (optional)">
-                  <input name="audiomackId" className="dash-input" value={single.audiomackId} onChange={handleSingle} placeholder="e.g. audiomack.com/your-name" maxLength={200} />
-                </Field>
               </div>
             </div>
 
@@ -371,6 +477,7 @@ export default function ArtistUploadPage() {
                   </select>
                 </Field>
                 <Field label="Release Date" required>
+                  <p className="text-xs text-muted mb-1.5">(We advise a minimum of 2-3 weeks from the date of uploading)</p>
                   <input name="releaseDate" type="date" className="dash-input" value={single.releaseDate} onChange={handleSingle} min={tomorrow} required />
                 </Field>
                 <Field label="Have you released music on streaming platforms before?" required>
@@ -385,6 +492,24 @@ export default function ArtistUploadPage() {
                 <div className="mt-4">
                   <Field label="Paste your Spotify / Apple Music profile or song link" required>
                     <input name="profileLink" className="dash-input" value={single.profileLink} onChange={handleSingle} placeholder="https://open.spotify.com/artist/..." maxLength={300} required />
+                  </Field>
+                </div>
+              )}
+              {single.featuring.trim() !== '' && (
+                <div className="mt-4">
+                  <Field label="Has the featuring artist released music on streaming platforms before?" required>
+                    <select name="featuringPreviouslyReleased" className="dash-input select-field" value={single.featuringPreviouslyReleased} onChange={handleSingle} required>
+                      <option value="">Select an option</option>
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </Field>
+                </div>
+              )}
+              {single.featuring.trim() !== '' && single.featuringPreviouslyReleased === 'yes' && (
+                <div className="mt-4">
+                  <Field label="Paste the featuring artist's Spotify / Apple Music profile or song link" required>
+                    <input name="featuringProfileLink" className="dash-input" value={single.featuringProfileLink} onChange={handleSingle} placeholder="https://open.spotify.com/artist/..." maxLength={300} required />
                   </Field>
                 </div>
               )}
@@ -432,10 +557,12 @@ export default function ArtistUploadPage() {
               <div className="text-xs text-red-400 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg">{error}</div>
             )}
 
+            {submitting && <UploadProgressBar percent={uploadProgress} stage={uploadStage} />}
+
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2 border-t border-line">
-              <button type="button" className="dash-btn dash-btn--ghost w-full sm:w-auto justify-center" onClick={() => setUploadType(null)}>Back</button>
+              <button type="button" className="dash-btn dash-btn--ghost w-full sm:w-auto justify-center" onClick={() => setUploadType(null)} disabled={submitting}>Back</button>
               <button type="submit" className="dash-btn dash-btn--gold w-full sm:w-auto justify-center" disabled={submitting}>
-                {submitting ? 'Submitting…' : 'Submit Single'}
+                {submitting ? `Submitting… ${uploadProgress}%` : 'Submit Single'}
               </button>
             </div>
 
@@ -464,9 +591,6 @@ export default function ArtistUploadPage() {
                 <Field label="Active WhatsApp Number" required>
                   <input name="whatsapp" className="dash-input" value={album.whatsapp} onChange={handleAlbum} placeholder="e.g. +234 801 234 5678" maxLength={20} required />
                 </Field>
-                <Field label="Audiomack Artist ID (optional)">
-                  <input name="audiomackId" className="dash-input" value={album.audiomackId} onChange={handleAlbum} placeholder="e.g. audiomack.com/your-name" maxLength={200} />
-                </Field>
               </div>
             </div>
 
@@ -490,7 +614,7 @@ export default function ArtistUploadPage() {
                 <Field label="Number of Tracks" required>
                   <input name="trackCount" type="number" min="2" max="30" className="dash-input" value={album.trackCount} onChange={handleAlbum} placeholder="e.g. 8" required />
                 </Field>
-                <Field label="Producer Name" required>
+                <Field label="Main Producer Name (used for any track where you don't enter one below)" required>
                   <input name="producer" className="dash-input" value={album.producer} onChange={handleAlbum} placeholder="e.g. Sarz" maxLength={100} required />
                 </Field>
                 <Field label="Genre" required>
@@ -500,43 +624,18 @@ export default function ArtistUploadPage() {
                   </select>
                 </Field>
                 <Field label="Release Date" required>
+                  <p className="text-xs text-muted mb-1.5">(We advise a minimum of 2-3 weeks from the date of uploading)</p>
                   <input name="releaseDate" type="date" className="dash-input" value={album.releaseDate} onChange={handleAlbum} min={tomorrow} required />
                 </Field>
-                <Field label="Have you released music on streaming platforms before?" required>
-                  <select name="previouslyReleased" className="dash-input select-field" value={album.previouslyReleased} onChange={handleAlbum} required>
-                    <option value="">Select an option</option>
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
-                  </select>
-                </Field>
               </div>
-              {album.previouslyReleased === 'yes' && (
-                <div className="mt-4">
-                  <Field label="Paste your Spotify / Apple Music profile or song link" required>
-                    <input name="profileLink" className="dash-input" value={album.profileLink} onChange={handleAlbum} placeholder="https://open.spotify.com/artist/..." maxLength={300} required />
-                  </Field>
-                </div>
-              )}
             </div>
 
             <div className="h-px" style={{ background: 'var(--color-line)' }} />
 
-            {/* Section 3 — Files */}
+            {/* Section 3 — Cover Art */}
             <div>
-              <div className="text-xs font-mono uppercase tracking-widest text-gold mb-4">03 · Upload Files</div>
+              <div className="text-xs font-mono uppercase tracking-widest text-gold mb-4">03 · Cover Art</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Audio Files (WAV or MP3 — all tracks)" required>
-                  <div
-                    className="dash-input flex items-center justify-between gap-3 cursor-pointer hover:border-gold/50 transition-colors"
-                    onClick={() => audioRef.current?.click()}
-                  >
-                    <span className="text-sm truncate" style={{ color: audioFiles?.length ? 'var(--color-ink)' : 'var(--color-muted)' }}>
-                      {audioFiles?.length ? `${audioFiles.length} file${audioFiles.length > 1 ? 's' : ''} selected` : 'Choose files…'}
-                    </span>
-                    <span className="text-xs text-gold shrink-0">Browse</span>
-                  </div>
-                  <input ref={audioRef} type="file" accept=".wav,.mp3,audio/wav,audio/mpeg" multiple className="hidden" onChange={(e) => setAudioFiles(e.target.files)} />
-                </Field>
                 <Field label="Cover Art (JPG or PNG, 3000×3000px)" required>
                   <div
                     className="dash-input flex items-center justify-between gap-3 cursor-pointer hover:border-gold/50 transition-colors"
@@ -550,21 +649,125 @@ export default function ArtistUploadPage() {
                   <input ref={coverRef} type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className="hidden" onChange={(e) => setCoverArt(e.target.files?.[0] ?? null)} />
                 </Field>
               </div>
-              <div className="mt-4">
-                <Field label="Track List" required>
-                  <textarea name="notes" className="dash-input" value={album.notes} onChange={handleAlbum} placeholder={"01. Track Title ft. Featured Artist — Produced by Producer Name\n02. Track Title — Produced by Producer Name\n03. Track Title ft. Artist A, Artist B — Produced by Producer Name"} rows={6} style={{ resize: 'vertical', fontFamily: 'var(--font-sans)' }} required />
-                </Field>
-              </div>
+            </div>
+
+            <div className="h-px" style={{ background: 'var(--color-line)' }} />
+
+            {/* Section 4 — Tracks */}
+            <div>
+              <div className="text-xs font-mono uppercase tracking-widest text-gold mb-4">04 · Tracks</div>
+              {albumSongs.length === 0 ? (
+                <p className="text-sm text-muted">Enter the number of tracks above to list each song.</p>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {albumSongs.map((song, i) => (
+                    <div key={song.id} className="border border-line rounded-lg p-4 flex flex-col gap-3" style={{ background: 'var(--color-bg-2)' }}>
+                      <div className="text-xs font-mono uppercase tracking-widest text-muted">Track {i + 1}</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Field label="Track Title" required>
+                          <input
+                            className="dash-input"
+                            value={song.title}
+                            onChange={(e) => updateAlbumSong(song.id, { title: e.target.value })}
+                            placeholder="e.g. Midnight Frequency"
+                            maxLength={100}
+                            required
+                          />
+                        </Field>
+                        <Field label="Featuring Artist(s)">
+                          <input
+                            className="dash-input"
+                            value={song.featuring}
+                            onChange={(e) => updateAlbumSong(song.id, { featuring: e.target.value })}
+                            placeholder="e.g. Wizkid (optional)"
+                            maxLength={100}
+                          />
+                        </Field>
+                      </div>
+                      <Field label="Have you released this song on streaming platforms before?" required>
+                        <select
+                          className="dash-input select-field"
+                          value={song.previouslyReleased}
+                          onChange={(e) => updateAlbumSong(song.id, { previouslyReleased: e.target.value as '' | 'yes' | 'no' })}
+                          required
+                        >
+                          <option value="">Select an option</option>
+                          <option value="no">No</option>
+                          <option value="yes">Yes</option>
+                        </select>
+                      </Field>
+                      {song.previouslyReleased === 'yes' && (
+                        <Field label="Paste your Spotify / Apple Music profile or song link" required>
+                          <input
+                            className="dash-input"
+                            value={song.profileLink}
+                            onChange={(e) => updateAlbumSong(song.id, { profileLink: e.target.value })}
+                            placeholder="https://open.spotify.com/artist/..."
+                            maxLength={300}
+                            required
+                          />
+                        </Field>
+                      )}
+                      {song.featuring.trim() !== '' && (
+                        <Field label="Has the featuring artist released music on streaming platforms before?" required>
+                          <select
+                            className="dash-input select-field"
+                            value={song.featuringPreviouslyReleased}
+                            onChange={(e) => updateAlbumSong(song.id, { featuringPreviouslyReleased: e.target.value as '' | 'yes' | 'no' })}
+                            required
+                          >
+                            <option value="">Select an option</option>
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                          </select>
+                        </Field>
+                      )}
+                      {song.featuring.trim() !== '' && song.featuringPreviouslyReleased === 'yes' && (
+                        <Field label="Paste the featuring artist's Spotify / Apple Music profile or song link" required>
+                          <input
+                            className="dash-input"
+                            value={song.featuringProfileLink}
+                            onChange={(e) => updateAlbumSong(song.id, { featuringProfileLink: e.target.value })}
+                            placeholder="https://open.spotify.com/artist/..."
+                            maxLength={300}
+                            required
+                          />
+                        </Field>
+                      )}
+                      <Field label="Audio File (WAV or MP3)" required>
+                        <input
+                          type="file"
+                          accept=".wav,.mp3,audio/wav,audio/mpeg"
+                          className="dash-input"
+                          onChange={(e) => updateAlbumSong(song.id, { audioFile: e.target.files?.[0] ?? null })}
+                          required
+                        />
+                      </Field>
+                      <Field label="Producer Name">
+                        <input
+                          className="dash-input"
+                          value={song.producer}
+                          onChange={(e) => updateAlbumSong(song.id, { producer: e.target.value })}
+                          placeholder={album.producer.trim() || 'e.g. Sarz'}
+                          maxLength={100}
+                        />
+                      </Field>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {error && (
               <div className="text-xs text-red-400 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg">{error}</div>
             )}
 
+            {submitting && <UploadProgressBar percent={uploadProgress} stage={uploadStage} />}
+
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2 border-t border-line">
-              <button type="button" className="dash-btn dash-btn--ghost w-full sm:w-auto justify-center" onClick={() => setUploadType(null)}>Back</button>
+              <button type="button" className="dash-btn dash-btn--ghost w-full sm:w-auto justify-center" onClick={() => setUploadType(null)} disabled={submitting}>Back</button>
               <button type="submit" className="dash-btn dash-btn--gold w-full sm:w-auto justify-center" disabled={submitting}>
-                {submitting ? 'Submitting…' : 'Submit Album / EP'}
+                {submitting ? `Submitting… ${uploadProgress}%` : 'Submit Album / EP'}
               </button>
             </div>
 
@@ -580,7 +783,7 @@ export default function ArtistUploadPage() {
             {/* Header */}
             <div className="px-6 pt-6 pb-4 border-b" style={{ borderColor: 'var(--color-line)' }}>
               <h2 className="font-serif text-xl font-normal text-ink">Confirmation Required</h2>
-              <p className="text-sm text-muted mt-1">You are about to submit this release to the following services:</p>
+              <p className="text-sm text-muted mt-1">You are about to submit this release to be distributed to digital and social platforms worldwide (250+ platforms).</p>
               <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono tracking-wide" style={{ borderColor: 'var(--color-gold)', color: 'var(--color-gold)', background: 'rgba(184,142,67,0.1)' }}>
                 ✦ 25 Services
               </div>
@@ -600,7 +803,7 @@ export default function ArtistUploadPage() {
                     className="w-4 h-4 accent-gold cursor-pointer mt-0.5 shrink-0"
                   />
                   <p className="text-sm text-ink leading-relaxed">
-                    I own or have legally licensed all copyrights to the sound recordings, compositions, and artwork embodied in this release, and furthermore abide and agree to all terms as set forth in our distribution agreement.
+                    I have legal copyright licenses to the sound recordings, beats/instrumentals, compositions and artwork in this project. And further abide and agree to all terms as set forth in our distribution agreement.
                   </p>
                 </label>
                 <a href="/legal#distribution" target="_blank" rel="noreferrer" className="mt-3 ml-7 inline-flex items-center gap-1 text-xs font-medium rounded px-2 py-1 border transition-colors hover:border-gold" style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-2)' }}>
@@ -708,6 +911,21 @@ function Field({ label, required, children }: { label: string; required?: boolea
         {label} {required && <span className="text-gold">*</span>}
       </label>
       {children}
+    </div>
+  );
+}
+
+function UploadProgressBar({ percent, stage }: { percent: number; stage: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      {stage && <div className="text-xs text-muted">{stage}</div>}
+      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-bg-3)' }}>
+        <div
+          className="h-full rounded-full transition-all duration-200"
+          style={{ width: `${percent}%`, background: 'var(--color-gold)' }}
+        />
+      </div>
+      <div className="text-xs text-ink font-medium text-right">{percent}%</div>
     </div>
   );
 }

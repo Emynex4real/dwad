@@ -26,6 +26,7 @@ require __DIR__ . '/src/Controllers/AnalyticsController.php';
 require __DIR__ . '/src/Controllers/PayoutController.php';
 require __DIR__ . '/src/Controllers/InviteController.php';
 require __DIR__ . '/src/Controllers/ProductionController.php';
+require __DIR__ . '/src/Controllers/DistroReleaseController.php';
 require __DIR__ . '/src/Controllers/BeatController.php';
 require __DIR__ . '/src/Controllers/PricingController.php';
 require __DIR__ . '/src/Controllers/SpotlightController.php';
@@ -66,6 +67,7 @@ $analyticsController = new AnalyticsController();
 $payoutController = new PayoutController();
 $inviteController = new InviteController();
 $productionController = new ProductionController();
+$distroReleaseController = new DistroReleaseController();
 $beatController = new BeatController();
 $pricingController = new PricingController();
 $spotlightController = new SpotlightController();
@@ -80,6 +82,7 @@ $router->add('GET', '/artists', [$artistController, 'index']);
 $router->add('POST', '/artists', [$artistController, 'store']);
 $router->add('GET', '/artists/{id}', [$artistController, 'show']);
 $router->add('PATCH', '/artists/{id}/upload-access', [$artistController, 'updateUploadAccess']);
+$router->add('PATCH', '/artists/{id}/copyright-flag', [$artistController, 'updateCopyrightFlag']);
 $router->add('PATCH', '/artists/{id}/payout', [$artistController, 'updatePayout']);
 $router->add('PATCH', '/artists/{id}/approve', [$artistController, 'approve']);
 $router->add('PATCH', '/artists/{id}', [$artistController, 'update']);
@@ -97,16 +100,20 @@ $router->add('GET', '/tracks', [$trackController, 'index']);
 $router->add('POST', '/tracks', [$trackController, 'store']);
 $router->add('GET', '/tracks/live', [$trackController, 'live']);
 $router->add('GET', '/tracks/artist/{id}', [$trackController, 'forArtist']);
+$router->add('GET', '/tracks/album/{albumId}/audio', [$trackController, 'albumAudio']);
 $router->add('GET', '/tracks/{id}/audio', [$trackController, 'audio']);
+$router->add('GET', '/tracks/{id}/cover', [$trackController, 'cover']);
 $router->add('GET', '/tracks/{id}', [$trackController, 'show']);
 $router->add('PATCH', '/tracks/{id}/status', [$trackController, 'updateStatus']);
 $router->add('PATCH', '/tracks/{id}', [$trackController, 'update']);
+$router->add('DELETE', '/tracks/{id}', [$trackController, 'destroy']);
 
 $router->add('POST', '/reports/upload', [$reportController, 'upload']);
 $router->add('GET', '/reports', [$reportController, 'index']);
 $router->add('GET', '/reports/pending', [$reportController, 'pending']);
 $router->add('PATCH', '/reports/pending/{id}/resolve', [$reportController, 'resolve']);
 $router->add('PATCH', '/reports/pending/{id}/skip', [$reportController, 'skip']);
+$router->add('POST', '/reports/backfill-tracks', [$reportController, 'backfillTracks']);
 
 $router->add('GET', '/settings/exchange-rate', [$settingsController, 'exchangeRate']);
 
@@ -126,6 +133,12 @@ $router->add('PATCH', '/productions/{id}', [$productionController, 'update']);
 $router->add('POST', '/productions/{id}', [$productionController, 'update']);
 $router->add('DELETE', '/productions/{id}', [$productionController, 'destroy']);
 
+$router->add('GET', '/distro-releases', [$distroReleaseController, 'index']);
+$router->add('POST', '/distro-releases', [$distroReleaseController, 'store']);
+$router->add('PATCH', '/distro-releases/{id}', [$distroReleaseController, 'update']);
+$router->add('POST', '/distro-releases/{id}', [$distroReleaseController, 'update']);
+$router->add('DELETE', '/distro-releases/{id}', [$distroReleaseController, 'destroy']);
+
 $router->add('GET', '/beats', [$beatController, 'index']);
 $router->add('POST', '/beats', [$beatController, 'store']);
 $router->add('PATCH', '/beats/{id}', [$beatController, 'update']);
@@ -134,7 +147,9 @@ $router->add('DELETE', '/beats/{id}', [$beatController, 'destroy']);
 
 $router->add('GET', '/pricing/localized', [$pricingController, 'localized']);
 $router->add('GET', '/pricing/plans', [$pricingController, 'plansIndex']);
+$router->add('POST', '/pricing/plans', [$pricingController, 'plansCreate']);
 $router->add('PATCH', '/pricing/plans/{id}', [$pricingController, 'plansUpdate']);
+$router->add('DELETE', '/pricing/plans/{id}', [$pricingController, 'plansDestroy']);
 
 $router->add('GET', '/spotlight', [$spotlightController, 'index']);
 $router->add('POST', '/spotlight/items', [$spotlightController, 'storeItem']);

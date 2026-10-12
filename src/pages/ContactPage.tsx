@@ -1,5 +1,6 @@
 import Arrow from '../components/ui/Arrow';
 import PageHero from '../components/ui/PageHero';
+import Reveal from '../components/ui/Reveal';
 import SEO from '../components/ui/SEO';
 import Ticker from '../components/ui/Ticker';
 
@@ -30,46 +31,49 @@ export default function ContactPage() {
           <div className="grid gap-12 sm:gap-20 items-start grid-cols-1 min-[900px]:grid-cols-[1.2fr_1fr]">
 
             {/* ── CTA ── */}
-            <div>
-              <a
-                href="https://wa.me/message/VYJP7JFQPZXSN1"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
-              >
-                WhatsApp us<Arrow />
-              </a>
-            </div>
+            <Reveal>
+              <div>
+                <a
+                  href="https://wa.me/message/VYJP7JFQPZXSN1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3 transition-colors duration-250 hover:bg-[var(--color-gold-2)]"
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', padding: '16px 28px', background: 'var(--color-gold)', color: 'var(--color-bg)' }}
+                >
+                  WhatsApp us<Arrow />
+                </a>
+              </div>
+            </Reveal>
 
             {/* ── Contact cards ── */}
             <div className="flex flex-col gap-5">
-              {contactItems.map(item => (
-                <div
-                  key={item.label}
-                  className="border"
-                  style={{ padding: '24px 28px', background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
-                >
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>
-                    {item.label}
-                  </div>
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      className="block mt-3 transition-colors duration-250 hover:text-[var(--color-gold)] break-all"
-                      style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(20px, 3.5vw, 28px)', fontWeight: 400, lineHeight: 1.2, color: 'var(--color-ink)' }}
-                    >
-                      {item.value}
-                    </a>
-                  ) : (
-                    <div
-                      className="mt-3 whitespace-pre-line"
-                      style={{ fontFamily: 'var(--font-serif)', fontSize: item.label === 'Hours' ? '18px' : 'clamp(20px, 3.5vw, 28px)', fontWeight: 400, lineHeight: 1.3, color: 'var(--color-ink)' }}
-                    >
-                      {item.value}
+              {contactItems.map((item, i) => (
+                <Reveal key={item.label} delay={i * 80}>
+                  <div
+                    className="border"
+                    style={{ padding: '24px 28px', background: 'var(--color-bg-2)', borderColor: 'var(--color-line)' }}
+                  >
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.22em', color: 'var(--color-muted)', textTransform: 'uppercase' }}>
+                      {item.label}
                     </div>
-                  )}
-                </div>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="block mt-3 transition-colors duration-250 hover:text-[var(--color-gold)] break-all"
+                        style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(20px, 3.5vw, 28px)', fontWeight: 400, lineHeight: 1.2, color: 'var(--color-ink)' }}
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      <div
+                        className="mt-3 whitespace-pre-line"
+                        style={{ fontFamily: 'var(--font-serif)', fontSize: item.label === 'Hours' ? '18px' : 'clamp(20px, 3.5vw, 28px)', fontWeight: 400, lineHeight: 1.3, color: 'var(--color-ink)' }}
+                      >
+                        {item.value}
+                      </div>
+                    )}
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>

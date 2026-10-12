@@ -27,15 +27,38 @@ class NotificationController
     public function store(): void
     {
         $pdo = Database::pdo();
-        Auth::requireAdmin($pdo);
+        $user = Auth::requireUser($pdo);
         $body = Request::body();
 
         if (empty($body['artistId']) || empty($body['type']) || empty($body['title']) || empty($body['message'])) {
             throw new HttpException('artistId, type, title, and message are required.', 422);
         }
 
+        // An artist may only ever log the one self-facing "I just submitted an
+        // upload" notification about themselves — every other type (approvals,
+        // rejections, broadcasts, etc.) stays admin-only.
+        $isSelfUploadNotice = $body['type'] === 'upload_submitted' && $body['artistId'] === $user['id'];
+        if ($user['role'] !== 'admin' && !$isSelfUploadNotice) {
+            throw new HttpException('Forbidden', 403);
+        }
+
         $id = $this->insertNotification($body['artistId'], $body['type'], $body['title'], $body['message'], $body['metadata'] ?? null);
+
+        if ($isSelfUploadNotice) {
+            $this->emailAdminsOfUpload($pdo, $body['title'], $body['message']);
+        }
+
         Response::json($this->findNotification($id), 201);
+    }
+
+    private function emailAdminsOfUpload(PDO $pdo, string $title, string $message): void
+    {
+        $admins = $pdo->query("SELECT name, email FROM artists WHERE role = 'admin'")->fetchAll();
+        $frontendUrl = rtrim(Config::get()['app']['frontend_url'], '/');
+        $body = '<p>' . htmlspecialchars($message) . '</p><p><a href="' . htmlspecialchars($frontendUrl) . '/admin/uploads">Review it in the admin dashboard</a></p>';
+        foreach ($admins as $admin) {
+            Mailer::send($admin['email'], $admin['name'], $title, $body);
+        }
     }
 
     public function broadcast(): void

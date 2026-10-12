@@ -2,7 +2,7 @@
 
 class ArtistController
 {
-    private const ARTIST_COLUMNS = 'id, name, email, phone, genre, country, avatar_url, bio, upload_access, status, payout_method, payout_details, joined_date, social_spotify, social_instagram, social_youtube, social_apple';
+    private const ARTIST_COLUMNS = 'id, name, email, phone, genre, country, avatar_url, bio, upload_access, copyright_status, status, payout_method, payout_details, joined_date, social_spotify, social_instagram, social_youtube, social_apple';
     private const PAYOUT_METHODS = ['bank_transfer', 'paypal', 'mobile_money'];
 
     public function index(): void
@@ -221,6 +221,23 @@ class ArtistController
         Response::json($this->mapArtist($this->findArtistRow($id)));
     }
 
+    public function updateCopyrightFlag(array $args): void
+    {
+        $pdo = Database::pdo();
+        Auth::requireAdmin($pdo);
+        $id = $args['id'];
+        $body = Request::body();
+
+        if ($this->findArtistRow($id) === null) {
+            throw new HttpException('Artist not found', 404);
+        }
+
+        $stmt = $pdo->prepare('UPDATE artists SET copyright_status = ? WHERE id = ?');
+        $stmt->execute([$body['copyrightStatus'] ?? 'clear', $id]);
+
+        Response::json($this->mapArtist($this->findArtistRow($id)));
+    }
+
     public function destroy(array $args): void
     {
         $pdo = Database::pdo();
@@ -282,6 +299,7 @@ class ArtistController
             'avatarUrl' => $row['avatar_url'],
             'bio' => $row['bio'],
             'uploadAccess' => $row['upload_access'],
+            'copyrightStatus' => $row['copyright_status'],
             'status' => $row['status'],
             'payoutMethod' => $row['payout_method'],
             'payoutDetails' => $row['payout_details'],

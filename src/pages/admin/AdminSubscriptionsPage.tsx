@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react';
-import { getAllArtists } from '../../services/artists.service';
 import {
   renewSubscription,
   setSubscriptionStatus,
@@ -7,14 +6,14 @@ import {
   PLAN_DEFINITIONS,
 } from '../../services/subscriptions.service';
 import { sendNotification } from '../../services/notifications.service';
-import type { ArtistProfile, Subscription, SubscriptionPlan } from '../../types/dashboard';
+import { useArtists } from '../../hooks/useArtists';
+import type { Subscription, SubscriptionPlan } from '../../types/dashboard';
 
 export default function AdminSubscriptionsPage() {
-  const [artists, setArtists]   = useState<ArtistProfile[]>([]);
+  const { artists, updateArtistInCache } = useArtists();
   const [expiring, setExpiring] = useState<Subscription[]>([]);
 
   useEffect(() => {
-    void getAllArtists().then(setArtists);
     void getExpiringSubscriptions(30).then(setExpiring);
   }, []);
 
@@ -26,20 +25,20 @@ export default function AdminSubscriptionsPage() {
   }), [artists]);
 
   async function handleRenew(artistId: string, plan: SubscriptionPlan) {
-    await renewSubscription(artistId, plan);
+    const updatedSub = await renewSubscription(artistId, plan);
+    if (updatedSub) updateArtistInCache(artistId, { subscription: updatedSub });
     void sendNotification(artistId, 'subscription_renewed', 'Subscription Renewed',
       `Your ${plan} plan has been renewed successfully.`);
-    setArtists(await getAllArtists());
   }
 
   async function handleSuspend(artistId: string) {
-    await setSubscriptionStatus(artistId, 'suspended');
-    setArtists(await getAllArtists());
+    const updatedSub = await setSubscriptionStatus(artistId, 'suspended');
+    if (updatedSub) updateArtistInCache(artistId, { subscription: updatedSub });
   }
 
   async function handleReactivate(artistId: string) {
-    await setSubscriptionStatus(artistId, 'active');
-    setArtists(await getAllArtists());
+    const updatedSub = await setSubscriptionStatus(artistId, 'active');
+    if (updatedSub) updateArtistInCache(artistId, { subscription: updatedSub });
   }
 
   return (

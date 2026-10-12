@@ -26,6 +26,7 @@ export interface Subscription {
 
 // ── Artist ────────────────────────────────────────────────────────────────────
 export type UploadAccess = 'granted' | 'locked';
+export type CopyrightStatus = 'clear' | 'flagged';
 
 const PayoutMethod = { BankTransfer: 'bank_transfer', PayPal: 'paypal', MobileMoney: 'mobile_money' } as const;
 export type PayoutMethod = typeof PayoutMethod[keyof typeof PayoutMethod];
@@ -43,6 +44,7 @@ export interface ArtistProfile {
   avatarUrl?: string;
   bio: string;
   uploadAccess: UploadAccess;
+  copyrightStatus: CopyrightStatus;
   status: AccountStatus;
   payoutMethod?: PayoutMethod;
   payoutDetails?: string;
@@ -58,6 +60,19 @@ export interface ArtistProfile {
 
 // ── Track ─────────────────────────────────────────────────────────────────────
 export type TrackStatus = 'pending' | 'approved' | 'rejected' | 'live';
+
+export interface TrackSubmissionDetails {
+  stageName?: string;
+  realName?: string;
+  country?: string;
+  whatsapp?: string;
+  producer?: string;
+  previouslyReleased?: 'yes' | 'no';
+  profileLink?: string;
+  featuringPreviouslyReleased?: 'yes' | 'no';
+  featuringProfileLink?: string;
+  notes?: string;
+}
 
 export interface TrackUpload {
   id: string;
@@ -75,6 +90,10 @@ export interface TrackUpload {
   submittedAt: string; // ISO date string
   reviewNote?: string;
   platforms: string[];
+  albumId?: string;
+  albumTitle?: string;
+  albumType?: string;
+  details?: TrackSubmissionDetails;
 }
 
 // ── Analytics ─────────────────────────────────────────────────────────────────
@@ -155,6 +174,8 @@ export interface PendingReportRow {
   revenueUsd: number;
   status: PendingReportStatus;
   createdAt: string;
+  suggestedArtistId: string | null;
+  suggestedArtistName: string | null;
 }
 
 export interface ExchangeRate {

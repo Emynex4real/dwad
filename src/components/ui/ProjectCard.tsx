@@ -4,11 +4,15 @@ import PlayIcon from './PlayIcon';
 interface ProjectCardProps {
   project: Project;
   idx: number;
+  href?: string;
 }
 
-export default function ProjectCard({ project, idx }: ProjectCardProps) {
+export default function ProjectCard({ project, idx, href }: ProjectCardProps) {
+  const Wrapper = href ? 'a' : 'div';
+  const wrapperProps = href ? { href, target: '_blank', rel: 'noreferrer' } : {};
+
   return (
-    <div className="project relative cursor-pointer group">
+    <Wrapper className="project relative cursor-pointer group block" {...wrapperProps}>
       <div
         className="project-cover relative overflow-hidden border"
         style={{
@@ -67,6 +71,6 @@ export default function ProjectCard({ project, idx }: ProjectCardProps) {
       >
         {project.artist}
       </div>
-    </div>
+    </Wrapper>
   );
 }

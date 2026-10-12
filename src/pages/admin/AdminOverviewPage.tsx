@@ -1,23 +1,46 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllArtists } from '../../services/artists.service';
-import { getAllTracks } from '../../services/tracks.service';
+import { useArtists } from '../../hooks/useArtists';
+import { useTracks } from '../../hooks/useTracks';
 import { getAllSubscriptions, getExpiringSubscriptions } from '../../services/subscriptions.service';
-import type { ArtistProfile, Subscription, TrackUpload } from '../../types/dashboard';
+import { getAllAnalytics } from '../../services/analytics.service';
+import AreaSparkline from '../../components/ui/AreaSparkline';
+import type { Subscription, ArtistAnalytics } from '../../types/dashboard';
+
+const MONTH_INDEX: Record<string, number> = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+
+function monthSortKey(label: string): number {
+  const [mon, yr] = label.split(' ');
+  return parseInt(yr, 10) * 12 + (MONTH_INDEX[mon] ?? 0);
+}
 
 export default function AdminOverviewPage() {
-  const [artists, setArtists]   = useState<ArtistProfile[]>([]);
+  const { artists } = useArtists();
+  const { tracks } = useTracks();
   const [subs, setSubs]         = useState<Subscription[]>([]);
   const [expiring, setExpiring] = useState<Subscription[]>([]);
-  const [tracks, setTracks]     = useState<TrackUpload[]>([]);
+  const [analytics, setAnalytics] = useState<ArtistAnalytics[]>([]);
   const pending  = useMemo(() => tracks.filter((t) => t.status === 'pending'), [tracks]);
 
   useEffect(() => {
-    void getAllArtists().then(setArtists);
     void getAllSubscriptions().then(setSubs);
     void getExpiringSubscriptions(30).then(setExpiring);
-    void getAllTracks().then(setTracks);
+    void getAllAnalytics().then(setAnalytics);
   }, []);
+
+  const monthlyStreams = useMemo(() => {
+    const monthlyMap = new Map<string, { streams: number; revenue: number }>();
+    analytics.forEach((a) => {
+      a.monthly.forEach((m) => {
+        const existing = monthlyMap.get(m.month) ?? { streams: 0, revenue: 0 };
+        monthlyMap.set(m.month, { streams: existing.streams + m.streams, revenue: existing.revenue + m.revenue });
+      });
+    });
+    return Array.from(monthlyMap.entries())
+      .map(([month, data]) => ({ month, ...data }))
+      .sort((a, b) => monthSortKey(a.month) - monthSortKey(b.month))
+      .slice(-6);
+  }, [analytics]);
 
   const active  = subs.filter((s) => s.status === 'active').length;
   const expired = subs.filter((s) => s.status === 'expired').length;
@@ -44,6 +67,15 @@ export default function AdminOverviewPage() {
         <div className="stat-card"><div className="stat-card__label">Pending Uploads</div><div className="stat-card__value">{pending.length}</div><div className="stat-card__note">Awaiting review</div></div>
         <div className="stat-card"><div className="stat-card__label">Live Releases</div><div className="stat-card__value">{live}</div><div className="stat-card__note">All platforms</div></div>
         <div className="stat-card stat-card--gold col-span-2 sm:col-span-1"><div className="stat-card__label">Monthly Revenue</div><div className="stat-card__value">${mrr}</div><div className="stat-card__note">Subscription income</div></div>
+      </div>
+
+      {/* Monthly streams chart */}
+      <div className="dash-panel">
+        <div className="dash-panel__header">
+          <h2 className="dash-panel__title">Monthly Streams</h2>
+          <Link to="/admin/stats" className="dash-panel__link">View full stats →</Link>
+        </div>
+        <AreaSparkline data={monthlyStreams} />
       </div>
 
       {/* Two panels */}

@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { getAllArtists } from '../../services/artists.service';
+import { useArtists } from '../../hooks/useArtists';
 import { sendNotification, broadcastNotification, getAllNotifications } from '../../services/notifications.service';
-import type { ArtistProfile, NotificationType, Notification } from '../../types/dashboard';
+import type { NotificationType, Notification } from '../../types/dashboard';
 
 const NOTIFICATION_TYPES: { value: NotificationType; label: string }[] = [
   { value: 'general',              label: 'General' },
@@ -14,21 +14,18 @@ const NOTIFICATION_TYPES: { value: NotificationType; label: string }[] = [
 ];
 
 export default function AdminNotificationsPage() {
-  const [artists, setArtists] = useState<ArtistProfile[]>([]);
+  const { artists } = useArtists();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const [target,   setTarget]   = useState<'individual' | 'all'>('individual');
-  const [artistId, setArtistId] = useState('');
+  const [artistIdOverride, setArtistIdOverride] = useState<string | null>(null);
+  const artistId = artistIdOverride ?? artists[0]?.id ?? '';
   const [type,     setType]     = useState<NotificationType>('general');
   const [title,    setTitle]    = useState('');
   const [message,  setMessage]  = useState('');
   const [sent,     setSent]     = useState(false);
 
   useEffect(() => {
-    void getAllArtists().then((list) => {
-      setArtists(list);
-      setArtistId((current) => current || (list[0]?.id ?? ''));
-    });
     void getAllNotifications().then(setNotifications);
   }, []);
 
@@ -85,7 +82,7 @@ export default function AdminNotificationsPage() {
             {target === 'individual' && (
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-ink-2">Artist</label>
-                <select className="dash-input select-field" value={artistId} onChange={(e) => setArtistId(e.target.value)}>
+                <select className="dash-input select-field" value={artistId} onChange={(e) => setArtistIdOverride(e.target.value)}>
                   {artists.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
               </div>

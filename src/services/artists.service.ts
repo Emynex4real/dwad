@@ -1,4 +1,4 @@
-import type { ArtistProfile, UploadAccess, PayoutMethod } from '../types/dashboard';
+import type { ArtistProfile, UploadAccess, CopyrightStatus, PayoutMethod } from '../types/dashboard';
 import { apiFetch, ApiError } from './httpClient';
 
 export async function getAllArtists(): Promise<ArtistProfile[]> {
@@ -31,6 +31,18 @@ export async function setUploadAccess(artistId: string, access: UploadAccess): P
     return await apiFetch<ArtistProfile>(`/artists/${artistId}/upload-access`, {
       method: 'PATCH',
       body: { uploadAccess: access },
+    });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
+}
+
+export async function setCopyrightFlag(artistId: string, status: CopyrightStatus): Promise<ArtistProfile | null> {
+  try {
+    return await apiFetch<ArtistProfile>(`/artists/${artistId}/copyright-flag`, {
+      method: 'PATCH',
+      body: { copyrightStatus: status },
     });
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) return null;

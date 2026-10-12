@@ -3,12 +3,13 @@ interface PageHeroProps {
   title: string;
   italic: string;
   lede?: string;
+  compact?: boolean;
 }
 
-export default function PageHero({ crumb, title, italic, lede }: PageHeroProps) {
+export default function PageHero({ crumb, title, italic, lede, compact = false }: PageHeroProps) {
   return (
     <section
-      className="border-b relative overflow-hidden pt-32 pb-14 px-5 sm:pt-[180px] sm:pb-20 sm:px-14"
+      className={`border-b relative overflow-hidden pb-14 px-5 sm:pb-20 sm:px-14 ${compact ? 'pt-14 sm:pt-16' : 'pt-32 sm:pt-[180px]'}`}
       style={{ borderColor: 'var(--color-line)' }}
     >
       <div className="max-w-[1440px] mx-auto">

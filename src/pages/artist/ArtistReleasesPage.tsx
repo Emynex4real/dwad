@@ -1,21 +1,33 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { getTracksByArtist } from '../../services/tracks.service';
-import { getArtistById } from '../../services/artists.service';
-import type { ArtistProfile, TrackStatus, TrackUpload } from '../../types/dashboard';
+import { useArtists } from '../../hooks/useArtists';
+import { useTracks } from '../../hooks/useTracks';
+import type { TrackStatus, TrackUpload } from '../../types/dashboard';
+
+interface AlbumGroupRow {
+  kind: 'album';
+  albumId: string;
+  albumTitle: string;
+  albumType: string;
+  tracks: TrackUpload[];
+}
+interface SingleGroupRow {
+  kind: 'single';
+  track: TrackUpload;
+}
+type GroupRow = AlbumGroupRow | SingleGroupRow;
 
 export default function ArtistReleasesPage() {
   const { user } = useAuth();
-  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
-  const [tracks, setTracks] = useState<TrackUpload[]>([]);
+  const { getArtist } = useArtists();
+  const { getTracksForArtist } = useTracks();
+  const artist = user?.artistId ? getArtist(user.artistId) : undefined;
   const [statusFilter, setStatusFilter] = useState<TrackStatus | 'all'>('all');
-
-  useEffect(() => {
-    if (!user?.artistId) return;
-    void getArtistById(user.artistId).then(setArtist);
-    void getTracksByArtist(user.artistId).then(setTracks);
-  }, [user]);
+  const tracks = useMemo(
+    () => (user?.artistId ? getTracksForArtist(user.artistId) : []),
+    [user, getTracksForArtist],
+  );
 
   const filtered = useMemo(() => {
     const list = statusFilter === 'all' ? tracks : tracks.filter((t) => t.status === statusFilter);
@@ -29,6 +41,88 @@ export default function ArtistReleasesPage() {
     pending: tracks.filter((t) => t.status === 'pending').length,
     rejected: tracks.filter((t) => t.status === 'rejected').length,
   }), [tracks]);
+
+  const groups = useMemo<GroupRow[]>(() => {
+    const result: GroupRow[] = [];
+    const albumIndex = new Map<string, number>();
+    for (const t of filtered) {
+      if (t.albumId) {
+        const idx = albumIndex.get(t.albumId);
+        if (idx === undefined) {
+          albumIndex.set(t.albumId, result.length);
+          result.push({ kind: 'album', albumId: t.albumId, albumTitle: t.albumTitle ?? '', albumType: t.albumType ?? 'Album', tracks: [t] });
+        } else {
+          (result[idx] as AlbumGroupRow).tracks.push(t);
+        }
+      } else {
+        result.push({ kind: 'single', track: t });
+      }
+    }
+    for (const g of result) {
+      if (g.kind === 'album') g.tracks.sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime());
+    }
+    return result;
+  }, [filtered]);
+
+  const [albumSelection, setAlbumSelection] = useState<Record<string, string>>({});
+
+  function selectedTrackFor(group: AlbumGroupRow): TrackUpload {
+    const sel = albumSelection[group.albumId];
+    return group.tracks.find((t) => t.id === sel) ?? group.tracks[0];
+  }
+
+  function renderTrackDetails(track: TrackUpload) {
+    return (
+      <>
+        <div className="release-card__details">
+          <div className="release-card__row">
+            <span>Release Date</span>
+            <span>{new Date(track.releaseDate).toLocaleDateString()}</span>
+          </div>
+          <div className="release-card__row">
+            <span>Genre</span>
+            <span>{track.genre}</span>
+          </div>
+          {track.upcCode && (
+            <div className="release-card__row">
+              <span>UPC</span>
+              <span className="text-mono">{track.upcCode}</span>
+            </div>
+          )}
+          {track.isrcCode && (
+            <div className="release-card__row">
+              <span>ISRC</span>
+              <span className="text-mono">{track.isrcCode}</span>
+            </div>
+          )}
+          {track.releaseLink && (
+            <div className="release-card__row">
+              <span>Link</span>
+              <a href={track.releaseLink} target="_blank" rel="noopener noreferrer" className="dash-link">
+                Open →
+              </a>
+            </div>
+          )}
+        </div>
+
+        <div className="release-card__platforms">
+          {track.platforms.map((p) => (
+            <span key={p} className="release-card__platform">{p}</span>
+          ))}
+        </div>
+
+        {track.reviewNote && (
+          <div className="dash-review-note release-card__note">
+            <strong>Review note:</strong> {track.reviewNote}
+          </div>
+        )}
+
+        <div className="release-card__footer">
+          <span className="text-muted text-sm">Submitted {new Date(track.submittedAt).toLocaleDateString()}</span>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="dash-page">
@@ -68,64 +162,50 @@ export default function ArtistReleasesPage() {
         </div>
       ) : (
         <div className="releases-grid">
-          {filtered.map((track) => (
-            <div key={track.id} className="release-card">
-              <div className="release-card__header">
-                <div>
-                  <div className="release-card__title">{track.title}</div>
-                  {track.featuring && <div className="release-card__feat">ft. {track.featuring}</div>}
-                </div>
-                <span className={`dash-badge dash-badge--${track.status}`}>{track.status}</span>
-              </div>
-
-              <div className="release-card__details">
-                <div className="release-card__row">
-                  <span>Release Date</span>
-                  <span>{new Date(track.releaseDate).toLocaleDateString()}</span>
-                </div>
-                <div className="release-card__row">
-                  <span>Genre</span>
-                  <span>{track.genre}</span>
-                </div>
-                {track.upcCode && (
-                  <div className="release-card__row">
-                    <span>UPC</span>
-                    <span className="text-mono">{track.upcCode}</span>
+          {groups.map((g) => {
+            if (g.kind === 'single') {
+              const track = g.track;
+              return (
+                <div key={track.id} className="release-card">
+                  <div className="release-card__header">
+                    <div>
+                      <div className="release-card__title">{track.title}</div>
+                      {track.featuring && <div className="release-card__feat">ft. {track.featuring}</div>}
+                    </div>
+                    <span className={`dash-badge dash-badge--${track.status}`}>{track.status}</span>
                   </div>
-                )}
-                {track.isrcCode && (
-                  <div className="release-card__row">
-                    <span>ISRC</span>
-                    <span className="text-mono">{track.isrcCode}</span>
-                  </div>
-                )}
-                {track.releaseLink && (
-                  <div className="release-card__row">
-                    <span>Link</span>
-                    <a href={track.releaseLink} target="_blank" rel="noopener noreferrer" className="dash-link">
-                      Open →
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              <div className="release-card__platforms">
-                {track.platforms.map((p) => (
-                  <span key={p} className="release-card__platform">{p}</span>
-                ))}
-              </div>
-
-              {track.reviewNote && (
-                <div className="dash-review-note release-card__note">
-                  <strong>Review note:</strong> {track.reviewNote}
+                  {renderTrackDetails(track)}
                 </div>
-              )}
+              );
+            }
 
-              <div className="release-card__footer">
-                <span className="text-muted text-sm">Submitted {new Date(track.submittedAt).toLocaleDateString()}</span>
+            const group = g;
+            const selectedTrack = selectedTrackFor(group);
+            return (
+              <div key={group.albumId} className="release-card">
+                <div className="release-card__header">
+                  <div>
+                    <div className="release-card__title">💿 {group.albumTitle}</div>
+                    <div className="release-card__feat">{group.albumType} · {group.tracks.length} tracks</div>
+                  </div>
+                  <span className={`dash-badge dash-badge--${selectedTrack.status}`}>{selectedTrack.status}</span>
+                </div>
+
+                <select
+                  className="dash-input"
+                  value={selectedTrack.id}
+                  onChange={(e) => setAlbumSelection((s) => ({ ...s, [group.albumId]: e.target.value }))}
+                >
+                  {group.tracks.map((t, i) => (
+                    <option key={t.id} value={t.id}>{i + 1}. {t.title}</option>
+                  ))}
+                </select>
+
+                {selectedTrack.featuring && <div className="release-card__feat">ft. {selectedTrack.featuring}</div>}
+                {renderTrackDetails(selectedTrack)}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -109,13 +109,22 @@ class TrackController
         $coverUrl = $this->storeCover($id, $_FILES['cover']['tmp_name'], $coverExt);
         $audioUrl = $this->storeAudio($id, $validAudio);
 
+        $albumId = trim($_POST['albumId'] ?? '');
+        $albumTitle = trim($_POST['albumTitle'] ?? '');
+        $albumType = trim($_POST['albumType'] ?? '');
+        $details = $this->sanitizedDetails($_POST['details'] ?? '');
+
         $stmt = $pdo->prepare(
-            'INSERT INTO tracks (id, artist_id, title, featuring, genre, release_date, cover_art_url, audio_file_url, platforms)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO tracks (id, artist_id, title, featuring, genre, release_date, cover_art_url, audio_file_url, platforms, album_id, album_title, album_type, submission_json)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $id, $artistId, $title, $featuring !== '' ? $featuring : null, $genre, $releaseDate,
             $coverUrl, $audioUrl, json_encode($platforms),
+            $albumId !== '' ? $albumId : null,
+            $albumTitle !== '' ? $albumTitle : null,
+            $albumType !== '' ? $albumType : null,
+            $details !== [] ? json_encode($details) : null,
         ]);
 
         Response::json($this->findTrack($id), 201);
@@ -186,6 +195,42 @@ class TrackController
         Response::json($track);
     }
 
+    // Lets an artist clean up their own still-pending submission — used by the
+    // upload form to roll back songs already saved for an album when a later
+    // song in the same batch fails, so a failed multi-song upload never leaves
+    // a broken partial album behind. Admins may delete any track for general cleanup.
+    public function destroy(array $args): void
+    {
+        $pdo = Database::pdo();
+        $user = Auth::requireUser($pdo);
+        $row = $this->findTrackRow($args['id']);
+
+        if ($row === null) {
+            throw new HttpException('Track not found', 404);
+        }
+        if ($user['role'] !== 'admin') {
+            if ($user['id'] !== $row['artist_id']) {
+                throw new HttpException('Forbidden', 403);
+            }
+            if ($row['status'] !== 'pending') {
+                throw new HttpException('Only a pending submission can be deleted.', 403);
+            }
+        }
+
+        foreach ([$row['cover_art_url'], $row['audio_file_url']] as $relativePath) {
+            if ($relativePath === null) {
+                continue;
+            }
+            $path = self::STORAGE_DIR . '/' . $relativePath;
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
+
+        $pdo->prepare('DELETE FROM tracks WHERE id = ?')->execute([$args['id']]);
+        Response::json(['success' => true]);
+    }
+
     public function audio(array $args): void
     {
         $pdo = Database::pdo();
@@ -215,6 +260,124 @@ class TrackController
         header('Content-Disposition: attachment; filename="' . basename($path) . '"');
         header('Content-Length: ' . (string) filesize($path));
         readfile($path);
+    }
+
+    // Cover art is otherwise served as a static file under /storage/ (no CORS headers,
+    // since Apache serves it directly rather than through this PHP app) — fine for an
+    // <img> tag, but a cross-origin fetch()/download attribute silently fails. This
+    // endpoint routes through the app so Content-Disposition can force a real download.
+    public function cover(array $args): void
+    {
+        $pdo = Database::pdo();
+        $user = Auth::requireUser($pdo);
+        $row = $this->findTrackRow($args['id']);
+
+        if ($row === null || $row['cover_art_url'] === null) {
+            throw new HttpException('Cover art not found', 404);
+        }
+        if ($user['role'] !== 'admin' && $user['id'] !== $row['artist_id']) {
+            throw new HttpException('Forbidden', 403);
+        }
+
+        $path = self::STORAGE_DIR . '/' . $row['cover_art_url'];
+        if (!is_file($path)) {
+            throw new HttpException('Cover art not found', 404);
+        }
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $mime = match ($ext) {
+            'png' => 'image/png',
+            'webp' => 'image/webp',
+            default => 'image/jpeg',
+        };
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+        header('Content-Length: ' . (string) filesize($path));
+        readfile($path);
+    }
+
+    // Free-text key -> max length. Anything not listed here is dropped, so a client
+    // can't stash arbitrary data in the row.
+    private const DETAIL_TEXT_FIELDS = [
+        'stageName' => 200, 'realName' => 200, 'country' => 120, 'whatsapp' => 60,
+        'producer' => 200, 'profileLink' => 500, 'featuringProfileLink' => 500, 'notes' => 2000,
+    ];
+    private const DETAIL_YES_NO_FIELDS = ['previouslyReleased', 'featuringPreviouslyReleased'];
+
+    /** @return array<string, string> */
+    private function sanitizedDetails(mixed $raw): array
+    {
+        if (!is_string($raw) || $raw === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach (self::DETAIL_TEXT_FIELDS as $key => $maxLength) {
+            if (isset($decoded[$key]) && is_string($decoded[$key])) {
+                $value = trim($decoded[$key]);
+                if ($value !== '') {
+                    $clean[$key] = mb_substr($value, 0, $maxLength);
+                }
+            }
+        }
+        foreach (self::DETAIL_YES_NO_FIELDS as $key) {
+            if (isset($decoded[$key]) && in_array($decoded[$key], ['yes', 'no'], true)) {
+                $clean[$key] = $decoded[$key];
+            }
+        }
+        return $clean;
+    }
+
+    public function albumAudio(array $args): void
+    {
+        $pdo = Database::pdo();
+        $user = Auth::requireUser($pdo);
+
+        $stmt = $pdo->prepare('SELECT * FROM tracks WHERE album_id = ? AND audio_file_url IS NOT NULL ORDER BY submitted_at ASC, id ASC');
+        $stmt->execute([$args['albumId']]);
+        $rows = $stmt->fetchAll();
+
+        if ($rows === []) {
+            throw new HttpException('Album audio not found', 404);
+        }
+        // Every row in an album belongs to one artist (they're created in a single submit).
+        if ($user['role'] !== 'admin' && $user['id'] !== $rows[0]['artist_id']) {
+            throw new HttpException('Forbidden', 403);
+        }
+
+        $tmp = tempnam(sys_get_temp_dir(), 'album');
+        $zip = new ZipArchive();
+        if ($zip->open($tmp, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new HttpException('Failed to create archive.', 500);
+        }
+        $added = 0;
+        foreach ($rows as $i => $row) {
+            $path = self::STORAGE_DIR . '/' . $row['audio_file_url'];
+            if (!is_file($path)) {
+                continue;
+            }
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            $zip->addFile($path, sprintf('%02d-%s.%s', $i + 1, $this->sanitizeZipEntryName($row['title']), $ext));
+            $added++;
+        }
+        $zip->close();
+
+        if ($added === 0) {
+            unlink($tmp);
+            throw new HttpException('Album audio not found', 404);
+        }
+
+        $name = $this->sanitizeZipEntryName($rows[0]['album_title'] ?? 'album') . '.zip';
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . $name . '"');
+        header('Content-Length: ' . (string) filesize($tmp));
+        readfile($tmp);
+        unlink($tmp);
     }
 
     private function validatedExtension(string $filename, array $allowed, string $errorMessage): string
@@ -314,6 +477,10 @@ class TrackController
             'submittedAt' => $row['submitted_at'],
             ...($row['review_note'] !== null ? ['reviewNote' => $row['review_note']] : []),
             'platforms' => json_decode($row['platforms'], true),
+            ...($row['album_id'] !== null ? ['albumId' => $row['album_id']] : []),
+            ...($row['album_title'] !== null ? ['albumTitle' => $row['album_title']] : []),
+            ...($row['album_type'] !== null ? ['albumType' => $row['album_type']] : []),
+            ...(($row['submission_json'] ?? null) !== null ? ['details' => json_decode($row['submission_json'], true)] : []),
         ];
     }
 }

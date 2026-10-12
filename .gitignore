@@ -36,6 +36,9 @@ api/storage/beats/audio/*
 !api/storage/productions/audio/.gitkeep
 !api/storage/beats/audio/.gitkeep
 
+api/storage/distro_releases/covers/*
+!api/storage/distro_releases/covers/.gitkeep
+
 # The initial seed images (migrated from the old hardcoded Spotlight page
 # content) are force-added and tracked despite this rule — this only keeps
 # *future* admin-uploaded spotlight images out of git, same as productions/beats.

@@ -1,9 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import { NAV } from '../../data';
-
 export default function Footer() {
-  const navigate = useNavigate();
-
   return (
     <footer
       className="border-t pt-16 sm:pt-24 px-5 sm:px-14 pb-10"
@@ -14,36 +9,7 @@ export default function Footer() {
     >
       <div className="max-w-[1440px] mx-auto">
         {/* Grid */}
-        <div className="grid grid-cols-1 min-[500px]:grid-cols-2 min-[800px]:grid-cols-3 gap-10 sm:gap-16">
-          {/* Navigate */}
-          <div>
-            <h5
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                letterSpacing: '0.22em',
-                color: 'var(--color-muted)',
-                textTransform: 'uppercase',
-                marginBottom: '20px',
-              }}
-            >
-              Navigate
-            </h5>
-            <ul className="list-none">
-              {NAV.map(n => (
-                <li key={n.slug} className="mb-3">
-                  <button
-                    onClick={() => navigate(n.slug === 'home' ? '/' : `/${n.slug}`)}
-                    className="transition-colors duration-250 hover:text-[var(--color-gold)] cursor-pointer"
-                    style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: 'var(--color-ink)' }}
-                  >
-                    {n.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
+        <div className="grid grid-cols-1 min-[500px]:grid-cols-2 gap-10 sm:gap-16">
           {/* Contact */}
           <div>
             <h5

@@ -81,15 +81,51 @@ class PricingController
         return ['currencyCode' => $currencyCode, 'rate' => (float) $targetRate / (float) $baseRate];
     }
 
+    private const PLAN_GROUPS = ['distro-basic', 'distro-bundle', 'studio', 'akiib'];
+    private const PLAN_COLUMNS = 'id, label, price, features_json, group_key, featured, sort_order, updated_at';
+
     public function plansIndex(): void
     {
-        $rows = Database::pdo()->query('SELECT id, label, price, updated_at FROM pricing_plans')->fetchAll();
-        Response::json(array_map(fn (array $row) => [
-            'id' => $row['id'],
-            'label' => $row['label'],
-            'price' => (float) $row['price'],
-            'updatedAt' => $row['updated_at'],
-        ], $rows));
+        $rows = Database::pdo()->query('SELECT ' . self::PLAN_COLUMNS . ' FROM pricing_plans ORDER BY group_key, sort_order')->fetchAll();
+        Response::json(array_map(fn (array $row) => self::formatPlan($row), $rows));
+    }
+
+    public function plansCreate(): void
+    {
+        $pdo = Database::pdo();
+        Auth::requireAdmin($pdo);
+
+        $body = Request::body();
+        $label = is_string($body['label'] ?? null) ? trim($body['label']) : '';
+        $price = $body['price'] ?? null;
+        $groupKey = is_string($body['groupKey'] ?? null) ? trim($body['groupKey']) : '';
+        $featured = !empty($body['featured']);
+
+        if ($label === '') {
+            throw new HttpException('label is required.', 422);
+        }
+        if (!is_numeric($price) || (float) $price <= 0) {
+            throw new HttpException('price must be a positive number.', 422);
+        }
+        if (!in_array($groupKey, self::PLAN_GROUPS, true)) {
+            throw new HttpException('groupKey must be one of: ' . implode(', ', self::PLAN_GROUPS), 422);
+        }
+
+        $features = $this->normalizedFeatures($body['features'] ?? []);
+
+        $maxSort = $pdo->prepare('SELECT COALESCE(MAX(sort_order), -1) FROM pricing_plans WHERE group_key = ?');
+        $maxSort->execute([$groupKey]);
+        $sortOrder = (int) $maxSort->fetchColumn() + 1;
+
+        $id = $groupKey . '-' . bin2hex(random_bytes(5));
+
+        $stmt = $pdo->prepare(
+            'INSERT INTO pricing_plans (id, label, price, features_json, group_key, featured, sort_order)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([$id, $label, (float) $price, json_encode($features), $groupKey, $featured ? 1 : 0, $sortOrder]);
+
+        Response::json($this->findPlan($id), 201);
     }
 
     public function plansUpdate(array $args): void
@@ -98,13 +134,48 @@ class PricingController
         Auth::requireAdmin($pdo);
 
         $body = Request::body();
-        $price = $body['price'] ?? null;
-        if (!is_numeric($price) || (float) $price <= 0) {
-            throw new HttpException('price must be a positive number.', 422);
+        $hasLabel = array_key_exists('label', $body);
+        $hasPrice = array_key_exists('price', $body);
+        $hasFeatures = array_key_exists('features', $body);
+        $hasFeatured = array_key_exists('featured', $body);
+        if (!$hasLabel && !$hasPrice && !$hasFeatures && !$hasFeatured) {
+            throw new HttpException('label, price, features, or featured must be provided.', 422);
         }
 
-        $stmt = $pdo->prepare('UPDATE pricing_plans SET price = ? WHERE id = ?');
-        $stmt->execute([(float) $price, $args['id']]);
+        $setClauses = [];
+        $params = [];
+
+        if ($hasLabel) {
+            $label = is_string($body['label']) ? trim($body['label']) : '';
+            if ($label === '') {
+                throw new HttpException('label must not be empty.', 422);
+            }
+            $setClauses[] = 'label = ?';
+            $params[] = $label;
+        }
+
+        if ($hasPrice) {
+            $price = $body['price'];
+            if (!is_numeric($price) || (float) $price <= 0) {
+                throw new HttpException('price must be a positive number.', 422);
+            }
+            $setClauses[] = 'price = ?';
+            $params[] = (float) $price;
+        }
+
+        if ($hasFeatures) {
+            $setClauses[] = 'features_json = ?';
+            $params[] = json_encode($this->normalizedFeatures($body['features']));
+        }
+
+        if ($hasFeatured) {
+            $setClauses[] = 'featured = ?';
+            $params[] = !empty($body['featured']) ? 1 : 0;
+        }
+
+        $params[] = $args['id'];
+        $stmt = $pdo->prepare('UPDATE pricing_plans SET ' . implode(', ', $setClauses) . ' WHERE id = ?');
+        $stmt->execute($params);
         if ($stmt->rowCount() === 0) {
             $exists = $pdo->prepare('SELECT 1 FROM pricing_plans WHERE id = ?');
             $exists->execute([$args['id']]);
@@ -113,16 +184,56 @@ class PricingController
             }
         }
 
-        $row = $pdo->prepare('SELECT id, label, price, updated_at FROM pricing_plans WHERE id = ?');
-        $row->execute([$args['id']]);
-        $plan = $row->fetch();
+        Response::json($this->findPlan($args['id']));
+    }
 
-        Response::json([
-            'id' => $plan['id'],
-            'label' => $plan['label'],
-            'price' => (float) $plan['price'],
-            'updatedAt' => $plan['updated_at'],
-        ]);
+    public function plansDestroy(array $args): void
+    {
+        $pdo = Database::pdo();
+        Auth::requireAdmin($pdo);
+
+        $stmt = $pdo->prepare('DELETE FROM pricing_plans WHERE id = ?');
+        $stmt->execute([$args['id']]);
+        if ($stmt->rowCount() === 0) {
+            throw new HttpException('Pricing plan not found', 404);
+        }
+
+        Response::json(['success' => true]);
+    }
+
+    /** @return list<string> */
+    private function normalizedFeatures(mixed $features): array
+    {
+        if (!is_array($features) || array_is_list($features) === false) {
+            throw new HttpException('features must be an array of strings.', 422);
+        }
+        return array_values(array_filter(array_map(
+            fn ($f) => is_string($f) ? trim($f) : null,
+            $features
+        ), fn ($f) => $f !== null && $f !== ''));
+    }
+
+    private function findPlan(string $id): ?array
+    {
+        $stmt = Database::pdo()->prepare('SELECT ' . self::PLAN_COLUMNS . ' FROM pricing_plans WHERE id = ?');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        return $row === false ? null : self::formatPlan($row);
+    }
+
+    private static function formatPlan(array $row): array
+    {
+        $features = json_decode($row['features_json'] ?? '[]', true);
+        return [
+            'id' => $row['id'],
+            'label' => $row['label'],
+            'price' => (float) $row['price'],
+            'features' => is_array($features) ? array_values($features) : [],
+            'groupKey' => $row['group_key'],
+            'featured' => (bool) $row['featured'],
+            'sortOrder' => (int) $row['sort_order'],
+            'updatedAt' => $row['updated_at'],
+        ];
     }
 
     private function clientIp(): ?string

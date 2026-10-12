@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/reports',       label: 'Reports',         shortLabel: 'Reports', icon: '◫' },
   { to: '/admin/notifications', label: 'Notifications',   shortLabel: 'Alerts',  icon: '◎' },
   { to: '/admin/productions',   label: 'Productions',     shortLabel: 'Songs',   icon: '♫' },
+  { to: '/admin/distro-releases', label: 'Distro Releases', shortLabel: 'Releases', icon: '▶' },
   { to: '/admin/beats',         label: 'Beats',           shortLabel: 'Beats',   icon: '●' },
   { to: '/admin/price-list', label: 'Price List', shortLabel: 'Prices',   icon: '$' },
   { to: '/admin/spotlight',     label: 'Spotlight',       shortLabel: 'Spotlight', icon: '✦' },

@@ -35,20 +35,26 @@
   --color-gold-deep: #8a6e3d;
 }
 
-/* ── Base reset ── */
-*, *::before, *::after { box-sizing: border-box; }
-html, body {
-  background: #0b0907;
-  color: #f4ecdc;
-  font-family: 'Archivo', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ── Base reset ──
+   Layered (not left bare) so @layer components rules like .dash-toggle can
+   reliably override `button { background: none }` etc. — unlayered CSS always
+   beats layered CSS regardless of source order, which silently ate the
+   toggle's background before this was layered. */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    background: #0b0907;
+    color: #f4ecdc;
+    font-family: 'Archivo', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body { margin: 0; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: #c9a667; color: #0b0907; }
 }
-body { margin: 0; overflow-x: hidden; }
-a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
-img { display: block; max-width: 100%; }
-::selection { background: #c9a667; color: #0b0907; }
 
 /* ── Keyframes ── */
 @keyframes marquee {
@@ -461,11 +467,12 @@ img { display: block; max-width: 100%; }
     width: 40px; height: 22px;
     border-radius: 11px;
     position: relative;
-    transition: background 0.25s;
+    transition: background 0.25s, border-color 0.25s;
     flex-shrink: 0;
+    border: 1px solid var(--color-line);
   }
-  .dash-toggle--on  { background: var(--color-gold); }
-  .dash-toggle--off { background: var(--color-muted-2); }
+  .dash-toggle--on  { background: var(--color-gold); border-color: var(--color-gold); }
+  .dash-toggle--off { background: var(--color-muted-2); border-color: var(--color-muted-2); }
   .dash-toggle__knob {
     position: absolute;
     top: 3px; left: 3px;
@@ -1079,7 +1086,8 @@ img { display: block; max-width: 100%; }
     .dash-panel { padding: 12px; }
     .stat-card { padding: 14px; }
     .stat-card__value { font-size: 20px; }
-    .dash-page__title { font-size: 20px !important; }
+    .dash-page__title { font-size: 18px !important; }
+    .dash-page__sub { font-size: 13px; }
     /* Topbar tighter on tiny screens */
     .dash-topbar { padding: 0 14px; }
     /* Hide avatar column in artists table on tiny screens */
@@ -1087,6 +1095,9 @@ img { display: block; max-width: 100%; }
     /* Event card: stack on tiny screens */
     .event-card { flex-direction: column; }
     /* Release card details: smaller text */
+    .release-card__title { font-size: 14px; }
     .release-card__row { font-size: 12px; }
+    /* Filter tabs: tighter so more fit before scrolling */
+    .dash-filter-tab { font-size: 10px; padding: 5px 10px; }
   }
 }

@@ -2,25 +2,26 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useNotifications } from '../../hooks/useNotifications';
-import { getArtistById } from '../../services/artists.service';
-import { getTracksByArtist } from '../../services/tracks.service';
+import { useArtists } from '../../hooks/useArtists';
+import { useTracks } from '../../hooks/useTracks';
 import { getArtistAnalytics } from '../../services/analytics.service';
 import { getPlanDefinition } from '../../services/subscriptions.service';
-import type { ArtistProfile, TrackUpload, ArtistAnalytics } from '../../types/dashboard';
+import AreaSparkline from '../../components/ui/AreaSparkline';
+import type { ArtistAnalytics } from '../../types/dashboard';
 
 export default function ArtistHomePage() {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { getArtist } = useArtists();
+  const { getTracksForArtist } = useTracks();
 
-  const [artist, setArtist] = useState<ArtistProfile | undefined>(undefined);
-  const [tracks, setTracks] = useState<TrackUpload[]>([]);
+  const artist = user?.artistId ? getArtist(user.artistId) : undefined;
+  const tracks = user?.artistId ? getTracksForArtist(user.artistId) : [];
   const [analytics, setAnalytics] = useState<ArtistAnalytics | undefined>(undefined);
   const planDef = useMemo(() => artist ? getPlanDefinition(artist.subscription.plan) : undefined, [artist]);
 
   useEffect(() => {
     if (!user?.artistId) return;
-    void getArtistById(user.artistId).then(setArtist);
-    void getTracksByArtist(user.artistId).then(setTracks);
     void getArtistAnalytics(user.artistId).then(setAnalytics);
   }, [user]);
 
@@ -123,6 +124,15 @@ export default function ArtistHomePage() {
           <div className="stat-card__value">{unreadCount}</div>
           <div className="stat-card__note">Unread</div>
         </div>
+      </div>
+
+      {/* Monthly streams chart */}
+      <div className="dash-panel">
+        <div className="dash-panel__header">
+          <h2 className="dash-panel__title">Monthly Streams</h2>
+          <Link to="/artist/analytics" className="dash-panel__link">View full analytics →</Link>
+        </div>
+        <AreaSparkline data={analytics?.monthly ?? []} />
       </div>
 
       {/* Notifications */}

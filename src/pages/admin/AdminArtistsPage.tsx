@@ -1,24 +1,26 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllArtists, setUploadAccess, approveArtist, deleteArtist } from '../../services/artists.service';
+import { setUploadAccess, setCopyrightFlag, approveArtist, deleteArtist } from '../../services/artists.service';
 import { createInvite } from '../../services/invites.service';
+import { useArtists } from '../../hooks/useArtists';
 import AddArtistForm from '../../components/admin/AddArtistForm';
-import type { ArtistProfile } from '../../types/dashboard';
 
 export default function AdminArtistsPage() {
-  const [artists, setArtists] = useState<ArtistProfile[]>([]);
+  const { artists, isLoading, refreshArtists, updateArtistInCache, addArtistToCache, removeArtistFromCache } = useArtists();
   const [search, setSearch]           = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'expired'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'active' | 'expired'>('all');
   const [showAddForm, setShowAddForm] = useState(false);
   const [inviteLink, setInviteLink] = useState('');
   const [inviteCopied, setInviteCopied] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    void getAllArtists().then(setArtists);
-  }, []);
-
-  async function refreshArtists() {
-    setArtists(await getAllArtists());
+  async function handleRefresh() {
+    setRefreshing(true);
+    try {
+      await refreshArtists();
+    } finally {
+      setRefreshing(false);
+    }
   }
 
   async function copyInviteLink() {
@@ -44,15 +46,17 @@ export default function AdminArtistsPage() {
   }
 
   async function handleApprove(id: string) {
-    await approveArtist(id);
-    await refreshArtists();
+    const updated = await approveArtist(id);
+    if (updated) updateArtistInCache(id, updated);
   }
 
   async function handleReject(id: string) {
     if (!window.confirm('Reject and delete this pending account?')) return;
     await deleteArtist(id);
-    await refreshArtists();
+    removeArtistFromCache(id);
   }
+
+  const pendingCount = useMemo(() => artists.filter((a) => a.status === 'pending').length, [artists]);
 
   const filtered = useMemo(() => {
     let list = artists;
@@ -60,15 +64,32 @@ export default function AdminArtistsPage() {
       const q = search.toLowerCase();
       list = list.filter((a) => a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q));
     }
-    if (filterStatus !== 'all') list = list.filter((a) => a.subscription.status === filterStatus);
-    return list;
+    if (filterStatus === 'pending') {
+      list = list.filter((a) => a.status === 'pending');
+    } else if (filterStatus !== 'all') {
+      list = list.filter((a) => a.subscription.status === filterStatus);
+    }
+    // Pending approvals surface first regardless of filter, so they're never buried below
+    // a long list of already-active artists.
+    return [...list].sort((a, b) => {
+      if (a.status === 'pending' && b.status !== 'pending') return -1;
+      if (a.status !== 'pending' && b.status === 'pending') return 1;
+      return 0;
+    });
   }, [artists, search, filterStatus]);
 
   async function toggleAccess(artistId: string) {
     const artist = artists.find((a) => a.id === artistId);
     if (!artist) return;
-    await setUploadAccess(artistId, artist.uploadAccess === 'granted' ? 'locked' : 'granted');
-    setArtists(await getAllArtists());
+    const updated = await setUploadAccess(artistId, artist.uploadAccess === 'granted' ? 'locked' : 'granted');
+    if (updated) updateArtistInCache(artistId, updated);
+  }
+
+  async function toggleCopyright(artistId: string) {
+    const artist = artists.find((a) => a.id === artistId);
+    if (!artist) return;
+    const updated = await setCopyrightFlag(artistId, artist.copyrightStatus === 'flagged' ? 'clear' : 'flagged');
+    if (updated) updateArtistInCache(artistId, updated);
   }
 
   return (
@@ -81,6 +102,9 @@ export default function AdminArtistsPage() {
           <p className="text-sm text-muted mt-1">{artists.length} registered artists</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <button className="dash-btn dash-btn--ghost" disabled={refreshing || isLoading} onClick={() => void handleRefresh()}>
+            {refreshing ? 'Refreshing…' : '↻ Refresh'}
+          </button>
           <button className="dash-btn dash-btn--ghost" onClick={() => void copyInviteLink()}>
             {inviteCopied ? 'Copied ✓' : 'Copy Invite Link'}
           </button>
@@ -107,7 +131,7 @@ export default function AdminArtistsPage() {
         <AddArtistForm
           onCancel={() => setShowAddForm(false)}
           onCreated={(artist) => {
-            setArtists((prev) => [...prev, artist]);
+            addArtistToCache(artist);
             setShowAddForm(false);
           }}
         />
@@ -123,13 +147,14 @@ export default function AdminArtistsPage() {
           className="dash-input w-full sm:max-w-xs"
         />
         <div className="flex gap-1 overflow-x-auto pb-0.5 shrink-0">
-          {(['all', 'active', 'expired'] as const).map((f) => (
+          {(['all', 'pending', 'active', 'expired'] as const).map((f) => (
             <button
               key={f}
               className={`dash-filter-tab whitespace-nowrap ${filterStatus === f ? 'dash-filter-tab--active' : ''}`}
               onClick={() => setFilterStatus(f)}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
+              {f === 'pending' && pendingCount > 0 && <span className="dash-filter-tab__count">{pendingCount}</span>}
             </button>
           ))}
         </div>
@@ -145,6 +170,7 @@ export default function AdminArtistsPage() {
               <div className="text-xs text-muted truncate">{artist.email}</div>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {artist.status === 'pending' && <span className="dash-badge dash-badge--pending">Pending Approval</span>}
+                {artist.copyrightStatus === 'flagged' && <span className="dash-badge dash-badge--rejected">⚠ Copyright</span>}
                 <span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span>
                 <span className="dash-badge dash-badge--plan">{artist.subscription.plan}</span>
                 <span className="text-[11px] text-muted">{artist.genre}</span>
@@ -157,13 +183,26 @@ export default function AdminArtistsPage() {
               )}
             </div>
             <div className="flex flex-col items-end gap-2 shrink-0">
-              <button
-                className={`dash-toggle ${artist.uploadAccess === 'granted' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
-                onClick={() => toggleAccess(artist.id)}
-                title={artist.uploadAccess === 'granted' ? 'Lock' : 'Grant'}
-              >
-                <span className="dash-toggle__knob" />
-              </button>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted">Upload</span>
+                <button
+                  className={`dash-toggle ${artist.uploadAccess === 'granted' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
+                  onClick={() => toggleAccess(artist.id)}
+                  title={artist.uploadAccess === 'granted' ? 'Lock' : 'Grant'}
+                >
+                  <span className="dash-toggle__knob" />
+                </button>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted">Copyright</span>
+                <button
+                  className={`dash-toggle ${artist.copyrightStatus === 'flagged' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
+                  onClick={() => toggleCopyright(artist.id)}
+                  title={artist.copyrightStatus === 'flagged' ? 'Clear flag' : 'Flag account'}
+                >
+                  <span className="dash-toggle__knob" />
+                </button>
+              </div>
               <Link to={`/admin/artists/${artist.id}`} className="text-xs text-gold">View →</Link>
             </div>
           </div>
@@ -182,6 +221,7 @@ export default function AdminArtistsPage() {
                 <th>Plan</th>
                 <th>Status</th>
                 <th>Upload</th>
+                <th>Copyright</th>
                 <th>Joined</th>
                 <th>Actions</th>
               </tr>
@@ -201,16 +241,28 @@ export default function AdminArtistsPage() {
                   <td className="text-muted">{artist.genre}</td>
                   <td><span className="dash-badge dash-badge--plan">{artist.subscription.plan}</span></td>
                   <td>
-                    {artist.status === 'pending' ? (
-                      <span className="dash-badge dash-badge--pending">Pending Approval</span>
-                    ) : (
-                      <span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span>
-                    )}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {artist.status === 'pending' ? (
+                        <span className="dash-badge dash-badge--pending">Pending Approval</span>
+                      ) : (
+                        <span className={`dash-badge dash-badge--${artist.subscription.status}`}>{artist.subscription.status}</span>
+                      )}
+                      {artist.copyrightStatus === 'flagged' && <span className="dash-badge dash-badge--rejected">⚠ Copyright</span>}
+                    </div>
                   </td>
                   <td>
                     <button
                       className={`dash-toggle ${artist.uploadAccess === 'granted' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
                       onClick={() => toggleAccess(artist.id)}
+                    >
+                      <span className="dash-toggle__knob" />
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className={`dash-toggle ${artist.copyrightStatus === 'flagged' ? 'dash-toggle--on' : 'dash-toggle--off'}`}
+                      onClick={() => toggleCopyright(artist.id)}
+                      title={artist.copyrightStatus === 'flagged' ? 'Clear flag' : 'Flag account'}
                     >
                       <span className="dash-toggle__knob" />
                     </button>

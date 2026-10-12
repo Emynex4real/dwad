@@ -57,6 +57,7 @@ export default function AddArtistForm({ onCreated, onCancel }: AddArtistFormProp
         country: country.trim(),
         bio: bio.trim(),
         uploadAccess,
+        copyrightStatus: 'clear',
         password,
         socialLinks: {
           ...(spotify.trim() ? { spotify: spotify.trim() } : {}),

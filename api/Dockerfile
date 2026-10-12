@@ -15,6 +15,8 @@ RUN a2enmod rewrite \
 RUN { \
     echo 'upload_max_filesize=200M'; \
     echo 'post_max_size=200M'; \
+    echo 'max_execution_time=300'; \
+    echo 'max_input_time=300'; \
     } > /usr/local/etc/php/conf.d/uploads.ini
 
 # By default PHP errors go to Apache's own error log FILE inside the container,

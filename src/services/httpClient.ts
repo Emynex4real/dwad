@@ -54,3 +54,52 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
 
   return data as T;
 }
+
+// `fetch` has no upload-progress event and can hang indefinitely on a stalled
+// mobile connection with zero feedback to the user — this uses XHR instead,
+// which exposes `upload.onprogress` and lets us enforce a hard timeout so an
+// upload always either finishes or fails, never hangs forever.
+export function uploadFormData<T>(
+  path: string,
+  formData: FormData,
+  onProgress?: (percent: number) => void,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${API_BASE_URL}${path}`);
+    xhr.withCredentials = true;
+    xhr.timeout = 10 * 60 * 1000; // 10 minutes — generous for large audio files on slow mobile connections
+    if (csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken);
+
+    xhr.upload.onprogress = (event) => {
+      if (onProgress && event.lengthComputable) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      let data: unknown;
+      try {
+        data = xhr.responseText ? JSON.parse(xhr.responseText) : null;
+      } catch {
+        data = null;
+      }
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(data as T);
+        return;
+      }
+
+      const message =
+        typeof data === 'object' && data !== null && 'error' in data && typeof data.error === 'string'
+          ? data.error
+          : 'Request failed';
+      reject(new ApiError(message, xhr.status));
+    };
+
+    xhr.onerror = () => reject(new ApiError('Network error — please check your connection and try again.', 0));
+    xhr.ontimeout = () => reject(new ApiError('Upload timed out. Please check your connection and try again.', 0));
+
+    xhr.send(formData);
+  });
+}

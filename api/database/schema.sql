@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS artists (
     avatar_url VARCHAR(255) NULL,
     bio TEXT NULL,
     upload_access ENUM('granted', 'locked') NOT NULL DEFAULT 'granted',
+    copyright_status ENUM('clear', 'flagged') NOT NULL DEFAULT 'clear',
     status ENUM('pending', 'active') NOT NULL DEFAULT 'active',
     payout_method ENUM('bank_transfer', 'paypal', 'mobile_money') NULL,
     payout_details TEXT NULL,
@@ -105,6 +106,18 @@ CREATE TABLE IF NOT EXISTS tracks (
     submitted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     review_note TEXT NULL,
     platforms JSON NOT NULL,
+    -- Denormalized album grouping — set only when this track was submitted as
+    -- part of a multi-song album/EP upload (see ArtistUploadPage's album flow).
+    -- No separate `albums` table: every song is still its own reviewable track
+    -- row, these three columns just let the admin UI cluster/label them.
+    album_id VARCHAR(64) NULL,
+    album_title VARCHAR(200) NULL,
+    album_type VARCHAR(20) NULL,
+    -- Everything else the artist typed into the upload form (real name, country,
+    -- WhatsApp, producer, "released before?" links, notes...). One JSON column so a
+    -- new form field never needs another migration; keys are whitelisted in
+    -- TrackController::sanitizedDetails().
+    submission_json JSON NULL,
     FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
 );
 
@@ -174,6 +187,21 @@ CREATE TABLE IF NOT EXISTS report_pending_rows (
     FOREIGN KEY (resolved_artist_id) REFERENCES artists(id) ON DELETE SET NULL
 );
 
+-- Learned from manually resolving an 'unmatched' pending row: remembers that a
+-- distributor's exact spelling of an artist's name (credit_text_normalized) belongs to
+-- a specific artist, so the next report using that same spelling matches automatically
+-- instead of falling into pending review again.
+CREATE TABLE IF NOT EXISTS report_credit_aliases (
+    id VARCHAR(40) PRIMARY KEY,
+    credit_text VARCHAR(255) NOT NULL,
+    credit_text_normalized VARCHAR(255) NOT NULL,
+    artist_id VARCHAR(40) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY report_credit_aliases_normalized_unique (credit_text_normalized),
+    FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS settings (
     id TINYINT PRIMARY KEY DEFAULT 1,
     gbp_to_usd_rate DECIMAL(10, 4) NOT NULL DEFAULT 1.2700,
@@ -199,32 +227,40 @@ CREATE TABLE IF NOT EXISTS currency_rates (
 );
 
 -- Admin-editable USD prices shown on the Distro/Studio/AkiibStudio marketing
--- pages. Only the price itself is editable here — plan names, feature lists
--- etc. stay hardcoded in each page's own JSX. Every visitor sees these
--- converted to their local currency via /pricing/localized's live rate.
+-- pages. Every field here — price, features, label, which section it renders
+-- in (group_key), whether it gets the "Most Popular" badge (featured), and
+-- its position (sort_order) — drives those pages directly, so adding or
+-- deleting a row here adds or removes a card live. `label` is shown verbatim
+-- on both the admin Price List and the public card, so keep it short (e.g.
+-- "Gold", "Package 2"). Every visitor sees the price converted to their local
+-- currency via /pricing/localized's live rate.
 CREATE TABLE IF NOT EXISTS pricing_plans (
     id VARCHAR(60) PRIMARY KEY,
     label VARCHAR(150) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
+    features_json JSON NOT NULL,
+    group_key VARCHAR(40) NOT NULL,
+    featured TINYINT(1) NOT NULL DEFAULT 0,
+    sort_order INT NOT NULL DEFAULT 0,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO pricing_plans (id, label, price) VALUES
-('distro-a', 'Distro — A (1 Song Upload)', 10.00),
-('distro-b', 'Distro — B (1 Song Upload Pro)', 15.00),
-('distro-c', 'Distro — C (Unlimited)', 30.00),
-('distro-gold', 'Distro — Gold', 150.00),
-('distro-diamond', 'Distro — Diamond', 500.00),
-('distro-platinum', 'Distro — Platinum', 1000.00),
-('studio-package-1', 'Studio — Package 1', 150.00),
-('studio-package-2', 'Studio — Package 2', 300.00),
-('studio-package-3', 'Studio — Package 3', 500.00),
-('studio-package-4', 'Studio — Package 4', 1000.00),
-('akiib-promo', 'Akiib Studio — Promo', 35.00),
-('akiib-package-1', 'Akiib Studio — Package 1', 135.00),
-('akiib-package-2', 'Akiib Studio — Package 2', 200.00),
-('akiib-package-3', 'Akiib Studio — Package 3', 335.00),
-('akiib-package-4', 'Akiib Studio — Package 4', 665.00);
+INSERT INTO pricing_plans (id, label, price, features_json, group_key, featured, sort_order) VALUES
+('distro-a', 'A · 1 Song Upload', 10.00, '["1 song upload","Spotify, Apple Music + all music apps","No TikTok or Instagram upload"]', 'distro-basic', 0, 0),
+('distro-b', 'B · 1 Song Upload Pro', 15.00, '["1 song upload","Spotify, Apple Music + 200 more apps","TikTok, Instagram + all social media apps"]', 'distro-basic', 0, 1),
+('distro-c', 'C · Unlimited', 30.00, '["Unlimited song uploads per year","Spotify, Apple Music + 200 more apps","TikTok, Instagram + all social media apps"]', 'distro-basic', 0, 2),
+('distro-gold', 'Gold', 150.00, '["Unlimited upload a year","All music apps","All social media apps","1 free radio promotion","Free editorial playlist pitching","1 free cover art graphics"]', 'distro-bundle', 0, 0),
+('distro-diamond', 'Diamond', 500.00, '["Unlimited upload a year","All music apps","All social media apps","3 free radio promotions","Free editorial playlist pitching","2 free cover art graphics","10 free web blog placements"]', 'distro-bundle', 0, 1),
+('distro-platinum', 'Platinum', 1000.00, '["Unlimited upload a year","All music apps","All social media apps","5 free radio promotions","Free editorial playlist pitching","5 free cover art graphics","50 free web blog placements","Free promo on TikTok, Instagram & Facebook"]', 'distro-bundle', 0, 2),
+('studio-package-1', 'Package 1', 150.00, '["Beat lease","Recording","Detailed Mixing & Mastering","Live Instruments (Sax, Guitar, Violin…)","Free distribution to streaming platforms"]', 'studio', 0, 0),
+('studio-package-2', 'Package 2', 300.00, '["Beat lease","Recording","Detailed Mixing & Mastering","Live Instruments (Sax, Guitar, Violin…)","Post production enhancements","Free cover art graphics","Free distribution to streaming platforms","Free Radio promotion"]', 'studio', 1, 1),
+('studio-package-3', 'Package 3', 500.00, '["Personal Beat","Recording","Live Instruments (Sax, Guitar, Violin…)","Detailed Mixing & Mastering","Post production enhancements","Free cover art graphics","Free distribution to streaming platforms","Free Radio promotion","Free video performance content","Free social media promotion"]', 'studio', 0, 2),
+('studio-package-4', 'Package 4', 1000.00, '["Personal Beat","Beat lease","Detailed Mixing & Mastering","Live Instruments (Sax, Guitar, Violin…)","Post production enhancements","Free cover art graphics","Free distribution to streaming platforms","Free Radio promotion","Free viral video","Free social media promotion"]', 'studio', 0, 3),
+('akiib-promo', 'Promo', 35.00, '["Ikorodu Studio","Beat lease","Recording, Mixing & Mastering","Terms & conditions apply"]', 'akiib', 0, 0),
+('akiib-package-1', 'Package 1', 135.00, '["Beat lease","Recording","Detailed Mixing & Mastering","Live Instruments (Sax, Guitar, Violin…)","Free distribution to streaming platforms"]', 'akiib', 0, 1),
+('akiib-package-2', 'Package 2', 200.00, '["Beat lease","Recording","Detailed Mixing & Mastering","Live Instruments (Sax, Guitar, Violin…)","Post production enhancements","Free cover art graphics","Free distribution to streaming platforms","Free Radio promotion"]', 'akiib', 1, 2),
+('akiib-package-3', 'Package 3', 335.00, '["Personal Beat","Recording","Live Instruments (Sax, Guitar, Violin…)","Detailed Mixing & Mastering","Post production enhancements","Free cover art graphics","Free distribution to streaming platforms","Free Radio promotion","Free video performance content","Free social media promotion"]', 'akiib', 0, 3),
+('akiib-package-4', 'Package 4', 665.00, '["Ajah & Egbeda Studios","Personal Beat","Beat lease","Detailed Mixing & Mastering","Live Instruments (Sax, Guitar, Violin…)","Post production enhancements","Free cover art graphics","Free distribution to streaming platforms","Free Radio promotion","Free viral video","Free social media promotion"]', 'akiib', 0, 4);
 
 CREATE TABLE IF NOT EXISTS productions (
     id VARCHAR(40) PRIMARY KEY,
@@ -233,6 +269,18 @@ CREATE TABLE IF NOT EXISTS productions (
     cover_art_url VARCHAR(255) NULL,
     audio_file_url VARCHAR(255) NULL,
     spotify_url VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Admin-curated "Released through Dwad" showcase on the Distro page. Distinct
+-- from `tracks` (real artist uploads/reports) — this is a simple manually
+-- curated highlight reel, same shape as `productions` minus the audio file.
+CREATE TABLE IF NOT EXISTS distro_releases (
+    id VARCHAR(60) PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    artist_name VARCHAR(150) NOT NULL,
+    cover_art_url VARCHAR(255) NULL,
+    release_url VARCHAR(500) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

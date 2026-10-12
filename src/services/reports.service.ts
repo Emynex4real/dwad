@@ -25,3 +25,7 @@ export async function resolvePendingReview(id: string, artistId: string): Promis
 export async function skipPendingReview(id: string): Promise<void> {
   await apiFetch(`/reports/pending/${id}/skip`, { method: 'PATCH' });
 }
+
+export async function backfillTracksFromReports(): Promise<{ combinationsChecked: number; tracksCreated: number }> {
+  return apiFetch<{ combinationsChecked: number; tracksCreated: number }>('/reports/backfill-tracks', { method: 'POST' });
+}

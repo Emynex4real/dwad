@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getAllArtists } from '../../services/artists.service';
-import { getAllTracks } from '../../services/tracks.service';
+import { useArtists } from '../../hooks/useArtists';
+import { useTracks } from '../../hooks/useTracks';
 import { getAllSubscriptions } from '../../services/subscriptions.service';
 import { getAllAnalytics } from '../../services/analytics.service';
-import type { ArtistProfile, Subscription, TrackUpload, ArtistAnalytics } from '../../types/dashboard';
+import type { Subscription, ArtistAnalytics } from '../../types/dashboard';
 
 const MONTH_INDEX: Record<string, number> = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
 
@@ -13,15 +13,13 @@ function monthSortKey(label: string): number {
 }
 
 export default function AdminStatsPage() {
-  const [artists, setArtists] = useState<ArtistProfile[]>([]);
+  const { artists } = useArtists();
+  const { tracks } = useTracks();
   const [subs, setSubs]       = useState<Subscription[]>([]);
-  const [tracks, setTracks]   = useState<TrackUpload[]>([]);
   const [analytics, setAnalytics] = useState<ArtistAnalytics[]>([]);
 
   useEffect(() => {
-    void getAllArtists().then(setArtists);
     void getAllSubscriptions().then(setSubs);
-    void getAllTracks().then(setTracks);
     void getAllAnalytics().then(setAnalytics);
   }, []);
 

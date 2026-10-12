@@ -15,6 +15,7 @@ import ayakata       from '../assets/covers/ayahata.jpg';
 // artist photos
 import bellaShmurda  from '../assets/artists/bella-shmurda.jpg';
 import dremo         from '../assets/artists/dremo.jpg';
+import kojoBlack     from '../assets/artists/kojo-black.jpg';
 import zinoleesky    from '../assets/artists/zinoleesky.jpg';
 import samad         from '../assets/artists/artist-6004.webp';
 import raybekah      from '../assets/artists/raybekah.jpg';
@@ -22,12 +23,13 @@ import raybekah      from '../assets/artists/raybekah.jpg';
 // general
 import logoDark      from '../assets/black logo.PNG';
 import logoWhite     from '../assets/new logo.PNG';
-import distroHero    from '../assets/IMG_6223.PNG';
+import distroHero    from '../assets/distro-hero-banner.png';
 import studioMain    from '../assets/studio/console-main.jpg';
 import studioDetail  from '../assets/studio/console-detail.jpg';
 import studioDaw     from '../assets/studio/daw.jpg';
+import productionHero from '../assets/studio/production-hero.jpg';
 
-export { logoDark, logoWhite, distroHero, studioMain, studioDetail, studioDaw };
+export { logoDark, logoWhite, distroHero, studioMain, studioDetail, studioDaw, productionHero };
 
 export const SERVICES: Service[] = [
   {
@@ -76,6 +78,7 @@ export const PROJECTS: Project[] = [
 export const HOF_ARTISTS = [
   { name: 'Bella Shmurda', role: 'Afrobeats · NG',  photo: bellaShmurda, spotify: 'https://open.spotify.com/artist/7kK5badbqOjd8WlT2XWMeM' },
   { name: 'Dremo',         role: 'Hip Hop · NG',    photo: dremo,        spotify: 'https://open.spotify.com/artist/6m0X6OQm6w3h4k7xnh4LeR' },
+  { name: 'Kojo Black',    role: 'Afrobeats · GH',  photo: kojoBlack,    spotify: '' },
   { name: 'Zinoleesky',    role: 'Street Pop · NG', photo: zinoleesky,   spotify: 'https://open.spotify.com/artist/6Kp3KWPiVgi33DkJqo9T4g' },
   { name: 'Samad',         role: 'Afrobeats · NG',  photo: samad,        spotify: 'https://open.spotify.com/artist/0X1sGf1y8XCupQFDUkiPmB' },
   { name: 'Raybekah',      role: 'Afropop · NG',    photo: raybekah,     spotify: 'https://open.spotify.com/artist/0SwPkNmxB2YGHWVJMI8kpW' },

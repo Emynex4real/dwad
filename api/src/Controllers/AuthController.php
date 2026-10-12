@@ -17,7 +17,7 @@ class AuthController
         }
 
         $pdo = Database::pdo();
-        $stmt = $pdo->prepare('SELECT id, email, name, role, status, password_hash FROM artists WHERE email = ?');
+        $stmt = $pdo->prepare('SELECT id, email, name, role, status, copyright_status, password_hash FROM artists WHERE email = ?');
         $stmt->execute([$email]);
         $row = $stmt->fetch();
 
@@ -26,6 +26,9 @@ class AuthController
         }
         if ($row['status'] === 'pending') {
             throw new HttpException('Your account is pending admin approval.', 403);
+        }
+        if ($row['copyright_status'] === 'flagged') {
+            throw new HttpException('Your account has a copyright issue, please contact the admin.', 403);
         }
 
         $ttlDays = Config::get()['auth']['token_ttl_days'];
